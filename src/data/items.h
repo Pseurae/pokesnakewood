@@ -4376,8 +4376,8 @@ const struct Item gItems[] =
         .importance = 1,
         .registrability = TRUE,
         .pocket = POCKET_KEY_ITEMS,
-        .type = ITEM_USE_BAG_MENU,
-        .fieldUseFunc = ItemUseOutOfBattle_CannotUse,
+        .type = ITEM_USE_PBLOCK_CASE,
+        .fieldUseFunc = ItemUseOutOfBattle_TmCase,
     },
 
     [ITEM_BERRY_POUCH] =

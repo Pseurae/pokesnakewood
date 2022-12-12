@@ -203,6 +203,8 @@ void NewGameInitData(void)
     WipeTrainerNameRecords();
     ResetTrainerHillResults();
     ResetContestLinkResults();
+    AddBagItem(364, 1);
+    AddBagItem(290, 1);
 }
 
 static void ResetMiniGamesRecords(void)

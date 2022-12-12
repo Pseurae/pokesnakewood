@@ -60,6 +60,7 @@
 #include "task.h"
 #include "text.h"
 #include "text_window.h"
+#include "tm_case.h"
 #include "trade.h"
 #include "union_room.h"
 #include "window.h"
@@ -341,8 +342,6 @@ static void SlidePartyMenuBoxOneStep(u8);
 static void Task_SlideSelectedSlotsOffscreen(u8);
 static void SwitchPartyMon(void);
 static void Task_SlideSelectedSlotsOnscreen(u8);
-static void CB2_SelectBagItemToGive(void);
-static void CB2_GiveHoldItem(void);
 static void CB2_WriteMailToGiveMon(void);
 static void Task_SwitchHoldItemsPrompt(u8);
 static void Task_GiveHoldItem(u8);
@@ -383,6 +382,7 @@ static void UpdatePartyMonAilmentGfx(u8, struct PartyMenuBox *);
 static u8 GetPartyLayoutFromBattleType(void);
 static void Task_SetSacredAshCB(u8);
 static void CB2_ReturnToBagMenu(void);
+static void CB2_ReturnToTMCaseMenu(void);
 static void Task_DisplayHPRestoredMessage(u8);
 static u16 ItemEffectToMonEv(struct Pokemon *, u8);
 static void ItemEffectToStatString(u8, u8 *);
@@ -3086,7 +3086,7 @@ static void CursorCb_Give(u8 taskId)
     Task_ClosePartyMenu(taskId);
 }
 
-static void CB2_SelectBagItemToGive(void)
+void CB2_SelectBagItemToGive(void)
 {
     if (InBattlePyramid() == FALSE)
         GoToBagMenu(ITEMMENULOCATION_PARTY, POCKETS_COUNT, CB2_GiveHoldItem);
@@ -3094,7 +3094,7 @@ static void CB2_SelectBagItemToGive(void)
         GoToBattlePyramidBagMenu(PYRAMIDBAG_LOC_PARTY, CB2_GiveHoldItem);
 }
 
-static void CB2_GiveHoldItem(void)
+void CB2_GiveHoldItem(void)
 {
     if (gSpecialVar_ItemId == ITEM_NONE)
     {
@@ -4259,7 +4259,10 @@ void CB2_ShowPartyMenuForItemUse(void)
     else
     {
         if (GetPocketByItemId(gSpecialVar_ItemId) == POCKET_TM_HM)
+        {
             msgId = PARTY_MSG_TEACH_WHICH_MON;
+            callback = CB2_ReturnToTMCaseMenu;
+        }
         else
             msgId = PARTY_MSG_USE_ON_WHICH_MON;
 
@@ -4275,6 +4278,11 @@ static void CB2_ReturnToBagMenu(void)
         GoToBagMenu(ITEMMENULOCATION_LAST, POCKETS_COUNT, NULL);
     else
         GoToBattlePyramidBagMenu(PYRAMIDBAG_LOC_PREV, gPyramidBagMenuState.exitCallback);
+}
+
+static void CB2_ReturnToTMCaseMenu(void)
+{
+    OpenTMCase(TMCASE_NA, NULL, 0xFF);
 }
 
 static void Task_SetSacredAshCB(u8 taskId)

@@ -36,6 +36,7 @@
 #include "string_util.h"
 #include "task.h"
 #include "text.h"
+#include "tm_case.h"
 #include "constants/event_bg.h"
 #include "constants/event_objects.h"
 #include "constants/item_effects.h"
@@ -54,6 +55,7 @@ static u8 GetDirectionToHiddenItem(s16, s16);
 static void PlayerFaceHiddenItem(u8);
 static void CheckForHiddenItemsInMapConnection(u8);
 static void Task_OpenRegisteredPokeblockCase(u8);
+static void Task_OpenRegisteredTMCase(u8);
 static void ItemUseOnFieldCB_Bike(u8);
 static void ItemUseOnFieldCB_Rod(u8);
 static void ItemUseOnFieldCB_Itemfinder(u8);
@@ -70,6 +72,7 @@ static void Task_UseRepel(u8);
 static void Task_CloseCantUseKeyItemMessage(u8);
 static void SetDistanceOfClosestHiddenItem(u8, s16, s16);
 static void CB2_OpenPokeblockFromBag(void);
+static void CB2_OpenTMCaseFromBag(void);
 
 // EWRAM variables
 EWRAM_DATA static void(*sItemUseOnFieldCB)(u8 taskId) = NULL;
@@ -629,6 +632,25 @@ void ItemUseOutOfBattle_PokeblockCase(u8 taskId)
     }
 }
 
+void ItemUseOutOfBattle_TmCase(u8 taskId)
+{
+    if (MenuHelpers_IsLinkActive() == TRUE)
+    {
+        DisplayDadsAdviceCannotUseItemMessage(taskId, gTasks[taskId].tUsingRegisteredKeyItem);
+    }
+    else if (gTasks[taskId].tUsingRegisteredKeyItem != TRUE)
+    {
+        gBagMenu->newScreenCallback = CB2_OpenTMCaseFromBag;
+        Task_FadeAndCloseBagMenu(taskId);
+    }
+    else
+    {
+        gFieldCallback = FieldCB_ReturnToFieldNoScript;
+        FadeScreen(FADE_TO_BLACK, 0);
+        gTasks[taskId].func = Task_OpenRegisteredTMCase;
+    }
+}
+
 static void CB2_OpenPokeblockFromBag(void)
 {
     OpenPokeblockCase(PBLOCK_CASE_FIELD, CB2_ReturnToBagMenuPocket);
@@ -640,6 +662,21 @@ static void Task_OpenRegisteredPokeblockCase(u8 taskId)
     {
         CleanupOverworldWindowsAndTilemaps();
         OpenPokeblockCase(PBLOCK_CASE_FIELD, CB2_ReturnToField);
+        DestroyTask(taskId);
+    }
+}
+
+static void CB2_OpenTMCaseFromBag(void)
+{
+    OpenTMCase(TMCASE_FROMFIELD, CB2_BagMenuFromStartMenu, 0);
+}
+
+static void Task_OpenRegisteredTMCase(u8 taskId)
+{
+    if (!gPaletteFade.active)
+    {
+        CleanupOverworldWindowsAndTilemaps();
+        OpenTMCase(TMCASE_FROMFIELD, CB2_ReturnToField, 1);
         DestroyTask(taskId);
     }
 }

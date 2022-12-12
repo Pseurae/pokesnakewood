@@ -35,6 +35,7 @@
 #include "player_pc.h"
 #include "pokemon.h"
 #include "pokemon_summary_screen.h"
+#include "pokemon_storage_system.h"
 #include "scanline_effect.h"
 #include "script.h"
 #include "shop.h"
@@ -44,6 +45,7 @@
 #include "string_util.h"
 #include "task.h"
 #include "text_window.h"
+#include "tm_case.h"
 #include "menu_helpers.h"
 #include "window.h"
 #include "apprentice.h"
@@ -121,6 +123,7 @@ struct TempWallyBag {
     u16 pocket;
 };
 
+static void CB2_BagMenuFromPokeStorage(void);
 static void CB2_Bag(void);
 static bool8 SetupBagMenu(void);
 static void BagMenu_InitBGs(void);
@@ -210,6 +213,9 @@ static void ConfirmToss(u8);
 static void CancelToss(u8);
 static void ConfirmSell(u8);
 static void CancelSell(u8);
+static void CB2_TMCaseGive(void);
+static void CB2_TMCaseGiveToPC(void);
+static void CB2_TMCaseSell(void);
 
 static const struct BgTemplate sBgTemplates_ItemMenu[] =
 {
@@ -561,6 +567,11 @@ void ResetBagScrollPositions(void)
 void CB2_BagMenuFromStartMenu(void)
 {
     GoToBagMenu(ITEMMENULOCATION_FIELD, POCKETS_COUNT, CB2_ReturnToFieldWithOpenMenu);
+}
+
+static void CB2_BagMenuFromPokeStorage(void)
+{
+    GoToBagMenu(ITEMMENULOCATION_PCBOX, POCKETS_COUNT, CB2_ReturnToPokeStorage);
 }
 
 void CB2_BagMenuFromBattle(void)
@@ -2003,6 +2014,11 @@ static void Task_ItemContext_GiveToParty(u8 taskId)
     {
         DisplayItemMessage(taskId, FONT_NORMAL, gText_CantWriteMail, HandleErrorMessage);
     }
+    else if (gSpecialVar_ItemId == ITEM_TM_CASE)
+    {
+        gBagMenu->newScreenCallback = CB2_TMCaseGive;
+        Task_FadeAndCloseBagMenu(taskId);
+    }
     else if (!IsHoldingItemAllowed(gSpecialVar_ItemId))
     {
         CopyItemName(gSpecialVar_ItemId, gStringVar1);
@@ -2024,6 +2040,11 @@ static void Task_ItemContext_GiveToPC(u8 taskId)
 {
     if (ItemIsMail(gSpecialVar_ItemId) == TRUE)
         DisplayItemMessage(taskId, FONT_NORMAL, gText_CantWriteMail, HandleErrorMessage);
+    else if (gSpecialVar_ItemId == ITEM_TM_CASE)
+    {
+        gBagMenu->newScreenCallback = CB2_TMCaseGiveToPC;
+        Task_FadeAndCloseBagMenu(taskId);   
+    }
     else if (gBagPosition.pocket != KEYITEMS_POCKET && !ItemId_GetImportance(gSpecialVar_ItemId))
         gTasks[taskId].func = Task_FadeAndCloseBagMenu;
     else
@@ -2073,6 +2094,11 @@ static void Task_ItemContext_Sell(u8 taskId)
         CopyItemName(gSpecialVar_ItemId, gStringVar2);
         StringExpandPlaceholders(gStringVar4, gText_CantBuyKeyItem);
         DisplayItemMessage(taskId, FONT_NORMAL, gStringVar4, CloseItemMessage);
+    }
+    else if (gSpecialVar_ItemId == ITEM_TM_CASE)
+    {
+        gBagMenu->newScreenCallback = CB2_TMCaseSell;
+        Task_FadeAndCloseBagMenu(taskId);
     }
     else
     {
@@ -2595,4 +2621,19 @@ static void PrintTMHMMoveData(u16 itemId)
 
         CopyWindowToVram(WIN_TMHM_INFO, COPYWIN_GFX);
     }
+}
+
+static void CB2_TMCaseGive(void)
+{
+    OpenTMCase(TMCASE_FROMPARTYGIVE, CB2_SelectBagItemToGive, FALSE);
+}
+
+static void CB2_TMCaseGiveToPC(void)
+{
+    OpenTMCase(TMCASE_FROMPOKEMONSTORAGEPC, CB2_BagMenuFromPokeStorage, FALSE);
+}
+
+static void CB2_TMCaseSell(void)
+{
+    OpenTMCase(TMCASE_FROMMARTSELL, CB2_GoToSellMenu, FALSE);
 }
