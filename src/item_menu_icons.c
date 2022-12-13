@@ -63,31 +63,34 @@ static const union AnimCmd sSpriteAnim_Bag_Closed[] =
 
 static const union AnimCmd sSpriteAnim_Bag_Items[] =
 {
-    ANIMCMD_FRAME(64, 4),
+    ANIMCMD_FRAME(0, 5),
+    ANIMCMD_FRAME(128, 4),
     ANIMCMD_END
 };
 
 static const union AnimCmd sSpriteAnim_Bag_KeyItems[] =
 {
-    ANIMCMD_FRAME(128, 4),
+    ANIMCMD_FRAME(0, 5),
+    ANIMCMD_FRAME(192, 4),
     ANIMCMD_END
 };
 
 static const union AnimCmd sSpriteAnim_Bag_Pokeballs[] =
 {
-    ANIMCMD_FRAME(192, 4),
+    ANIMCMD_FRAME(0, 5),
+    ANIMCMD_FRAME(64, 4),
     ANIMCMD_END
 };
 
 static const union AnimCmd sSpriteAnim_Bag_TMsHMs[] =
 {
-    ANIMCMD_FRAME(256, 4),
+    // ANIMCMD_FRAME(256, 4),
     ANIMCMD_END
 };
 
 static const union AnimCmd sSpriteAnim_Bag_Berries[] =
 {
-    ANIMCMD_FRAME(320, 4),
+    // ANIMCMD_FRAME(320, 4),
     ANIMCMD_END
 };
 
@@ -437,7 +440,7 @@ void RemoveBagSprite(u8 id)
 void AddBagVisualSprite(u8 bagPocketId)
 {
     u8 *spriteId = &gBagMenu->spriteIds[ITEMMENUSPRITE_BAG];
-    *spriteId = CreateSprite(&sBagSpriteTemplate, 68, 66, 0);
+    *spriteId = CreateSprite(&sBagSpriteTemplate, 40, 68, 0);
     SetBagVisualPocketId(bagPocketId, FALSE);
 }
 
@@ -547,7 +550,7 @@ void AddBagItemIconSprite(u16 itemId, u8 id)
         {
             *spriteId = iconSpriteId;
             gSprites[iconSpriteId].x2 = 24;
-            gSprites[iconSpriteId].y2 = 88;
+            gSprites[iconSpriteId].y2 = 140;
         }
     }
 }
@@ -584,7 +587,7 @@ void SetItemMenuSwapLineInvisibility(bool8 invisible)
 
 void UpdateItemMenuSwapLinePos(u8 y)
 {
-    UpdateSwapLineSpritesPos(&gBagMenu->spriteIds[ITEMMENUSPRITE_SWAP_LINE], ITEMMENU_SWAP_LINE_LENGTH | SWAP_LINE_HAS_MARGIN, 120, (y + 1) * 16);
+    UpdateSwapLineSpritesPos(&gBagMenu->spriteIds[ITEMMENUSPRITE_SWAP_LINE], ITEMMENU_SWAP_LINE_LENGTH | SWAP_LINE_HAS_MARGIN, 100, y * 16 + 8);
 }
 
 static void ArrangeBerryGfx(void *src, void *dest)
