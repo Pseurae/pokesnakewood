@@ -1729,6 +1729,11 @@
 	.2byte \quantity
 	.endm
 
+	@ Displays a number input through the textbox and blocks script execution until the user finishes.
+	@ The number is stored in VAR_RESULT.
+	.macro shownuminput
+	.byte 0xe3
+	.endm
 
 @ Supplementary
 
