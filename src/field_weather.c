@@ -251,6 +251,7 @@ static void None_Init(void)
 {
     gWeatherPtr->targetColorMapIndex = 0;
     gWeatherPtr->colorMapStepDelay = 0;
+    Weather_SetBlendCoeffs(7, 13);
 }
 
 static void None_Main(void)
