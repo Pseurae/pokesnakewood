@@ -403,7 +403,9 @@ void CreateSwapLineSprites(u8 *spriteIds, u8 count)
     for (i = 0; i < count; i++)
     {
         spriteIds[i] = CreateSprite(&sSpriteTemplate_SwapLine, i * 16, 0, 0);
-        if (i != 0)
+        if (i == (count - 1))
+            StartSpriteAnim(&gSprites[spriteIds[i]], 2);
+        else if (i > 0)
             StartSpriteAnim(&gSprites[spriteIds[i]], 1);
 
         gSprites[spriteIds[i]].invisible = TRUE;

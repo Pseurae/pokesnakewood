@@ -35,7 +35,7 @@ enum {
     ITEMWIN_COUNT
 };
 
-#define ITEMMENU_SWAP_LINE_LENGTH 8  // Swap line is 8 sprites long
+#define ITEMMENU_SWAP_LINE_LENGTH 9  // Swap line is 9 sprites long
 enum {
     ITEMMENUSPRITE_BAG,
     ITEMMENUSPRITE_BALL,
