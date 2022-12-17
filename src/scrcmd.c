@@ -28,6 +28,7 @@
 #include "menu.h"
 #include "money.h"
 #include "mystery_event_script.h"
+#include "number_input.h"
 #include "palette.h"
 #include "party_menu.h"
 #include "pokemon_storage_system.h"
@@ -2304,4 +2305,17 @@ bool8 ScrCmd_warpwhitefade(struct ScriptContext *ctx)
     DoWhiteFadeWarp();
     ResetInitialPlayerAvatarState();
     return TRUE;
+}
+
+bool8 ScrCmd_shownuminput(struct ScriptContext *ctx)
+{
+    if (ScriptMenu_Number() == TRUE)
+    {
+        ScriptContext_Stop();
+        return TRUE;
+    }
+    else
+    {
+        return FALSE;
+    }
 }

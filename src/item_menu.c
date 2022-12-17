@@ -78,6 +78,7 @@ enum {
 
 enum {
     ACTION_USE,
+    ACTION_OPEN,
     ACTION_TOSS,
     ACTION_REGISTER,
     ACTION_GIVE,
@@ -259,21 +260,22 @@ static const struct ListMenuTemplate sItemListMenu =
     .maxShowed = 0,
     .windowId = WIN_ITEM_LIST,
     .header_X = 0,
-    .item_X = 8,
+    .item_X = 9,
     .cursor_X = 0,
-    .upText_Y = 1,
+    .upText_Y = 2,
     .cursorPal = 2,
     .fillValue = 0,
     .cursorShadowPal = 3,
     .lettersSpacing = 0,
-    .itemVerticalPadding = 0,
+    .itemVerticalPadding = 2,
     .scrollMultiple = LIST_NO_MULTIPLE_SCROLL,
-    .fontId = FONT_NARROW,
+    .fontId = FONT_SHORT,
     .cursorKind = CURSOR_BLACK_ARROW
 };
 
 static const struct MenuAction sItemMenuActions[] = {
     [ACTION_USE]               = {gMenuText_Use,      ItemMenu_UseOutOfBattle},
+    [ACTION_OPEN]              = {gMenuText_Open,     ItemMenu_UseOutOfBattle},
     [ACTION_TOSS]              = {gMenuText_Toss,     ItemMenu_Toss},
     [ACTION_REGISTER]          = {gMenuText_Register, ItemMenu_Register},
     [ACTION_GIVE]              = {gMenuText_Give,     ItemMenu_Give},
@@ -301,6 +303,7 @@ static const u8 sContextMenuItems_KeyItemsPocket[] = {
     ACTION_USE,         ACTION_REGISTER,
     ACTION_DUMMY,       ACTION_CANCEL
 };
+
 
 static const u8 sContextMenuItems_BallsPocket[] = {
     ACTION_GIVE,        ACTION_DUMMY,
@@ -394,7 +397,7 @@ static const u8 sFontColorTable[][3] = {
                             // bgColor, textColor, shadowColor
     [COLORID_NORMAL]      = {TEXT_COLOR_TRANSPARENT, TEXT_COLOR_DARK_GRAY,  TEXT_COLOR_LIGHT_GRAY},
     [COLORID_POCKET_NAME] = {TEXT_COLOR_TRANSPARENT, TEXT_COLOR_WHITE,      TEXT_COLOR_DARK_GRAY},
-    [COLORID_GRAY_CURSOR] = {TEXT_COLOR_TRANSPARENT, TEXT_COLOR_LIGHT_GRAY, TEXT_COLOR_GREEN},
+    [COLORID_GRAY_CURSOR] = {TEXT_COLOR_TRANSPARENT, TEXT_COLOR_LIGHT_GRAY, TEXT_COLOR_DARK_GRAY},
     [COLORID_DESCRIPTION] = {TEXT_COLOR_TRANSPARENT, TEXT_COLOR_WHITE,      TEXT_COLOR_DARK_GRAY},
     [COLORID_TMHM_INFO]   = {TEXT_COLOR_TRANSPARENT, TEXT_DYNAMIC_COLOR_5,  TEXT_DYNAMIC_COLOR_1}
 };
@@ -995,16 +998,16 @@ static void BagMenu_ItemPrintCallback(u8 windowId, u32 itemIndex, u8 y)
             // Print berry quantity
             ConvertIntToDecimalStringN(gStringVar1, itemQuantity, STR_CONV_MODE_RIGHT_ALIGN, BERRY_CAPACITY_DIGITS);
             StringExpandPlaceholders(gStringVar4, gText_xVar1);
-            offset = GetStringRightAlignXOffset(FONT_NARROW, gStringVar4, 119);
-            BagMenu_Print(windowId, FONT_NARROW, gStringVar4, offset, y, 0, 0, TEXT_SKIP_DRAW, COLORID_NORMAL);
+            offset = GetStringRightAlignXOffset(FONT_SHORT, gStringVar4, 119);
+            BagMenu_Print(windowId, FONT_SHORT, gStringVar4, offset, y, 0, 0, TEXT_SKIP_DRAW, COLORID_NORMAL);
         }
         else if (gBagPosition.pocket != KEYITEMS_POCKET && ItemId_GetImportance(itemId) == FALSE)
         {
             // Print item quantity
             ConvertIntToDecimalStringN(gStringVar1, itemQuantity, STR_CONV_MODE_RIGHT_ALIGN, BAG_ITEM_CAPACITY_DIGITS);
             StringExpandPlaceholders(gStringVar4, gText_xVar1);
-            offset = GetStringRightAlignXOffset(FONT_NARROW, gStringVar4, 119);
-            BagMenu_Print(windowId, FONT_NARROW, gStringVar4, offset, y, 0, 0, TEXT_SKIP_DRAW, COLORID_NORMAL);
+            offset = GetStringRightAlignXOffset(FONT_SHORT, gStringVar4, 134);
+            BagMenu_Print(windowId, FONT_SHORT, gStringVar4, offset, y, 0, 0, TEXT_SKIP_DRAW, COLORID_NORMAL);
         }
         else
         {
@@ -1041,9 +1044,9 @@ static void BagMenu_PrintCursor(u8 listTaskId, u8 colorIndex)
 static void BagMenu_PrintCursorAtPos(u8 y, u8 colorIndex)
 {
     if (colorIndex == COLORID_NONE)
-        FillWindowPixelRect(WIN_ITEM_LIST, PIXEL_FILL(0), 0, y, GetMenuCursorDimensionByFont(FONT_NORMAL, 0), GetMenuCursorDimensionByFont(FONT_NORMAL, 1));
+        FillWindowPixelRect(WIN_ITEM_LIST, PIXEL_FILL(0), 0, y, GetMenuCursorDimensionByFont(FONT_SHORT, 0), GetMenuCursorDimensionByFont(FONT_SHORT, 1));
     else
-        BagMenu_Print(WIN_ITEM_LIST, FONT_NORMAL, gText_SelectorArrow2, 0, y, 0, 0, 0, colorIndex);
+        BagMenu_Print(WIN_ITEM_LIST, FONT_SHORT, gText_SelectorArrow2, 0, y, 0, 0, 0, colorIndex);
 
 }
 
@@ -1644,6 +1647,8 @@ static void OpenContextMenu(u8 taskId)
                 memcpy(&gBagMenu->contextMenuItemsBuffer, &sContextMenuItems_KeyItemsPocket, sizeof(sContextMenuItems_KeyItemsPocket));
                 if (gSaveBlock1Ptr->registeredItem == gSpecialVar_ItemId)
                     gBagMenu->contextMenuItemsBuffer[1] = ACTION_DESELECT;
+                if (gSpecialVar_ItemId == ITEM_TM_CASE || gSpecialVar_ItemId == ITEM_BERRY_POUCH)
+                    gBagMenu->contextMenuItemsBuffer[0] = ACTION_OPEN;
                 if (gSpecialVar_ItemId == ITEM_MACH_BIKE || gSpecialVar_ItemId == ITEM_ACRO_BIKE)
                 {
                     if (TestPlayerAvatarFlags(PLAYER_AVATAR_FLAG_MACH_BIKE | PLAYER_AVATAR_FLAG_ACRO_BIKE))

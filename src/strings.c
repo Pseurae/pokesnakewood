@@ -179,6 +179,7 @@ const u8 gText_ConfirmStarterChoice[] = _("Do you choose this POKéMON?");
 const u8 gText_Pokemon4[] = _("POKéMON"); // Unused
 const u8 gText_FlyToWhere[] = _("FLY to where?");
 const u8 gMenuText_Use[] = _("USE");
+const u8 gMenuText_Open[] = _("OPEN");
 const u8 gMenuText_Toss[] = _("TOSS");
 const u8 gMenuText_Register[] = _("REGISTER");
 const u8 gMenuText_Give[] = _("GIVE");

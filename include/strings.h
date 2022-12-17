@@ -204,6 +204,7 @@ extern const u8 gText_WhitePokeblock[];
 extern const u8 gText_GoldPokeblock[];
 
 extern const u8 gMenuText_Use[];
+extern const u8 gMenuText_Open[];
 extern const u8 gMenuText_Toss[];
 extern const u8 gMenuText_Give[];
 extern const u8 gMenuText_Give2[];

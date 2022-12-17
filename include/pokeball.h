@@ -39,6 +39,7 @@ u8 CreateTradePokeballSprite(u8 monSpriteId, u8 monPalNum, u8 x, u8 y, u8 oamPri
 void StartHealthboxSlideIn(u8 battler);
 void DoHitAnimHealthboxEffect(u8 battler);
 void LoadBallGfx(u8 ballId);
+void LoadBallDNGfx(u8 ballId);
 void FreeBallGfx(u8 ballId);
 
 #endif // GUARD_POKEBALL_H

@@ -18,6 +18,7 @@
 // this file's functions
 static bool8 CheckPyramidBagHasItem(u16 itemId, u16 count);
 static bool8 CheckPyramidBagHasSpace(u16 itemId, u16 count);
+static bool8 AddBagItemInternal(u16 itemId, u16 count);
 
 // EWRAM variables
 EWRAM_DATA struct BagPocket gBagPockets[POCKETS_COUNT] = {0};
@@ -239,7 +240,7 @@ bool8 CheckBagHasSpace(u16 itemId, u16 count)
     return TRUE;
 }
 
-bool8 AddBagItem(u16 itemId, u16 count)
+static bool8 AddBagItemInternal(u16 itemId, u16 count)
 {
     u8 i;
 
@@ -344,6 +345,17 @@ bool8 AddBagItem(u16 itemId, u16 count)
         Free(newItems);
         return TRUE;
     }
+}
+
+bool8 AddBagItem(u16 itemId, u16 count)
+{
+    if (ItemId_GetPocket(itemId) == POCKET_TM_HM && !CheckBagHasItem(ITEM_TM_CASE, 1))
+        AddBagItemInternal(ITEM_TM_CASE, 1);
+    
+    if (ItemId_GetPocket(itemId) == POCKET_BERRIES && !CheckBagHasItem(ITEM_BERRY_POUCH, 1))
+        AddBagItemInternal(ITEM_BERRY_POUCH, 1);
+
+    AddBagItemInternal(itemId, count);
 }
 
 bool8 RemoveBagItem(u16 itemId, u16 count)
