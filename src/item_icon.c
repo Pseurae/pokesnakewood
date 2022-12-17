@@ -1,5 +1,6 @@
 #include "global.h"
 #include "decompress.h"
+#include "event_data.h"
 #include "graphics.h"
 #include "item_icon.h"
 #include "malloc.h"
@@ -9,6 +10,7 @@
 // EWRAM vars
 EWRAM_DATA u8 *gItemIconDecompressionBuffer = NULL;
 EWRAM_DATA u8 *gItemIcon4x4Buffer = NULL;
+static EWRAM_DATA u8 sObtainedItemIconSpriteId = MAX_SPRITES;
 
 // const rom data
 #include "data/item_icon_table.h"
@@ -81,6 +83,27 @@ void CopyItemIconPicTo4x4Buffer(const void *src, void *dest)
 
     for (i = 0; i < 3; i++)
         CpuCopy16(src + i * 96, dest + i * 128, 0x60);
+}
+
+u8 AddObtainedItemIconSprite(void)
+{
+    u16 itemId;
+    
+    itemId = VarGet(VAR_0x8004);
+    sObtainedItemIconSpriteId = AddItemIconSprite(3, 3, itemId);
+
+    if (sObtainedItemIconSpriteId != MAX_SPRITES)
+    {
+        gSprites[sObtainedItemIconSpriteId].x2 = 220;
+        gSprites[sObtainedItemIconSpriteId].y2 = 140;
+        gSprites[sObtainedItemIconSpriteId].oam.priority = 0;
+    }
+}
+
+u8 RemoveObtainedItemIconSprite(void)
+{
+    if (sObtainedItemIconSpriteId != MAX_SPRITES)
+        DestroySprite(&gSprites[sObtainedItemIconSpriteId]);
 }
 
 u8 AddItemIconSprite(u16 tilesTag, u16 paletteTag, u16 itemId)
