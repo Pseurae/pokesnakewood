@@ -228,6 +228,8 @@ gScriptCmdTable::
 	.4byte ScrCmd_buffercontestname         @ 0xe1
 	.4byte ScrCmd_bufferitemnameplural      @ 0xe2
 	.4byte ScrCmd_shownuminput
+	.4byte ScrCmd_setname
+	.4byte ScrCmd_clearname
 
 gScriptCmdTableEnd::
 	.4byte ScrCmd_nop

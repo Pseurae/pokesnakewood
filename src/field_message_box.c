@@ -5,8 +5,12 @@
 #include "text.h"
 #include "match_call.h"
 #include "field_message_box.h"
+#include "constants/character_names.h"
 
 static EWRAM_DATA u8 sFieldMessageBoxMode = 0;
+
+static EWRAM_DATA bool8 sDisplayNamebox = FALSE;
+static EWRAM_DATA u8 sCurrentCharacterName[20] = { 0x0 };
 
 static void ExpandStringAndStartDrawFieldMessage(const u8 *, bool32);
 static void StartDrawFieldMessage(void);
@@ -22,22 +26,33 @@ void InitFieldMessageBox(void)
 
 #define tState data[0]
 
+#include "strings.h"
+
 static void Task_DrawFieldMessage(u8 taskId)
 {
     struct Task *task = &gTasks[taskId];
+    const u8 color[3] = { TEXT_DYNAMIC_COLOR_2, TEXT_COLOR_WHITE, TEXT_COLOR_DARK_GRAY };
 
     switch (task->tState)
     {
         case 0:
-           LoadMessageBoxAndBorderGfx();
-           task->tState++;
-           break;
+            LoadMessageBoxAndBorderGfx();
+            task->tState++;
+            break;
         case 1:
-           DrawDialogueFrame(0, TRUE);
-           task->tState++;
-           break;
+            DrawDialogueFrame(0, TRUE);
+            task->tState++;
+            break;
         case 2:
-            if (RunTextPrintersAndIsPrinter0Active() != TRUE)
+            if (sDisplayNamebox)
+            {
+                DrawNameboxFrame(1, TRUE);
+                AddTextPrinterParameterized4(1, FONT_SMALL, 3, 1, 0, 0, color, 0, sCurrentCharacterName);
+            }
+            task->tState++;
+        case 3:
+            RunTextPrinters();
+            if (!IsTextPrinterActive(0) && !IsTextPrinterActive(1))
             {
                 sFieldMessageBoxMode = FIELD_MESSAGE_BOX_HIDDEN;
                 DestroyTask(taskId);
@@ -57,6 +72,22 @@ static void DestroyTask_DrawFieldMessage(void)
     u8 taskId = FindTaskIdByFunc(Task_DrawFieldMessage);
     if (taskId != TASK_NONE)
         DestroyTask(taskId);
+}
+
+#include "data/text/character_names.h"
+
+bool8 SetCharacterName(u8 index)
+{
+    if (index < CHAR_NAME_COUNT)
+    {
+        sDisplayNamebox = TRUE;
+        StringExpandPlaceholders(sCurrentCharacterName, gCharacterNames[index]);
+    }
+}
+
+bool8 ClearCharacterName(void)
+{
+    sDisplayNamebox = FALSE;
 }
 
 bool8 ShowFieldMessage(const u8 *str)
@@ -133,6 +164,8 @@ void HideFieldMessageBox(void)
 {
     DestroyTask_DrawFieldMessage();
     ClearDialogWindowAndFrame(0, TRUE);
+    ClearNameboxWindowAndFrame(1, TRUE);
+    sDisplayNamebox = FALSE;
     sFieldMessageBoxMode = FIELD_MESSAGE_BOX_HIDDEN;
 }
 

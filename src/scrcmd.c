@@ -2319,3 +2319,16 @@ bool8 ScrCmd_shownuminput(struct ScriptContext *ctx)
         return FALSE;
     }
 }
+
+bool8 ScrCmd_setname(struct ScriptContext *ctx)
+{
+    u8 index = ScriptReadByte(ctx);
+    SetCharacterName(index);
+    return FALSE;
+}
+
+bool8 ScrCmd_clearname(struct ScriptContext *ctx)
+{
+    ClearCharacterName();
+    return FALSE;
+}

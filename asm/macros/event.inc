@@ -1735,6 +1735,15 @@
 	.byte 0xe3
 	.endm
 
+	.macro setname move:req
+	.byte 0xe4
+	.byte \move
+	.endm
+
+	.macro clearname
+	.byte 0xe4
+	.endm
+
 @ Supplementary
 
 	.macro goto_if_unset flag:req, dest:req

@@ -13,6 +13,7 @@
 #include "constants/battle_tower.h"
 #include "constants/berry.h"
 #include "constants/cable_club.h"
+#include "constants/character_names.h"
 #include "constants/coins.h"
 #include "constants/contest.h"
 #include "constants/daycare.h"
