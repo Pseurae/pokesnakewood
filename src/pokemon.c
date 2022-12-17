@@ -4047,6 +4047,34 @@ u32 GetBoxMonData(struct BoxPokemon *boxMon, s32 field, u8 *data)
     return retVal;
 }
 
+u8 GetHiddenPowerBase(struct Pokemon *mon)
+{
+    u8 powerBits = ((GetMonData(mon, MON_DATA_HP_IV, NULL) & 2) >> 1)
+                 | ((GetMonData(mon, MON_DATA_ATK_IV, NULL) & 2) << 0)
+                 | ((GetMonData(mon, MON_DATA_DEF_IV, NULL) & 2) << 1)
+                 | ((GetMonData(mon, MON_DATA_SPEED_IV, NULL) & 2) << 2)
+                 | ((GetMonData(mon, MON_DATA_SPATK_IV, NULL) & 2) << 3)
+                 | ((GetMonData(mon, MON_DATA_SPDEF_IV, NULL) & 2) << 4);
+
+    return (40 * powerBits) / 63 + 30;
+}
+
+u8 GetHiddenPowerType(struct Pokemon *mon)
+{
+    u8 moveType;
+
+    u8 typeBits = ((GetMonData(mon, MON_DATA_HP_IV, NULL) & 1) >> 0)
+                | ((GetMonData(mon, MON_DATA_ATK_IV, NULL) & 1) << 1)
+                | ((GetMonData(mon, MON_DATA_DEF_IV, NULL) & 1) << 2)
+                | ((GetMonData(mon, MON_DATA_SPEED_IV, NULL) & 1) << 3)
+                | ((GetMonData(mon, MON_DATA_SPATK_IV, NULL) & 1) << 4)
+                | ((GetMonData(mon, MON_DATA_SPDEF_IV, NULL) & 1) << 5);
+
+    moveType = ((NUMBER_OF_MON_TYPES - 3) * typeBits) / 63 + 1;
+    return (moveType >= TYPE_MYSTERY) ? moveType + 1 : moveType;
+}
+
+
 #define SET8(lhs) (lhs) = *data
 #define SET16(lhs) (lhs) = data[0] + (data[1] << 8)
 #define SET32(lhs) (lhs) = data[0] + (data[1] << 8) + (data[2] << 16) + (data[3] << 24)

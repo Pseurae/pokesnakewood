@@ -3526,34 +3526,51 @@ static void PrintMoveNameAndPP(u8 moveIndex)
 static void PrintMovePowerAndAccuracy(u16 moveIndex)
 {
     const u8 *text;
-    if (moveIndex != 0)
+    u8 monFriendship = GetMonData(&gPlayerParty[sMonSummaryScreen->curMonIndex], MON_DATA_FRIENDSHIP);
+    u8 movePower;
+
+    if (!moveIndex)
+        return;
+
+    FillWindowPixelRect(PSS_LABEL_WINDOW_MOVES_POWER_ACC, PIXEL_FILL(0), 53, 0, 19, 32);
+
+    switch (moveIndex)
     {
-        FillWindowPixelRect(PSS_LABEL_WINDOW_MOVES_POWER_ACC, PIXEL_FILL(0), 53, 0, 19, 32);
-
-        if (gBattleMoves[moveIndex].power < 2)
-        {
-            text = gText_ThreeDashes;
-        }
-        else
-        {
-            ConvertIntToDecimalStringN(gStringVar1, gBattleMoves[moveIndex].power, STR_CONV_MODE_RIGHT_ALIGN, 3);
-            text = gStringVar1;
-        }
-
-        PrintTextOnWindow(PSS_LABEL_WINDOW_MOVES_POWER_ACC, text, 53, 1, 0, 0);
-
-        if (gBattleMoves[moveIndex].accuracy == 0)
-        {
-            text = gText_ThreeDashes;
-        }
-        else
-        {
-            ConvertIntToDecimalStringN(gStringVar1, gBattleMoves[moveIndex].accuracy, STR_CONV_MODE_RIGHT_ALIGN, 3);
-            text = gStringVar1;
-        }
-
-        PrintTextOnWindow(PSS_LABEL_WINDOW_MOVES_POWER_ACC, text, 53, 17, 0, 0);
+    case MOVE_RETURN:
+        movePower = (10 * monFriendship / 25);
+        break;
+    case MOVE_FRUSTRATION:
+        movePower = (10 * (MAX_FRIENDSHIP - monFriendship) / 25);
+        break;
+    case MOVE_HIDDEN_POWER:
+        movePower = GetHiddenPowerBase(&gPlayerParty[sMonSummaryScreen->curMonIndex]);
+        break;
+    default:
+        movePower = gBattleMoves[moveIndex].power;
+        break;
     }
+
+    ConvertIntToDecimalStringN(gStringVar1, max(movePower, 1), STR_CONV_MODE_RIGHT_ALIGN, 3);
+    text = gStringVar1;
+
+    if (movePower < 2)
+    {
+        text = gText_ThreeDashes;
+    }
+
+    PrintTextOnWindow(PSS_LABEL_WINDOW_MOVES_POWER_ACC, text, 53, 1, 0, 0);
+
+    if (gBattleMoves[moveIndex].accuracy == 0)
+    {
+        text = gText_ThreeDashes;
+    }
+    else
+    {
+        ConvertIntToDecimalStringN(gStringVar1, gBattleMoves[moveIndex].accuracy, STR_CONV_MODE_RIGHT_ALIGN, 3);
+        text = gStringVar1;
+    }
+
+    PrintTextOnWindow(PSS_LABEL_WINDOW_MOVES_POWER_ACC, text, 53, 17, 0, 0);
 }
 
 static void PrintContestMoves(void)
@@ -3807,10 +3824,12 @@ static void SetMoveTypeIcons(void)
     struct PokeSummary *summary = &sMonSummaryScreen->summary;
     for (i = 0; i < MAX_MON_MOVES; i++)
     {
-        if (summary->moves[i] != MOVE_NONE)
-            SetTypeSpritePosAndPal(gBattleMoves[summary->moves[i]].type, 85, 32 + (i * 16), i + SPRITE_ARR_ID_TYPE);
-        else
+        if (summary->moves[i] == MOVE_NONE)
             SetSpriteInvisibility(i + SPRITE_ARR_ID_TYPE, TRUE);
+        else if (summary->moves[i] == MOVE_HIDDEN_POWER)
+            SetTypeSpritePosAndPal(GetHiddenPowerType(&gPlayerParty[sMonSummaryScreen->curMonIndex]), 85, 32 + (i * 16), i + SPRITE_ARR_ID_TYPE);
+        else
+            SetTypeSpritePosAndPal(gBattleMoves[summary->moves[i]].type, 85, 32 + (i * 16), i + SPRITE_ARR_ID_TYPE);
     }
 }
 
@@ -3836,7 +3855,12 @@ static void SetNewMoveTypeIcon(void)
     else
     {
         if (sMonSummaryScreen->currPageIndex == PSS_PAGE_BATTLE_MOVES)
-            SetTypeSpritePosAndPal(gBattleMoves[sMonSummaryScreen->newMove].type, 85, 96, SPRITE_ARR_ID_TYPE + 4);
+        {
+            if (sMonSummaryScreen->newMove == MOVE_HIDDEN_POWER)
+                SetTypeSpritePosAndPal(GetHiddenPowerType(&gPlayerParty[sMonSummaryScreen->curMonIndex]), 85, 96, SPRITE_ARR_ID_TYPE + 4);
+            else
+                SetTypeSpritePosAndPal(gBattleMoves[sMonSummaryScreen->newMove].type, 85, 96, SPRITE_ARR_ID_TYPE + 4);
+        }
         else
             SetTypeSpritePosAndPal(NUMBER_OF_MON_TYPES + gContestMoves[sMonSummaryScreen->newMove].contestCategory, 85, 96, SPRITE_ARR_ID_TYPE + 4);
     }

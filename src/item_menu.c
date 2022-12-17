@@ -919,29 +919,16 @@ static void LoadBagItemListBuffers(u8 pocketId)
     gMultiuseListMenuTemplate.maxShowed = gBagMenu->numShownItems[pocketId];
 }
 
+static const u8 sText_TMCaseBerryPouch[] = _("{COLOR BLUE}{STR_VAR_2}{COLOR DARK_GRAY}");
+
 static void GetItemName(s8 *dest, u16 itemId)
 {
-    switch (gBagPosition.pocket)
+    switch (itemId)
     {
-    case TMHM_POCKET:
-        StringCopy(gStringVar2, gMoveNames[ItemIdToBattleMoveId(itemId)]);
-        if (itemId >= ITEM_HM01)
-        {
-            // Get HM number
-            ConvertIntToDecimalStringN(gStringVar1, itemId - ITEM_HM01 + 1, STR_CONV_MODE_LEADING_ZEROS, 1);
-            StringExpandPlaceholders(dest, gText_NumberItem_HM);
-        }
-        else
-        {
-            // Get TM number
-            ConvertIntToDecimalStringN(gStringVar1, itemId - ITEM_TM01 + 1, STR_CONV_MODE_LEADING_ZEROS, 2);
-            StringExpandPlaceholders(dest, gText_NumberItem_TMBerry);
-        }
-        break;
-    case BERRIES_POCKET:
-        ConvertIntToDecimalStringN(gStringVar1, itemId - FIRST_BERRY_INDEX + 1, STR_CONV_MODE_LEADING_ZEROS, 2);
+    case ITEM_TM_CASE:
+    case ITEM_BERRY_POUCH:
         CopyItemName(itemId, gStringVar2);
-        StringExpandPlaceholders(dest, gText_NumberItem_TMBerry);
+        StringExpandPlaceholders(dest, sText_TMCaseBerryPouch);
         break;
     default:
         CopyItemName(itemId, dest);

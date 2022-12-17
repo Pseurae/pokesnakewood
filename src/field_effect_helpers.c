@@ -236,6 +236,10 @@ u32 FldEff_Shadow(void)
     objectEventId = GetObjectEventIdByLocalIdAndMap(gFieldEffectArguments[0], gFieldEffectArguments[1], gFieldEffectArguments[2]);
     graphicsInfo = GetObjectEventGraphicsInfo(gObjectEvents[objectEventId].graphicsId);
     spriteId = CreateSpriteAtEnd(gFieldEffectObjectTemplatePointers[sShadowEffectTemplateIds[graphicsInfo->shadowSize]], 0, 0, 0x94);
+    
+    if (graphicsInfo->shadowSize == 3)
+        return 0;
+
     if (spriteId != MAX_SPRITES)
     {
         gSprites[spriteId].coordOffsetEnabled = TRUE;
@@ -265,6 +269,8 @@ void UpdateShadowFieldEffect(struct Sprite *sprite)
         sprite->oam.priority = linkedSprite->oam.priority;
         sprite->x = linkedSprite->x;
         sprite->y = linkedSprite->y + sprite->data[3];
+        sprite->invisible = linkedSprite->invisible;
+
         if (!objectEvent->active || !objectEvent->hasShadow)
         {
             FieldEffectStop(sprite, FLDEFF_SHADOW);
