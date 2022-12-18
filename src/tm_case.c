@@ -50,7 +50,6 @@ static const u8 sTMCaseHMIcon_Gfx[] = INCBIN_U8("graphics/tm_case/hm.4bpp");
 static const u16 sTMCaseMainWindowPalette[] = INCBIN_U16("graphics/tm_case/window.gbapal");
 
 static const u8 sText_ClearTo18[] = _("{CLEAR_TO 18}");
-static const u8 sText_Close[] = _("Close");
 
 static EWRAM_DATA struct TMCaseControl sTMCaseStaticResources = {};
 static EWRAM_DATA struct TMCaseData * sTMCaseDynamicResources = NULL;
@@ -600,7 +599,7 @@ static void InitTMCaseListMenuItems(void)
         sListMenuItemsBuffer[i].name = sListMenuStringsBuffer[i];
         sListMenuItemsBuffer[i].id = i;
     }
-    sListMenuItemsBuffer[i].name = sText_Close;
+    sListMenuItemsBuffer[i].name = gText_Close;
     sListMenuItemsBuffer[i].id = -2;
     gMultiuseListMenuTemplate.items = sListMenuItemsBuffer;
     gMultiuseListMenuTemplate.totalItems = sTMCaseDynamicResources->numTMs + 1;
@@ -621,9 +620,6 @@ static void InitTMCaseListMenuItems(void)
     gMultiuseListMenuTemplate.cursorKind = 0;
     gMultiuseListMenuTemplate.scrollMultiple = 0;
 }
-
-const u8 gText_FontSize0[] = _("{FONT_SMALL}");
-const u8 gText_FontSize2[] = _("{FONT_SHORT}");
 
 static void GetTMNumberAndMoveString(u8 * dest, u16 itemId)
 {

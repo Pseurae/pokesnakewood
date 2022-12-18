@@ -224,7 +224,7 @@ static const struct MenuAction sItemStorage_MenuActions[] =
 
 static const struct ItemSlot sNewGamePCItems[] =
 {
-    { ITEM_POTION, 1 },
+    { ITEM_ORAN_BERRY, 1 },
     { ITEM_NONE, 0 }
 };
 
@@ -520,7 +520,7 @@ static void InitItemStorageMenu(u8 taskId, u8 var)
 static void ItemStorageMenuPrint(const u8 *textPtr)
 {
     DrawDialogueFrame(0, FALSE);
-    AddTextPrinterParameterized(0, FONT_NORMAL, textPtr, 0, 1, 0, 0);
+    AddTextPrinterParameterized2(0, FONT_NORMAL, textPtr, 0, NULL, TEXT_COLOR_WHITE, TEXT_DYNAMIC_COLOR_2, TEXT_COLOR_DARK_GRAY);
 }
 
 static void ItemStorageMenuProcessInput(u8 taskId)

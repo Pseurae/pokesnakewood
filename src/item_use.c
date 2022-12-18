@@ -4,6 +4,7 @@
 #include "battle_pyramid.h"
 #include "battle_pyramid_bag.h"
 #include "berry.h"
+#include "berry_pouch.h"
 #include "berry_powder.h"
 #include "bike.h"
 #include "coins.h"
@@ -649,6 +650,43 @@ void ItemUseOutOfBattle_TmCase(u8 taskId)
         FadeScreen(FADE_TO_BLACK, 0);
         gTasks[taskId].func = Task_OpenRegisteredTMCase;
     }
+}
+
+static void InitBerryPouchFromBag(void)
+{
+    InitBerryPouch(BERRYPOUCH_FROMFIELD, CB2_BagMenuFromStartMenu, 0);
+}
+
+static void Task_OpenRegisteredBerryPouch(u8 taskId)
+{
+    if (!gPaletteFade.active)
+    {
+        CleanupOverworldWindowsAndTilemaps();
+        InitBerryPouch(BERRYPOUCH_FROMFIELD, CB2_ReturnToField, 1);
+        DestroyTask(taskId);
+    }
+}
+
+void ItemUseOutOfBattle_BerryPouch(u8 taskId)
+{
+    if (gTasks[taskId].tUsingRegisteredKeyItem != TRUE)
+    {
+        gBagMenu->newScreenCallback = InitBerryPouchFromBag;
+        Task_FadeAndCloseBagMenu(taskId);
+    }
+    else
+    {
+        gFieldCallback = FieldCB_ReturnToFieldNoScript;
+        FadeScreen(FADE_TO_BLACK, 0);
+        gTasks[taskId].func = Task_OpenRegisteredBerryPouch;
+    }
+}
+
+void ItemUseInBattle_BerryPouch(u8 taskId)
+{
+    gFieldCallback = FieldCB_ReturnToFieldNoScript;
+    FadeScreen(FADE_TO_BLACK, 0);
+    gTasks[taskId].func = Task_OpenRegisteredBerryPouch;
 }
 
 static void CB2_OpenPokeblockFromBag(void)

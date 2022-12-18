@@ -420,6 +420,7 @@ extern const u8 gText_FirmSlash[];
 
 // item menu screen text
 extern const u8 gText_CloseBag[];
+extern const u8 gText_Close[];
 extern const u8 gText_NumberItem_HM[];
 extern const u8 gText_NumberItem_TMBerry[];
 extern const u8 gText_xVar1[];
@@ -3026,5 +3027,9 @@ extern const u8 gText_YourName[];
 extern const u8 gText_BoxName[];
 extern const u8 gText_PkmnsNickname[];
 extern const u8 gText_TellHimTheWords[];
+
+extern const u8 gText_FontSize0[];
+extern const u8 gText_FontSize1[];
+extern const u8 gText_FontSize2[];
 
 #endif // GUARD_STRINGS_H

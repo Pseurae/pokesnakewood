@@ -5,6 +5,7 @@
 #include "battle_pyramid.h"
 #include "frontier_util.h"
 #include "battle_pyramid_bag.h"
+#include "berry_pouch.h"
 #include "berry_tag_screen.h"
 #include "bg.h"
 #include "data.h"
@@ -217,6 +218,9 @@ static void CancelSell(u8);
 static void CB2_TMCaseGive(void);
 static void CB2_TMCaseGiveToPC(void);
 static void CB2_TMCaseSell(void);
+static void CB2_BerryPouchGive(void);
+static void CB2_BerryPouchGiveToPC(void);
+static void CB2_BerryPouchSell(void);
 
 static const u16 sBagWindowPal[] = INCBIN_U16("graphics/bag/bag_window.gbapal");
 
@@ -426,7 +430,7 @@ static const struct WindowTemplate sDefaultBagWindows[] =
         .bg = 0,
         .tilemapLeft = 1,
         .tilemapTop = 1,
-        .width = 9,
+        .width = 8,
         .height = 2,
         .paletteNum = 15,
         .baseBlock = 415,
@@ -606,7 +610,7 @@ void CB2_GoToSellMenu(void)
 
 void CB2_GoToItemDepositMenu(void)
 {
-    GoToBagMenu(ITEMMENULOCATION_ITEMPC, POCKETS_COUNT, CB2_PlayerPCExitBagMenu);
+    GoToBagMenu(ITEMMENULOCATION_ITEMPC, ITEMS_POCKET, CB2_PlayerPCExitBagMenu);
 }
 
 void ApprenticeOpenBagMenu(void)
@@ -644,9 +648,14 @@ void GoToBagMenu(u8 location, u8 pocket, void ( *exitCallback)())
             gBagPosition.exitCallback = exitCallback;
         if (pocket < POCKETS_COUNT)
             gBagPosition.pocket = pocket;
-        if (gBagPosition.location == ITEMMENULOCATION_BERRY_TREE ||
-            gBagPosition.location == ITEMMENULOCATION_BERRY_BLENDER_CRUSH)
+        switch (gBagPosition.location)
+        {
+        case ITEMMENULOCATION_BERRY_TREE:
+        case ITEMMENULOCATION_BERRY_BLENDER_CRUSH:
+        case ITEMMENULOCATION_ITEMPC:
             gBagMenu->pocketSwitchDisabled = TRUE;
+            break;
+        }
         gBagMenu->newScreenCallback = NULL;
         gBagMenu->toSwapPos = NOT_SWAPPING;
         gBagMenu->pocketScrollArrowsTask = TASK_NONE;
@@ -696,6 +705,14 @@ static void PrintPocketName(void)
     FillWindowPixelBuffer(WIN_POCKET_NAME, PIXEL_FILL(0));
     BagMenu_Print(WIN_POCKET_NAME, FONT_NORMAL, pocketName, offset / 2, 1, 0, 0, TEXT_SKIP_DRAW, COLORID_POCKET_NAME);
     CopyWindowToVram(WIN_POCKET_NAME, COPYWIN_GFX);
+}
+
+static void BagDrawDepositItemTextBox(void)
+{
+    u32 x;
+    DrawStdFrameWithCustomTileAndPalette(2, FALSE, 1, 14);
+    x = 0x40 - GetStringWidth(FONT_SMALL, gText_DepositItem, 0);
+    AddTextPrinterParameterized(WIN_POCKET_NAME, FONT_SMALL, gText_DepositItem, x / 2, 1, 0, NULL);
 }
 
 static bool8 SetupBagMenu(void)
@@ -763,10 +780,10 @@ static bool8 SetupBagMenu(void)
         gMain.state++;
         break;
     case 13:
-        PrintPocketName();
-        // PrintPocketNames(gPocketNamesStringsTable[gBagPosition.pocket], 0);
-        // CopyPocketNameToWindow(0);
-        // DrawPocketIndicatorSquare(gBagPosition.pocket, TRUE);
+        if (gBagPosition.location == ITEMMENULOCATION_ITEMPC)
+            BagDrawDepositItemTextBox();
+        else
+            PrintPocketName();
         gMain.state++;
         break;
     case 14:
@@ -2025,6 +2042,11 @@ static void Task_ItemContext_GiveToParty(u8 taskId)
         gBagMenu->newScreenCallback = CB2_TMCaseGive;
         Task_FadeAndCloseBagMenu(taskId);
     }
+    else if (gSpecialVar_ItemId == ITEM_BERRY_POUCH)
+    {
+        gBagMenu->newScreenCallback = CB2_BerryPouchGive;
+        Task_FadeAndCloseBagMenu(taskId);   
+    }
     else if (!IsHoldingItemAllowed(gSpecialVar_ItemId))
     {
         CopyItemName(gSpecialVar_ItemId, gStringVar1);
@@ -2049,6 +2071,11 @@ static void Task_ItemContext_GiveToPC(u8 taskId)
     else if (gSpecialVar_ItemId == ITEM_TM_CASE)
     {
         gBagMenu->newScreenCallback = CB2_TMCaseGiveToPC;
+        Task_FadeAndCloseBagMenu(taskId);   
+    }
+    else if (gSpecialVar_ItemId == ITEM_BERRY_POUCH)
+    {
+        gBagMenu->newScreenCallback = CB2_BerryPouchGiveToPC;
         Task_FadeAndCloseBagMenu(taskId);   
     }
     else if (gBagPosition.pocket != KEYITEMS_POCKET && !ItemId_GetImportance(gSpecialVar_ItemId))
@@ -2105,6 +2132,11 @@ static void Task_ItemContext_Sell(u8 taskId)
     {
         gBagMenu->newScreenCallback = CB2_TMCaseSell;
         Task_FadeAndCloseBagMenu(taskId);
+    }
+    else if (gSpecialVar_ItemId == ITEM_BERRY_POUCH)
+    {
+        gBagMenu->newScreenCallback = CB2_BerryPouchSell;
+        Task_FadeAndCloseBagMenu(taskId);   
     }
     else
     {
@@ -2235,7 +2267,7 @@ static void Task_ItemContext_Deposit(u8 taskId)
         CopyItemName(gSpecialVar_ItemId, gStringVar1);
         StringExpandPlaceholders(gStringVar4, gText_DepositHowManyVar1);
         FillWindowPixelBuffer(WIN_DESCRIPTION, PIXEL_FILL(0));
-        BagMenu_Print(WIN_DESCRIPTION, FONT_NORMAL, gStringVar4, 3, 1, 0, 0, 0, COLORID_NORMAL);
+        BagMenu_Print(WIN_DESCRIPTION, FONT_NORMAL, gStringVar4, 3, 1, 0, 0, 0, COLORID_DESCRIPTION);
         AddItemQuantityWindow(ITEMWIN_QUANTITY);
         gTasks[taskId].func = Task_ChooseHowManyToDeposit;
     }
@@ -2273,7 +2305,7 @@ static void TryDepositItem(u8 taskId)
     if (ItemId_GetImportance(gSpecialVar_ItemId))
     {
         // Can't deposit important items
-        BagMenu_Print(WIN_DESCRIPTION, FONT_NORMAL, gText_CantStoreImportantItems, 3, 1, 0, 0, 0, COLORID_NORMAL);
+        BagMenu_Print(WIN_DESCRIPTION, FONT_NORMAL, gText_CantStoreImportantItems, 3, 1, 0, 0, 0, COLORID_DESCRIPTION);
         gTasks[taskId].func = WaitDepositErrorMessage;
     }
     else if (AddPCItem(gSpecialVar_ItemId, tItemCount) == TRUE)
@@ -2282,7 +2314,7 @@ static void TryDepositItem(u8 taskId)
         CopyItemName(gSpecialVar_ItemId, gStringVar1);
         ConvertIntToDecimalStringN(gStringVar2, tItemCount, STR_CONV_MODE_LEFT_ALIGN, MAX_ITEM_DIGITS);
         StringExpandPlaceholders(gStringVar4, gText_DepositedVar2Var1s);
-        BagMenu_Print(WIN_DESCRIPTION, FONT_NORMAL, gStringVar4, 3, 1, 0, 0, 0, COLORID_NORMAL);
+        BagMenu_Print(WIN_DESCRIPTION, FONT_NORMAL, gStringVar4, 3, 1, 0, 0, 0, COLORID_DESCRIPTION);
         gTasks[taskId].func = Task_RemoveItemFromBag;
     }
     else
@@ -2634,12 +2666,27 @@ static void CB2_TMCaseGive(void)
     OpenTMCase(TMCASE_FROMPARTYGIVE, CB2_SelectBagItemToGive, FALSE);
 }
 
+static void CB2_BerryPouchGive(void)
+{
+    InitBerryPouch(BERRYPOUCH_FROMPARTYGIVE, CB2_SelectBagItemToGive, FALSE);
+}
+
 static void CB2_TMCaseGiveToPC(void)
 {
     OpenTMCase(TMCASE_FROMPOKEMONSTORAGEPC, CB2_BagMenuFromPokeStorage, FALSE);
 }
 
+static void CB2_BerryPouchGiveToPC(void)
+{
+    InitBerryPouch(BERRYPOUCH_FROMPOKEMONSTORAGEPC, CB2_BagMenuFromPokeStorage, FALSE);
+}
+
 static void CB2_TMCaseSell(void)
 {
     OpenTMCase(TMCASE_FROMMARTSELL, CB2_GoToSellMenu, FALSE);
+}
+
+static void CB2_BerryPouchSell(void)
+{
+    InitBerryPouch(BERRYPOUCH_FROMMARTSELL, CB2_BagMenuFromPokeStorage, FALSE);
 }

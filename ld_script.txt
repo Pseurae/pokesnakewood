@@ -344,6 +344,7 @@ SECTIONS {
         src/battle_transition_frontier.o(.text);
         src/international_string_util.o(.text);
         src/tm_case.o(.text);
+        src/berry_pouch.o(.text);
         src/day_night.o(.text);
         src/number_input.o(.text);
     } =0
@@ -706,6 +707,7 @@ SECTIONS {
         src/fonts.o(.rodata);
         src/international_string_util.o(.rodata);
         src/tm_case.o(.rodata);
+        src/berry_pouch.o(.rodata);
         src/day_night.o(.rodata);
         src/number_input.o(.rodata);
         src/mystery_event_msg.o(.rodata);
