@@ -141,8 +141,6 @@ void ResetPaletteFade(void)
 {
     u8 i;
 
-    gDayNight.hasTinted = FALSE;
-
     for (i = 0; i < NUM_PALETTE_STRUCTS; i++)
         PaletteStruct_Reset(i);
 
