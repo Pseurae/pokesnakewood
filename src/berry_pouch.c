@@ -15,6 +15,7 @@
 #include "graphics.h"
 #include "berry.h"
 #include "item.h"
+#include "item_icon.h"
 #include "item_use.h"
 #include "party_menu.h"
 #include "text_window.h"
@@ -37,7 +38,7 @@ struct BerryPouchStruct_203F36C
     u8 indicatorTaskId;
     u8 listMenuNumItems;
     u8 listMenuMaxShowed;
-    u8 itemMenuIconId;
+    u8 iconSpriteId;
     u8 ALIGNED(4) bg1TilemapBuffer[BG_SCREEN_SIZE];
     s16 data[4];
 };
@@ -77,8 +78,8 @@ const u32 gBerryPouchBgPal0FemaleOverride[] = INCBIN_U32("graphics/berry_pouch/b
 const u32 gBerryPouchSpritePalette[] = INCBIN_U32("graphics/berry_pouch/berry_pouch.gbapal.lz");
 const u32 gBerryPouchBg1Tilemap[] = INCBIN_U32("graphics/berry_pouch/background.bin.lz");
 
-static void CB2_InitBerryPouch(void);
-static bool8 RunBerryPouchInit(void);
+static void CB2_BerryPouch(void);
+static bool8 SetupBerryPouch(void);
 static void AbortBerryPouchLoading(void);
 static void Task_AbortBerryPouchLoading_WaitFade(u8 taskId);
 static void BerryPouchInitBgs(void);
@@ -448,17 +449,17 @@ void InitBerryPouch(u8 type, void (*savedCallback)(void), u8 allowSelect)
         if (savedCallback != NULL)
             sStaticCnt.savedCallback = savedCallback;
         sResources->exitCallback = NULL;
-        sResources->itemMenuIconId = 0;
+        sResources->iconSpriteId = 0;
         sResources->indicatorTaskId = 0xFF;
         for (i = 0; i < 4; i++)
             sResources->data[i] = 0;
         gTextFlags.autoScroll = FALSE;
         gSpecialVar_ItemId = ITEM_NONE;
-        SetMainCallback2(CB2_InitBerryPouch);
+        SetMainCallback2(CB2_BerryPouch);
     }
 }
 
-static void CB2_BerryPouchIdle(void)
+static void CB2_BerryPouchRun(void)
 {
     RunTasks();
     AnimateSprites();
@@ -467,27 +468,20 @@ static void CB2_BerryPouchIdle(void)
     UpdatePaletteFade();
 }
 
-static void VBlankCB_BerryPouchIdle(void)
+static void VBlankCB_BerryPouchRun(void)
 {
     LoadOam();
     ProcessSpriteCopyRequests();
     TransferPlttBuffer();
 }
 
-static void CB2_InitBerryPouch(void)
+static void CB2_BerryPouch(void)
 {
-    while (1)
-    {
-        if (MenuHelpers_ShouldWaitForLinkRecv() == TRUE)
-            break;
-        if (RunBerryPouchInit() == TRUE)
-            break;
-        if (MenuHelpers_IsLinkActive() == TRUE)
-            break;
-    }
+    while (MenuHelpers_ShouldWaitForLinkRecv() != TRUE && SetupBerryPouch() != TRUE && MenuHelpers_IsLinkActive() != TRUE)
+        { };
 }
 
-static bool8 RunBerryPouchInit(void)
+static bool8 SetupBerryPouch(void)
 {
     u8 taskId;
 
@@ -515,7 +509,7 @@ static bool8 RunBerryPouchInit(void)
         gMain.state++;
         break;
     case 5:
-        // ResetItemMenuIconState();
+        memset(gBagMenu->spriteIds, SPRITE_NONE, sizeof(gBagMenu->spriteIds));
         gMain.state++;
         break;
     case 6:
@@ -581,8 +575,8 @@ static bool8 RunBerryPouchInit(void)
         gMain.state++;
         break;
     default:
-        SetVBlankCallback(VBlankCB_BerryPouchIdle);
-        SetMainCallback2(CB2_BerryPouchIdle);
+        SetVBlankCallback(VBlankCB_BerryPouchRun);
+        SetMainCallback2(CB2_BerryPouchRun);
         return TRUE;
     }
 
@@ -593,8 +587,8 @@ static void AbortBerryPouchLoading(void)
 {
     BeginNormalPaletteFade(PALETTES_ALL, -2, 0, 16, RGB_BLACK);
     CreateTask(Task_AbortBerryPouchLoading_WaitFade, 0);
-    SetVBlankCallback(VBlankCB_BerryPouchIdle);
-    SetMainCallback2(CB2_BerryPouchIdle);
+    SetVBlankCallback(VBlankCB_BerryPouchRun);
+    SetMainCallback2(CB2_BerryPouchRun);
 }
 
 static void Task_AbortBerryPouchLoading_WaitFade(u8 taskId)
@@ -722,19 +716,36 @@ static void CopySelectedListMenuItemName(s16 itemIdx, u8 * dest)
     StringCopy(dest, &sListMenuStrbuf[itemIdx * 27]);
 }
 
+#define TAG_ITEM_ICON 5500
+
 static void BerryPouchMoveCursorFunc(s32 itemIndex, bool8 onInit, struct ListMenu *list)
 {
+    u8 spriteId;
+    u16 itemId = BagGetItemIdByPocketPosition(POCKET_BERRIES, itemIndex);
     if (onInit != TRUE)
     {
         PlaySE(SE_SELECT);
         StartBerryPouchSpriteWobbleAnim();
     }
-    // DestroyItemMenuIcon(sResources->itemMenuIconId ^ 1);
-    // if (sResources->listMenuNumItems != itemIndex)
-        // CreateBerryPouchItemIcon(BagGetItemIdByPocketPosition(POCKET_BERRIES, itemIndex), sResources->itemMenuIconId);
-    // else
-        // CreateBerryPouchItemIcon(ITEMS_COUNT, sResources->itemMenuIconId);
-    sResources->itemMenuIconId ^= 1;
+
+    FreeSpriteTilesByTag(TAG_ITEM_ICON);
+    FreeSpritePaletteByTag(TAG_ITEM_ICON);
+
+    if (sResources->iconSpriteId != MAX_SPRITES)
+        DestroySprite(&gSprites[sResources->iconSpriteId]);
+
+    if (sResources->listMenuNumItems != itemIndex)
+        spriteId = AddItemIconSprite(TAG_ITEM_ICON, TAG_ITEM_ICON, itemId);
+    else
+        spriteId = AddItemIconSprite(TAG_ITEM_ICON, TAG_ITEM_ICON, ITEM_LIST_END);
+    
+    if (spriteId != MAX_SPRITES)
+    {
+        sResources->iconSpriteId = spriteId;
+        gSprites[spriteId].x2 = 24;
+        gSprites[spriteId].y2 = 147;
+    }
+
     PrintSelectedBerryDescription(itemIndex);
 }
 
@@ -1507,7 +1518,7 @@ void DisplayItemMessageInBerryPouch(u8 taskId, u8 fontId, const u8 * str, TaskFu
 {
     if (sVariableWindowIds[5] == 0xFF)
         sVariableWindowIds[5] = AddWindow(&sWindowTemplates_Variable[5]);
-    DisplayMessageAndContinueTask(taskId, sVariableWindowIds[5], 0x013, 0xD, fontId, GetPlayerTextSpeedDelay(), str, followUpFunc);
+    DisplayMessageAndContinueTask(taskId, sVariableWindowIds[5], 0x1, 0xE, fontId, GetPlayerTextSpeedDelay(), str, followUpFunc);
     ScheduleBgCopyTilemapToVram(2);
 }
 

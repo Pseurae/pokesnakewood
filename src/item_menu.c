@@ -855,7 +855,10 @@ static bool8 LoadBagMenu_Graphics(void)
     case 1:
         if (FreeTempTileDataBuffersIfPossible() != TRUE)
         {
-            LZDecompressWram(gBagScreen_GfxTileMap, gBagMenu->tilemapBuffer);
+            if (gBagPosition.location == ITEMMENULOCATION_ITEMPC)
+                LZDecompressWram(gBagScreen_GfxTileMap, gBagMenu->tilemapBuffer);
+            else
+                LZDecompressWram(gBagScreenHeader_GfxTileMap, gBagMenu->tilemapBuffer);
             gBagMenu->graphicsLoadState++;
         }
         break;

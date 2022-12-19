@@ -72,6 +72,7 @@ static void Task_StartUseRepel(u8);
 static void Task_UseRepel(u8);
 static void Task_CloseCantUseKeyItemMessage(u8);
 static void SetDistanceOfClosestHiddenItem(u8, s16, s16);
+static void InitBerryPouchFromBattle(void);
 static void CB2_OpenPokeblockFromBag(void);
 static void CB2_OpenTMCaseFromBag(void);
 
@@ -684,9 +685,13 @@ void ItemUseOutOfBattle_BerryPouch(u8 taskId)
 
 void ItemUseInBattle_BerryPouch(u8 taskId)
 {
-    gFieldCallback = FieldCB_ReturnToFieldNoScript;
-    FadeScreen(FADE_TO_BLACK, 0);
-    gTasks[taskId].func = Task_OpenRegisteredBerryPouch;
+    gBagMenu->newScreenCallback = InitBerryPouchFromBattle;
+    Task_FadeAndCloseBagMenu(taskId);
+}
+
+static void InitBerryPouchFromBattle(void)
+{
+    InitBerryPouch(BERRYPOUCH_FROMBATTLE, CB2_BagMenuFromBattle, 0);
 }
 
 static void CB2_OpenPokeblockFromBag(void)
