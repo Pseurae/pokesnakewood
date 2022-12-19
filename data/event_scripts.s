@@ -25,6 +25,7 @@
 #include "constants/field_poison.h"
 #include "constants/field_specials.h"
 #include "constants/field_tasks.h"
+#include "constants/field_tint.h"
 #include "constants/field_weather.h"
 #include "constants/flags.h"
 #include "constants/frontier_util.h"

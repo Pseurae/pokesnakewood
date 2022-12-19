@@ -230,6 +230,7 @@ gScriptCmdTable::
 	.4byte ScrCmd_shownuminput
 	.4byte ScrCmd_setname
 	.4byte ScrCmd_clearname
+	.4byte ScrCmd_setfieldtint
 
 gScriptCmdTableEnd::
 	.4byte ScrCmd_nop

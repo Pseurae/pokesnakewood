@@ -51,6 +51,7 @@ void CopySecondaryTilesetToVram(const struct MapLayout *);
 struct MapHeader const *const GetMapHeaderFromConnection(struct MapConnection *connection);
 struct MapConnection *GetMapConnectionAtPos(s16 x, s16 y);
 void MapGridSetMetatileImpassabilityAt(int x, int y, bool32 impassable);
+void ApplyGlobalTintToPaletteEntries(u16 *palette, u16 size);
 
 // field_region_map.c
 void FieldInitRegionMap(MainCallback callback);

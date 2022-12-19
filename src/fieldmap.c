@@ -15,6 +15,7 @@
 #include "secret_base.h"
 #include "trainer_hill.h"
 #include "tv.h"
+#include "constants/field_tint.h"
 #include "constants/rgb.h"
 #include "constants/metatile_behaviors.h"
 
@@ -31,6 +32,7 @@ EWRAM_DATA struct MapHeader gMapHeader = {0};
 EWRAM_DATA struct Camera gCamera = {0};
 EWRAM_DATA static struct ConnectionFlags sMapConnectionFlags = {0};
 EWRAM_DATA static u32 sFiller = 0; // without this, the next file won't align properly
+EWRAM_DATA u8 gFieldTintMode = 0;
 
 struct BackupMapLayout gBackupMapLayout;
 
@@ -862,14 +864,19 @@ static void CopyTilesetToVramUsingHeap(struct Tileset const *tileset, u16 numTil
 }
 
 // Below two are dummied functions from FRLG, used to tint the overworld palettes for the Quest Log
-static void ApplyGlobalTintToPaletteEntries(u16 offset, u16 size)
+void ApplyGlobalTintToPaletteEntries(u16 *palette, u16 size)
 {
-
-}
-
-static void ApplyGlobalTintToPaletteSlot(u8 slot, u8 count)
-{
-
+    switch (gFieldTintMode)
+    {
+    case FIELD_TINT_NONE:
+        return;
+    case FIELD_TINT_GRAYSCALE:
+        TintPalette_GrayScale(palette, size);
+        break;
+    case FIELD_TINT_SEPIA:
+        TintPalette_SepiaTone(palette, size);
+        break;
+    }
 }
 
 void LoadTilesetPalette(struct Tileset const *tileset, u16 destOffset, u16 size)
@@ -882,17 +889,14 @@ void LoadTilesetPalette(struct Tileset const *tileset, u16 destOffset, u16 size)
         {
             LoadPalette(&black, destOffset, 2);
             LoadDNPalette(tileset->palettes[0] + 1, destOffset + 1, size - 2);
-            ApplyGlobalTintToPaletteEntries(destOffset + 1, (size - 2) >> 1);
         }
         else if (tileset->isSecondary == TRUE)
         {
             LoadDNPalette(tileset->palettes[NUM_PALS_IN_PRIMARY], destOffset, size);
-            ApplyGlobalTintToPaletteEntries(destOffset, size >> 1);
         }
         else
         {
             LoadCompressedDNPalette((const u32 *)tileset->palettes, destOffset, size);
-            ApplyGlobalTintToPaletteEntries(destOffset, size >> 1);
         }
     }
 }

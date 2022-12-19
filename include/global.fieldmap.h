@@ -339,5 +339,6 @@ extern u8 gSelectedObjectEvent;
 extern struct MapHeader gMapHeader;
 extern struct PlayerAvatar gPlayerAvatar;
 extern struct Camera gCamera;
+extern u8 gFieldTintMode;
 
 #endif // GUARD_GLOBAL_FIELDMAP_H

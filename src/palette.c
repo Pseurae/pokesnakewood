@@ -84,7 +84,7 @@ static const u8 sRoundedDownGrayscaleMap[] = {
 
 void LoadCompressedPalette(const u32 *src, u16 offset, u16 size)
 {
-    CpuFill16(RGB_BLACK, &gPlttBufferDayNight[offset], size);
+    FillDNPalette(offset, size);
     LZDecompressWram(src, gPaletteDecompressionBuffer);
     CpuCopy16(gPaletteDecompressionBuffer, &gPlttBufferUnfaded[offset], size);
     CpuCopy16(gPaletteDecompressionBuffer, &gPlttBufferFaded[offset], size);
@@ -92,14 +92,14 @@ void LoadCompressedPalette(const u32 *src, u16 offset, u16 size)
 
 void LoadPalette(const void *src, u16 offset, u16 size)
 {
-    CpuFill16(RGB_BLACK, &gPlttBufferDayNight[offset], size);
+    FillDNPalette(offset, size);
     CpuCopy16(src, &gPlttBufferUnfaded[offset], size);
     CpuCopy16(src, &gPlttBufferFaded[offset], size);
 }
 
 void FillPalette(u16 value, u16 offset, u16 size)
 {
-    CpuFill16(RGB_BLACK, &gPlttBufferDayNight[offset], size);
+    FillDNPalette(offset, size);
     CpuFill16(value, &gPlttBufferUnfaded[offset], size);
     CpuFill16(value, &gPlttBufferFaded[offset], size);
 }
@@ -140,6 +140,8 @@ u8 UpdatePaletteFade(void)
 void ResetPaletteFade(void)
 {
     u8 i;
+
+    gDayNight.hasTinted = FALSE;
 
     for (i = 0; i < NUM_PALETTE_STRUCTS; i++)
         PaletteStruct_Reset(i);

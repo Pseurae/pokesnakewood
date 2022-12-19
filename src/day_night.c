@@ -1,16 +1,17 @@
 #include "global.h"
-#include "sprite.h"
 #include "day_night.h"
+#include "sprite.h"
 #include "decompress.h"
+#include "fieldmap.h"
 #include "field_weather.h"
 #include "overworld.h"
 #include "palette.h"
 #include "rtc.h"
 #include "constants/rgb.h"
 
-#define TINT_MORNING Q_8_8(0.7), Q_8_8(0.7), Q_8_8(0.9)
-#define TINT_DAY     Q_8_8(1.0), Q_8_8(1.0), Q_8_8(1.0)
-#define TINT_NIGHT   Q_8_8(0.6), Q_8_8(0.6), Q_8_8(0.92)
+#define TINT_MORNING  Q_8_8(0.7), Q_8_8(0.7), Q_8_8(0.9)
+#define TINT_DAY      Q_8_8(1.0), Q_8_8(1.0), Q_8_8(1.0)
+#define TINT_NIGHT    Q_8_8(0.6), Q_8_8(0.6), Q_8_8(0.92)
 
 // From CrystalDust
 static const u16 sTimeOfDayTints[][3] = {
@@ -40,31 +41,34 @@ static const u16 sTimeOfDayTints[][3] = {
     [23] =  { TINT_NIGHT },
 };
 
-EWRAM_DATA static u16 sCurrentTint[3] = { 0 }; 
-ALIGNED(4) EWRAM_DATA u16 gPlttBufferDayNight[PLTT_BUFFER_SIZE] = { 0 };
-EWRAM_DATA static u8 sDayNightTintState = 0;
+EWRAM_DATA struct DayNight gDayNight = { 0 };
+ALIGNED(4) EWRAM_DATA static u16 sPlttBufferDayNight[PLTT_BUFFER_SIZE] = { 0 };
 
 /*
 LoadTilesetPalette for tilesets.
 PatchObjectPalette for objects.
 
 DrawMainBattleBackground for battle background.
-
 */
+
+void FillDNPalette(u16 offset, u16 size)
+{
+    CpuFill16(RGB_BLACK, &sPlttBufferDayNight[offset], size);
+}
 
 static bool8 BlendColors(const u16 *src1, const u16 *src2, u8 coeff)
 {
     if (src1[0] != src2[0]
-        && src1[1] != src2[1]
-        && src1[2] != src2[2])
+     && src1[1] != src2[1]
+     && src1[2] != src2[2])
     {
-        sCurrentTint[0] = src1[0] + ((src2[0] - src1[0]) * coeff) / 60;
-        sCurrentTint[1] = src1[1] + ((src2[1] - src1[1]) * coeff) / 60;
-        sCurrentTint[2] = src1[2] + ((src2[2] - src1[2]) * coeff) / 60;
+        gDayNight.tint[0] = src1[0] + ((src2[0] - src1[0]) * coeff) / 60;
+        gDayNight.tint[1] = src1[1] + ((src2[1] - src1[1]) * coeff) / 60;
+        gDayNight.tint[2] = src1[2] + ((src2[2] - src1[2]) * coeff) / 60;
         return TRUE;
     }
 
-    memcpy(sCurrentTint, src1, sizeof(sCurrentTint));
+    memcpy(gDayNight.tint, src1, sizeof(gDayNight.tint));
     return FALSE;
 }
 
@@ -80,8 +84,16 @@ static void UpdateCurrentTint(void)
 
     RtcCalcLocalTime();
 
-    hours = gLocalTime.hours;
-    minutes = gLocalTime.minutes;
+    if (gDayNight.shouldOverrideTime)
+    {
+        hours = gDayNight.overrideTime[0];
+        minutes = gDayNight.overrideTime[1];
+    }
+    else
+    {
+        hours = gLocalTime.hours;
+        minutes = gLocalTime.minutes;
+    }
 
     currTint = sTimeOfDayTints[hours];
     nextTint = sTimeOfDayTints[(hours + 1) % 24];
@@ -89,16 +101,32 @@ static void UpdateCurrentTint(void)
     BlendColors(currTint, nextTint, minutes);
 }
 
-static void ApplyDayNightPalette(u16 offset, u16 size)
+static void ApplyNormalPalette(void)
 {
     u16 color;
+    s32 i;
+
+    for (i = 0; i < PLTT_BUFFER_SIZE; i++)
+    {
+        color = sPlttBufferDayNight[i];
+        if (!color) continue;
+        gPlttBufferUnfaded[i] = color;
+        gPlttBufferFaded[i] = color;
+    }
+}
+
+static void ApplyDayNightPalette(u16 offset, u16 size)
+{
+    u16 color, *tint;
     s32 r, g, b, i;
 
     UpdateCurrentTint();
 
+    tint = gDayNight.tint;
+
     for (i = 0; i < size; i++)
     {
-        color = gPlttBufferDayNight[offset + i];
+        color = sPlttBufferDayNight[offset + i];
 
         if (!color) continue;
 
@@ -106,9 +134,9 @@ static void ApplyDayNightPalette(u16 offset, u16 size)
         g = GET_G(color);
         b = GET_B(color);
 
-        r = (u16)((sCurrentTint[0] * r)) >> 8;
-        g = (u16)((sCurrentTint[1] * g)) >> 8;
-        b = (u16)((sCurrentTint[2] * b)) >> 8;
+        r = (u16)((tint[0] * r)) >> 8;
+        g = (u16)((tint[1] * g)) >> 8;
+        b = (u16)((tint[2] * b)) >> 8;
 
         if (r > 31)
             r = 31;
@@ -123,35 +151,51 @@ static void ApplyDayNightPalette(u16 offset, u16 size)
 
 void UpdateDayNightPalettes(void)
 {
+    u8 state = gDayNight.tintState;
+
     if (!IsDayNightApplicable())
         return;
 
-    switch (sDayNightTintState)
+    if (!gDayNight.hasTinted)
+        return;
+
+    if (gDayNight.isDisabled)
+        state = DN_TINT_STATE_RESET;
+
+    switch (state)
     {
-    case 0:
+    case DN_TINT_STATE_BG:
         ApplyDayNightPalette(0, BG_PLTT_SIZE >> 1);
-        sDayNightTintState++;
+        gDayNight.tintState++;
         break;
-    case 1:
+    case DN_TINT_STATE_OBJ:
         ApplyDayNightPalette(BG_PLTT_SIZE >> 1, OBJ_PLTT_SIZE >> 1);
-        sDayNightTintState++;
+        gDayNight.tintState++;
+        break;
+    case DN_TINT_STATE_RESET:
+        ApplyNormalPalette();
+        gDayNight.tintState = DN_TINT_STATE_BG;
+        gDayNight.hasTinted = FALSE;
         break;
     default:
         if (gWeatherPtr->palProcessingState == WEATHER_PAL_STATE_IDLE)
             CpuFastCopy(gPlttBufferUnfaded, gPlttBufferFaded, PLTT_SIZE);
-
-        sDayNightTintState = 0;
+        gDayNight.tintState = DN_TINT_STATE_BG;
         break;
     }
 }
 
 void LoadDNPalette(const void *src, u16 offset, u16 size)
 {
-    CpuCopy16(src, &gPlttBufferDayNight[offset], size);
-    CpuCopy16(&gPlttBufferDayNight[offset], &gPlttBufferUnfaded[offset], size);
+    CpuCopy16(src, &sPlttBufferDayNight[offset], size);
+    ApplyGlobalTintToPaletteEntries(sPlttBufferDayNight + offset, size);
+    CpuCopy16(&sPlttBufferDayNight[offset], &gPlttBufferUnfaded[offset], size);
 
-    if (IsDayNightApplicable())
+    if (IsDayNightApplicable() && !gDayNight.isDisabled)
+    {
         ApplyDayNightPalette(offset, size >> 1);
+        gDayNight.hasTinted = TRUE;
+    }
 
     CpuCopy16(&gPlttBufferUnfaded[offset], &gPlttBufferFaded[offset], size);
 }
@@ -174,6 +218,7 @@ u8 LoadSpriteDNPalette(const struct SpritePalette *palette)
 
     return index;
 }
+
 void LoadCompressedSpriteDNPalette(const struct CompressedSpritePalette *src)
 {
     struct SpritePalette dest;

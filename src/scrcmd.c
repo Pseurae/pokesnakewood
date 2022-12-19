@@ -2332,3 +2332,8 @@ bool8 ScrCmd_clearname(struct ScriptContext *ctx)
     ClearCharacterName();
     return FALSE;
 }
+
+bool8 ScrCmd_setfieldtint(struct ScriptContext *ctx)
+{
+    gFieldTintMode = ScriptReadByte(ctx);
+}

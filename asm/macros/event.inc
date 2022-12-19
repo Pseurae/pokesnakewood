@@ -1735,13 +1735,18 @@
 	.byte 0xe3
 	.endm
 
-	.macro setname move:req
+	.macro setname id:req
 	.byte 0xe4
-	.byte \move
+	.byte \id
 	.endm
 
 	.macro clearname
-	.byte 0xe4
+	.byte 0xe5
+	.endm
+
+	.macro setfieldtint mode:req
+	.byte 0xe6
+	.byte \mode
 	.endm
 
 @ Supplementary
