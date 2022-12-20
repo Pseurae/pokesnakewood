@@ -241,7 +241,7 @@ const u8 gText_MatchCallParasolLady_Madeline_Intro2[] = _("enemy. Get protected.
 const u8 gText_MatchCallSwimmer_Jenny_Strategy[] = _("No mercy!");
 const u8 gText_MatchCallSwimmer_Jenny_Pokemon[] = _("Cute Water Pokémon.");
 const u8 gText_MatchCallSwimmer_Jenny_Intro1[] = _("I have too many fans.");
-const u8 gText_MatchCallSwimmer_Jenny_Intro2[] = _("I was interviewed on Tv.");
+const u8 gText_MatchCallSwimmer_Jenny_Intro2[] = _("I was interviewed on TV.");
 
 const u8 gText_MatchCallPicnicker_Diana_Strategy[] = _("I think about this & that.");
 const u8 gText_MatchCallPicnicker_Diana_Pokemon[] = _("I like all Pokémon.");

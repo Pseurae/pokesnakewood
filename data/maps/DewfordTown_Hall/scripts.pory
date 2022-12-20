@@ -300,7 +300,7 @@ DewfordTown_Hall_Text_NotEasyToKeepUp:
 DewfordTown_Hall_Text_TVShowAboutTrend:
 	.string "This whole business about\n"
 	.string "“{STR_VAR_1}”…\l"
-	.string "Isn't there a Tv show on it?$"
+	.string "Isn't there a TV show on it?$"
 
 DewfordTown_Hall_Text_IsTrendMorePopularAcrossSea:
 	.string "Across the sea…\p"

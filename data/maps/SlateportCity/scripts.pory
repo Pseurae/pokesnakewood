@@ -1163,10 +1163,10 @@ SlateportCity_Text_CaptainComeBackWithBigFish:
 
 SlateportCity_Text_AmIOnTV:
 	.string "Hey! Are you watching?\n"
-	.string "Am I on Tv?$"
+	.string "Am I on TV?$"
 
 SlateportCity_Text_CaptainsACelebrity:
-	.string "A Tv interview! Here!\n"
+	.string "A TV interview! Here!\n"
 	.string "The Captain's a celebrity!$"
 
 SlateportCity_Text_BigSmileForCamera:
@@ -1191,7 +1191,7 @@ SlateportCity_Text_GabbyWonderfulThanksForInterview:
 SlateportCity_Text_SternWhewFirstInterview:
 	.string "Capt. Stern: Whew…\p"
 	.string "That was my first time to be filmed for\n"
-	.string "Tv. That was nerve-wracking.$"
+	.string "TV. That was nerve-wracking.$"
 
 SlateportCity_Text_OhPlayerWeMadeDiscovery:
 	.string "Oh! {PLAYER}{KUN}!\n"

@@ -965,7 +965,7 @@ static const u8 sBerryPouchDesc[] = _(
     "Berries.");
 
 static const u8 sTeachyTVDesc[] = _(
-    "A Tv set tuned to an advice program\n"
+    "A V set tuned to an advice program\n"
     "for Trainers.");
 
 static const u8 sTriPassDesc[] = _(
