@@ -25,6 +25,7 @@ EWRAM_DATA struct BagPocket gBagPockets[POCKETS_COUNT] = {0};
 
 // rodata
 #include "data/text/item_descriptions.h"
+#include "data/text/tm_descriptions.h"
 #include "data/items.h"
 
 // code

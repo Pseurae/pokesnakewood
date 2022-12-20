@@ -419,8 +419,8 @@ static const struct WindowTemplate sDefaultBagWindows[] =
     },
     [WIN_DESCRIPTION] = {
         .bg = 0,
-        .tilemapLeft = 0x5,
-        .tilemapTop = 0xe,
+        .tilemapLeft = 5,
+        .tilemapTop = 14,
         .width = 25,
         .height = 6,
         .paletteNum = 15,
