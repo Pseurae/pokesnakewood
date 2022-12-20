@@ -51,4 +51,3 @@ Route114_FossilManiacsHouse_Text_CrammedWithBooks:
 	.string "How Rain Shapes The Land…\l"
 	.string "Stones, Soil, and Rock…\p"
 	.string "It's crammed with books.$"
-

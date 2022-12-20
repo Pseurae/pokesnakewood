@@ -535,4 +535,3 @@ LilycoveCity_ContestHall_Text_CuteContestStage:
 LilycoveCity_ContestHall_Text_SmartContestStage:
 	.string "Smartness Contest Stage\n"
 	.string "Be Impressed By Smart Pokémon!$"
-
