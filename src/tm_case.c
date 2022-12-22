@@ -1,5 +1,5 @@
 #include "global.h"
-
+#include "tm_case.h"
 #include "bg.h"
 #include "palette.h"
 #include "gpu_regs.h"
@@ -12,7 +12,6 @@
 #include "blit.h"
 #include "string_util.h"
 #include "decompress.h"
-
 #include "graphics.h"
 #include "task.h"
 #include "text_window.h"
@@ -31,8 +30,6 @@
 #include "scanline_effect.h"
 #include "strings.h"
 #include "list_menu.h"
-#include "tm_case.h"
-
 #include "constants/items.h"
 #include "constants/songs.h"
 #include "constants/rgb.h"
@@ -76,7 +73,7 @@ static void TMCaseSetup_UpdateVisualMenuOffset(void);
 static void DestroyTMCaseBuffers(void);
 static void Task_TMCaseFadeOut(u8 taskId);
 static void Task_TMCaseFadeIn(u8 taskId);
-static void Task_SelectTMAction_FromFieldBag(u8 taskId);
+static void Task_ContextMenu_FromFieldBag(u8 taskId);
 static void Task_TMContextMenu_HandleInput(u8 taskId);
 static void TMHMContextMenuAction_Use(u8 taskId);
 static void TMHMContextMenuAction_Give(u8 taskId);
@@ -85,9 +82,9 @@ static void PrintError_ItemCantBeHeld(u8 taskId);
 static void Task_WaitButtonAfterErrorPrint(u8 taskId);
 static void Subtask_CloseContextMenuAndReturnToMain(u8 taskId);
 static void TMHMContextMenuAction_Exit(u8 taskId);
-static void Task_SelectTMAction_Type1(u8 taskId);
-static void Task_SelectTMAction_Type3(u8 taskId);
-static void Task_SelectTMAction_FromSellMenu(u8 taskId);
+static void Task_ContextMenu_FromPartyGiveMenu(u8 taskId);
+static void Task_ContextMenu_FromPokemonPC(u8 taskId);
+static void Task_ContextMenu_FromSellMenu(u8 taskId);
 static void Task_AskConfirmSaleWithAmount(u8 taskId);
 static void Task_PlaceYesNoBox(u8 taskId);
 static void Task_SaleOfTMsCanceled(u8 taskId);
@@ -151,33 +148,33 @@ static const struct BgTemplate sBgTemplates[] = {
 };
 
 static void (*const sSelectTMActionTasks[])(u8 taskId) = {
-    Task_SelectTMAction_FromFieldBag,
-    Task_SelectTMAction_Type1,
-    Task_SelectTMAction_FromSellMenu,
-    Task_SelectTMAction_Type3
+    Task_ContextMenu_FromFieldBag,
+    Task_ContextMenu_FromPartyGiveMenu,
+    Task_ContextMenu_FromSellMenu,
+    Task_ContextMenu_FromPokemonPC
 };
 
 enum
 {
     ACTION_USE,
-    ACTION_GIVE,
+    // ACTION_GIVE,
     ACTION_EXIT
 };
 
 static const struct MenuAction sMenuActions_UseGiveExit[] = {
     [ACTION_USE] =  { gMenuText_Use,  TMHMContextMenuAction_Use  },
-    [ACTION_GIVE] = { gMenuText_Give, TMHMContextMenuAction_Give },
+    // [ACTION_GIVE] = { gMenuText_Give, TMHMContextMenuAction_Give },
     [ACTION_EXIT] = { gText_MenuExit, TMHMContextMenuAction_Exit },
 };
 
 static const u8 sMenuActionIndices_Field[] = {
     ACTION_USE, 
-    ACTION_GIVE, 
+    // ACTION_GIVE, 
     ACTION_EXIT
 };
 
 static const u8 sMenuActionIndices_UnionRoom[] = {
-    ACTION_GIVE, 
+    // ACTION_GIVE, 
     ACTION_EXIT
 };
 
@@ -647,7 +644,7 @@ static void TMCase_MoveCursorFunc(s32 itemIndex, bool8 onInit, struct ListMenu *
 {
     u16 itemId;
 
-    if (itemIndex == -2)
+    if (itemIndex == LIST_CANCEL)
         itemId = 0;
     else
         itemId = BagGetItemIdByPocketPosition(POCKET_TM_HM, itemIndex);
@@ -663,15 +660,9 @@ static void TMCase_MoveCursorFunc(s32 itemIndex, bool8 onInit, struct ListMenu *
 
 static void TMCase_ItemPrintFunc(u8 windowId, u32 itemId, u8 y)
 {
-    if (itemId != -2)
+    if (itemId != LIST_CANCEL)
     {
-        if (!ItemId_GetImportance(BagGetItemIdByPocketPosition(POCKET_TM_HM, itemId)))
-        {
-            ConvertIntToDecimalStringN(gStringVar1, BagGetQuantityByPocketPosition(POCKET_TM_HM, itemId), STR_CONV_MODE_RIGHT_ALIGN, 3);
-            StringExpandPlaceholders(gStringVar4, gText_xVar1);
-            AddTextPrinterParameterized_ColorByIndex(windowId, FONT_SMALL, gStringVar4, 0x7E, y, 0, 0, 0xFF, 1);
-        }
-        else
+        if (ItemId_GetImportance(BagGetItemIdByPocketPosition(POCKET_TM_HM, itemId)))
         {
             PlaceHMTileInWindow(windowId, 8, y);
         }
@@ -873,7 +864,7 @@ static void Subtask_ReturnToTMCaseMain(u8 taskId)
     gTasks[taskId].func = Task_TMCaseFadeIn;
 }
 
-static void Task_SelectTMAction_FromFieldBag(u8 taskId)
+static void Task_ContextMenu_FromFieldBag(u8 taskId)
 {
     TMCase_SetWindowBorder2(2);
     if (!MenuHelpers_IsLinkActive() && InUnionRoom() != TRUE)
@@ -1031,7 +1022,7 @@ static void TMHMContextMenuAction_Exit(u8 taskId)
     Subtask_ReturnToTMCaseMain(taskId);
 }
 
-static void Task_SelectTMAction_Type1(u8 taskId)
+static void Task_ContextMenu_FromPartyGiveMenu(u8 taskId)
 {
     s16 * data = gTasks[taskId].data;
 
@@ -1046,7 +1037,7 @@ static void Task_SelectTMAction_Type1(u8 taskId)
     }
 }
 
-static void Task_SelectTMAction_Type3(u8 taskId)
+static void Task_ContextMenu_FromPokemonPC(u8 taskId)
 {
     s16 * data = gTasks[taskId].data;
 
@@ -1061,7 +1052,7 @@ static void Task_SelectTMAction_Type3(u8 taskId)
     }
 }
 
-static void Task_SelectTMAction_FromSellMenu(u8 taskId)
+static void Task_ContextMenu_FromSellMenu(u8 taskId)
 {
     s16 * data = gTasks[taskId].data;
 

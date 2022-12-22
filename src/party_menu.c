@@ -2619,22 +2619,17 @@ static void SetPartyMonSelectionActions(struct Pokemon *mons, u8 slotId, u8 acti
 
 static void SetPartyMonFieldSelectionActions(struct Pokemon *mons, u8 slotId)
 {
-    u8 i, j;
+    u8 i;
 
     sPartyMenuInternal->numActions = 0;
     AppendToList(sPartyMenuInternal->actions, &sPartyMenuInternal->numActions, MENU_SUMMARY);
 
     // Add field moves to action list
-    for (i = 0; i < MAX_MON_MOVES; i++)
+    for (i = 0; sFieldMoves[i] != FIELD_MOVES_COUNT; i++)
     {
-        for (j = 0; sFieldMoves[j] != FIELD_MOVES_COUNT; j++)
-        {
-            if (GetMonData(&mons[slotId], i + MON_DATA_MOVE1) == sFieldMoves[j])
-            {
-                AppendToList(sPartyMenuInternal->actions, &sPartyMenuInternal->numActions, j + MENU_FIELD_MOVES);
-                break;
-            }
-        }
+        if ((i <= FIELD_MOVE_WATERFALL && CanMonLearnTMHM(&mons[slotId], sFieldTMs[i])) ||
+            CheckIfKnowsMove(&mons[slotId], sFieldMoves[i]))
+            AppendToList(sPartyMenuInternal->actions, &sPartyMenuInternal->numActions, MENU_FIELD_MOVES + i);
     }
 
     if (!InBattlePike())
@@ -4793,12 +4788,9 @@ static void Task_LearnedMove(u8 taskId)
     s16 *move = &gPartyMenu.data1;
     u16 item = gSpecialVar_ItemId;
 
-    if (move[1] == 0)
-    {
+    if (!move[1])
         AdjustFriendship(mon, FRIENDSHIP_EVENT_LEARN_TMHM);
-        if (item < ITEM_HM01_CUT)
-            RemoveBagItem(item, 1);
-    }
+
     GetMonNickname(mon, gStringVar1);
     StringCopy(gStringVar2, gMoveNames[move[0]]);
     StringExpandPlaceholders(gStringVar4, gText_PkmnLearnedMove3);

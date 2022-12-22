@@ -918,7 +918,8 @@ const u8 *ItemId_GetDescription(u16 itemId)
 
 u8 ItemId_GetImportance(u16 itemId)
 {
-    return gItems[SanitizeItemId(itemId)].importance;
+    return gItems[SanitizeItemId(itemId)].importance ||
+           gItems[SanitizeItemId(itemId)].pocket == POCKET_TM_HM;
 }
 
 // Unused

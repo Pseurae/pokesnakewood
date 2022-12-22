@@ -536,5 +536,6 @@ void DestroyMonSpritesGfxManager(u8 managerId);
 u8 *MonSpritesGfxManager_GetSpritePtr(u8 managerId, u8 spriteNum);
 u8 GetHiddenPowerBase(struct Pokemon *mon);
 u8 GetHiddenPowerType(struct Pokemon *mon);
+bool8 CheckIfKnowsMove(struct Pokemon *mon, u16 moveId);
 
 #endif // GUARD_POKEMON_H

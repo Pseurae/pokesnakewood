@@ -48,6 +48,8 @@ static u8 CreatePokemonFrontSprite(u16 species, u8 x, u8 y);
 static void SpriteCB_SelectionHand(struct Sprite *sprite);
 static void SpriteCB_Pokeball(struct Sprite *sprite);
 static void SpriteCB_StarterPokemon(struct Sprite *sprite);
+static void Task_StartStarterChoiceFadeOut(u8 taskId);
+static void Task_StarterChoiceFadeOut(u8 taskId);
 
 static u16 sStarterLabelWindowId;
 
@@ -117,9 +119,16 @@ static const u8 sStarterLabelCoords[STARTER_MON_COUNT][2] =
 
 static const u16 sStarterMon[STARTER_MON_COUNT] =
 {
-    SPECIES_TREECKO,
-    SPECIES_TORCHIC,
-    SPECIES_MUDKIP,
+    SPECIES_PARAS,
+    SPECIES_BALTOY,
+    SPECIES_KOFFING,
+};
+
+static const u8 sStarterDesc[STARTER_MON_COUNT][55] =
+{
+    _("This Poké Ball has an air of ill\nhealth about it."),
+    _("This Poké Ball is spinning slowly on\nits own axis."),
+    _("This Poké Ball is gently spewing\nexhaust fumes.")
 };
 
 static const struct BgTemplate sBgTemplates[3] =
@@ -478,9 +487,9 @@ static void CB2_StarterChoose(void)
 
 static void Task_StarterChoose(u8 taskId)
 {
-    CreateStarterPokemonLabel(gTasks[taskId].tStarterSelection);
+    // CreateStarterPokemonLabel(gTasks[taskId].tStarterSelection);
     DrawStdFrameWithCustomTileAndPalette(0, FALSE, 0x2A8, 0xD);
-    AddTextPrinterParameterized(0, FONT_NORMAL, gText_BirchInTrouble, 0, 1, 0, NULL);
+    AddTextPrinterParameterized(0, FONT_NORMAL, sStarterDesc[gTasks[taskId].tStarterSelection], 0, 1, 0, NULL);
     PutWindowTilemap(0);
     ScheduleBgCopyTilemapToVram(0);
     gTasks[taskId].func = Task_HandleStarterChooseInput;
@@ -496,17 +505,17 @@ static void Task_HandleStarterChooseInput(u8 taskId)
 
         ClearStarterLabel();
 
-        // Create white circle background
-        spriteId = CreateSprite(&sSpriteTemplate_StarterCircle, sPokeballCoords[selection][0], sPokeballCoords[selection][1], 1);
-        gTasks[taskId].tCircleSpriteId = spriteId;
+        // // Create white circle background
+        // spriteId = CreateSprite(&sSpriteTemplate_StarterCircle, sPokeballCoords[selection][0], sPokeballCoords[selection][1], 1);
+        // gTasks[taskId].tCircleSpriteId = spriteId;
 
-        // Create Pokemon sprite
-        spriteId = CreatePokemonFrontSprite(GetStarterPokemon(gTasks[taskId].tStarterSelection), sPokeballCoords[selection][0], sPokeballCoords[selection][1]);
-        gSprites[spriteId].affineAnims = &sAffineAnims_StarterPokemon;
-        gSprites[spriteId].callback = SpriteCB_StarterPokemon;
+        // // Create Pokemon sprite
+        // spriteId = CreatePokemonFrontSprite(GetStarterPokemon(gTasks[taskId].tStarterSelection), sPokeballCoords[selection][0], sPokeballCoords[selection][1]);
+        // gSprites[spriteId].affineAnims = &sAffineAnims_StarterPokemon;
+        // gSprites[spriteId].callback = SpriteCB_StarterPokemon;
 
         gTasks[taskId].tPkmnSpriteId = spriteId;
-        gTasks[taskId].func = Task_WaitForStarterSprite;
+        gTasks[taskId].func = Task_AskConfirmStarter;
     }
     else if (JOY_NEW(DPAD_LEFT) && selection > 0)
     {
@@ -540,6 +549,20 @@ static void Task_AskConfirmStarter(u8 taskId)
     gTasks[taskId].func = Task_HandleConfirmStarterInput;
 }
 
+static void Task_StartStarterChoiceFadeOut(u8 taskId)
+{
+    BeginNormalPaletteFade(PALETTES_ALL, -2, 0, 16, RGB_BLACK);
+    gTasks[taskId].func = Task_StarterChoiceFadeOut;
+}
+
+static void Task_StarterChoiceFadeOut(u8 taskId)
+{
+    if (!gPaletteFade.active)
+    {
+        SetMainCallback2(gMain.savedCallback);
+    }    
+}
+
 static void Task_HandleConfirmStarterInput(u8 taskId)
 {
     u8 spriteId;
@@ -550,18 +573,19 @@ static void Task_HandleConfirmStarterInput(u8 taskId)
         // Return the starter choice and exit.
         gSpecialVar_Result = gTasks[taskId].tStarterSelection;
         ResetAllPicSprites();
-        SetMainCallback2(gMain.savedCallback);
+        // SetMainCallback2(gMain.savedCallback);
+        Task_StartStarterChoiceFadeOut(taskId);
         break;
     case 1:  // NO
     case MENU_B_PRESSED:
         PlaySE(SE_SELECT);
-        spriteId = gTasks[taskId].tPkmnSpriteId;
-        FreeOamMatrix(gSprites[spriteId].oam.matrixNum);
-        FreeAndDestroyMonPicSprite(spriteId);
+        // spriteId = gTasks[taskId].tPkmnSpriteId;
+        // FreeOamMatrix(gSprites[spriteId].oam.matrixNum);
+        // FreeAndDestroyMonPicSprite(spriteId);
 
-        spriteId = gTasks[taskId].tCircleSpriteId;
-        FreeOamMatrix(gSprites[spriteId].oam.matrixNum);
-        DestroySprite(&gSprites[spriteId]);
+        // spriteId = gTasks[taskId].tCircleSpriteId;
+        // FreeOamMatrix(gSprites[spriteId].oam.matrixNum);
+        // DestroySprite(&gSprites[spriteId]);
         gTasks[taskId].func = Task_DeclineStarter;
         break;
     }
@@ -627,7 +651,9 @@ static void Task_MoveStarterChooseCursor(u8 taskId)
 
 static void Task_CreateStarterLabel(u8 taskId)
 {
-    CreateStarterPokemonLabel(gTasks[taskId].tStarterSelection);
+    FillWindowPixelBuffer(0, PIXEL_FILL(1));
+    AddTextPrinterParameterized(0, FONT_NORMAL, sStarterDesc[gTasks[taskId].tStarterSelection], 0, 1, 0, NULL);
+    // CreateStarterPokemonLabel(gTasks[taskId].tStarterSelection);
     gTasks[taskId].func = Task_HandleStarterChooseInput;
 }
 
