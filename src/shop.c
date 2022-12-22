@@ -60,6 +60,7 @@ enum {
 
 enum {
     COLORID_NORMAL,      // Item descriptions, quantity in bag, and quantity/price
+    COLORID_DESCRIPTION,
     COLORID_ITEM_LIST,   // The text in the item list, and the cursor normally
     COLORID_GRAY_CURSOR, // When the cursor has selected an item to purchase
 };
@@ -183,7 +184,7 @@ static const struct WindowTemplate sShopMenuWindowTemplates[] =
         .width = 9,
         .height = 6,
         .paletteNum = 15,
-        .baseBlock = 0x0008,
+        .baseBlock = 0x0001,
     },
     // Separate shop menu window for decorations, which can't be sold
     [WIN_BUY_QUIT] = {
@@ -193,7 +194,7 @@ static const struct WindowTemplate sShopMenuWindowTemplates[] =
         .width = 9,
         .height = 4,
         .paletteNum = 15,
-        .baseBlock = 0x0008,
+        .baseBlock = 0x0001,
     }
 };
 
@@ -213,9 +214,9 @@ static const struct ListMenuTemplate sShopBuyMenuListTemplate =
     .fillValue = 0,
     .cursorShadowPal = 3,
     .lettersSpacing = 0,
-    .itemVerticalPadding = 0,
+    .itemVerticalPadding = 2,
     .scrollMultiple = LIST_NO_MULTIPLE_SCROLL,
-    .fontId = FONT_NARROW,
+    .fontId = FONT_SHORT,
     .cursorKind = CURSOR_BLACK_ARROW
 };
 
@@ -265,28 +266,28 @@ static const struct WindowTemplate sShopBuyMenuWindowTemplates[] =
         .bg = 0,
         .tilemapLeft = 1,
         .tilemapTop = 1,
-        .width = 10,
+        .width = 8,
         .height = 2,
         .paletteNum = 15,
-        .baseBlock = 0x001E,
+        .baseBlock = 0x1,
     },
     [WIN_ITEM_LIST] = {
         .bg = 0,
-        .tilemapLeft = 14,
-        .tilemapTop = 2,
-        .width = 15,
-        .height = 16,
+        .tilemapLeft = 11,
+        .tilemapTop = 1,
+        .width = 17,
+        .height = 12,
         .paletteNum = 15,
-        .baseBlock = 0x0032,
+        .baseBlock = 0x11,
     },
     [WIN_ITEM_DESCRIPTION] = {
         .bg = 0,
-        .tilemapLeft = 0,
-        .tilemapTop = 13,
-        .width = 14,
+        .tilemapLeft = 5,
+        .tilemapTop = 14,
+        .width = 25,
         .height = 6,
         .paletteNum = 15,
-        .baseBlock = 0x0122,
+        .baseBlock = 0xdd,
     },
     [WIN_QUANTITY_IN_BAG] = {
         .bg = 0,
@@ -295,7 +296,7 @@ static const struct WindowTemplate sShopBuyMenuWindowTemplates[] =
         .width = 12,
         .height = 2,
         .paletteNum = 15,
-        .baseBlock = 0x0176,
+        .baseBlock = 0x173,
     },
     [WIN_QUANTITY_PRICE] = {
         .bg = 0,
@@ -304,7 +305,7 @@ static const struct WindowTemplate sShopBuyMenuWindowTemplates[] =
         .width = 10,
         .height = 2,
         .paletteNum = 15,
-        .baseBlock = 0x018E,
+        .baseBlock = 0x18b,
     },
     [WIN_MESSAGE] = {
         .bg = 0,
@@ -313,7 +314,7 @@ static const struct WindowTemplate sShopBuyMenuWindowTemplates[] =
         .width = 27,
         .height = 4,
         .paletteNum = 15,
-        .baseBlock = 0x01A2,
+        .baseBlock = 0x19f,
     },
     DUMMY_WIN_TEMPLATE
 };
@@ -332,6 +333,7 @@ static const struct WindowTemplate sShopBuyMenuYesNoWindowTemplates =
 static const u8 sShopBuyMenuTextColors[][3] =
 {
     [COLORID_NORMAL]      = {1, 2, 3},
+    [COLORID_DESCRIPTION] = {0, 1, 2},
     [COLORID_ITEM_LIST]   = {0, 2, 3},
     [COLORID_GRAY_CURSOR] = {0, 3, 2},
 };
@@ -613,7 +615,7 @@ static void BuyMenuPrintItemDescriptionAndShowItemIcon(s32 item, bool8 onInit, s
     }
 
     FillWindowPixelBuffer(WIN_ITEM_DESCRIPTION, PIXEL_FILL(0));
-    BuyMenuPrint(WIN_ITEM_DESCRIPTION, description, 3, 1, 0, COLORID_NORMAL);
+    BuyMenuPrint(WIN_ITEM_DESCRIPTION, description, 3, 3, 0, COLORID_DESCRIPTION);
 }
 
 static void BuyMenuPrintPriceInList(u8 windowId, u32 itemId, u8 y)
@@ -640,8 +642,8 @@ static void BuyMenuPrintPriceInList(u8 windowId, u32 itemId, u8 y)
         }
 
         StringExpandPlaceholders(gStringVar4, gText_PokedollarVar1);
-        x = GetStringRightAlignXOffset(FONT_NARROW, gStringVar4, 120);
-        AddTextPrinterParameterized4(windowId, FONT_NARROW, x, y, 0, 0, sShopBuyMenuTextColors[COLORID_ITEM_LIST], TEXT_SKIP_DRAW, gStringVar4);
+        // x = GetStringRightAlignXOffset(FONT_NARROW, gStringVar4, 140);
+        AddTextPrinterParameterized4(windowId, FONT_SMALL, 105, y, 0, 0, sShopBuyMenuTextColors[COLORID_ITEM_LIST], TEXT_SKIP_DRAW, gStringVar4);
     }
 }
 
@@ -690,7 +692,7 @@ static void BuyMenuAddItemIcon(u16 item, u8 iconSlot)
         {
             *spriteIdPtr = spriteId;
             gSprites[spriteId].x2 = 24;
-            gSprites[spriteId].y2 = 88;
+            gSprites[spriteId].y2 = 140;
         }
     }
     else
@@ -729,7 +731,7 @@ static void BuyMenuInitBgs(void)
     SetGpuReg(REG_OFFSET_BG3HOFS, 0);
     SetGpuReg(REG_OFFSET_BG3VOFS, 0);
     SetGpuReg(REG_OFFSET_BLDCNT, 0);
-    SetGpuReg(REG_OFFSET_DISPCNT, DISPCNT_MODE_0 | DISPCNT_OBJ_ON | DISPCNT_OBJ_1D_MAP);
+    SetGpuReg(REG_OFFSET_DISPCNT, DISPCNT_OBJ_ON | DISPCNT_OBJ_1D_MAP);
     ShowBg(0);
     ShowBg(1);
     ShowBg(2);
@@ -738,16 +740,16 @@ static void BuyMenuInitBgs(void)
 
 static void BuyMenuDecompressBgGraphics(void)
 {
-    DecompressAndCopyTileDataToVram(1, gShopMenu_Gfx, 0x3A0, 0x3E3, 0);
+    DecompressAndCopyTileDataToVram(1, gShopMenu_Gfx, 0x480, 0x3DC, 0);
     LZDecompressWram(gShopMenu_Tilemap, sShopData->tilemapBuffers[0]);
-    LoadCompressedPalette(gShopMenu_Pal, 0xC0, 0x20);
+    LoadCompressedPalette(gShopMenu_Pal, 0xB0, 0x20);
 }
 
 static void BuyMenuInitWindows(void)
 {
     InitWindows(sShopBuyMenuWindowTemplates);
     DeactivateAllTextPrinters();
-    LoadUserWindowBorderGfx(WIN_MONEY, 1, 0xD0);
+    LoadUserWindowBorderGfx(WIN_MONEY, 0x212, 0xD0);
     LoadMessageBoxGfx(WIN_MONEY, 0xA, 0xE0);
     PutWindowTilemap(WIN_MONEY);
     PutWindowTilemap(WIN_ITEM_LIST);
@@ -756,7 +758,7 @@ static void BuyMenuInitWindows(void)
 
 static void BuyMenuPrint(u8 windowId, const u8 *text, u8 x, u8 y, s8 speed, u8 colorSet)
 {
-    AddTextPrinterParameterized4(windowId, FONT_NORMAL, x, y, 0, 0, sShopBuyMenuTextColors[colorSet], speed, text);
+    AddTextPrinterParameterized4(windowId, FONT_SHORT, x, y, 0, 0, sShopBuyMenuTextColors[colorSet], speed, text);
 }
 
 static void BuyMenuDisplayMessage(u8 taskId, const u8 *text, TaskFunc callback)
@@ -770,7 +772,7 @@ static void BuyMenuDrawGraphics(void)
     BuyMenuDrawMapGraphics();
     BuyMenuCopyMenuBgToBg1TilemapBuffer();
     AddMoneyLabelObject(19, 11);
-    PrintMoneyAmountInMoneyBoxWithBorder(WIN_MONEY, 1, 13, GetMoney(&gSaveBlock1Ptr->money));
+    PrintMoneyAmountInMoneyBoxWithBorder(WIN_MONEY, 0x212, 13, GetMoney(&gSaveBlock1Ptr->money));
     ScheduleBgCopyTilemapToVram(0);
     ScheduleBgCopyTilemapToVram(1);
     ScheduleBgCopyTilemapToVram(2);
@@ -785,32 +787,28 @@ static void BuyMenuDrawMapGraphics(void)
 }
 
 static void BuyMenuDrawMapBg(void)
-{
-    s16 i, j;
-    s16 x, y;
+{    
+    s16 i, j, x, y;
     const struct MapLayout *mapLayout;
     u16 metatile;
     u8 metatileLayerType;
 
     mapLayout = gMapHeader.mapLayout;
     GetXYCoordsOneStepInFrontOfPlayer(&x, &y);
-    x -= 4;
-    y -= 4;
+    x -= 2;
+    y -= 3;
 
     for (j = 0; j < 10; j++)
     {
-        for (i = 0; i < 15; i++)
+        for (i = 0; i < 5; i++)
         {
             metatile = MapGridGetMetatileIdAt(x + i, y + j);
-            if (BuyMenuCheckForOverlapWithMenuBg(i, j) == TRUE)
-                metatileLayerType = MapGridGetMetatileLayerTypeAt(x + i, y + j);
-            else
-                metatileLayerType = METATILE_LAYER_TYPE_COVERED;
+            metatileLayerType = MapGridGetMetatileLayerTypeAt(x + i, y + j);
 
             if (metatile < NUM_METATILES_IN_PRIMARY)
-                BuyMenuDrawMapMetatile(i, j, mapLayout->primaryTileset->metatiles + metatile * NUM_TILES_PER_METATILE, metatileLayerType);
+                BuyMenuDrawMapMetatile(i, j, mapLayout->primaryTileset->metatiles + metatile * 8, metatileLayerType);
             else
-                BuyMenuDrawMapMetatile(i, j, mapLayout->secondaryTileset->metatiles + ((metatile - NUM_METATILES_IN_PRIMARY) * NUM_TILES_PER_METATILE), metatileLayerType);
+                BuyMenuDrawMapMetatile(i, j, mapLayout->secondaryTileset->metatiles + ((metatile - NUM_METATILES_IN_PRIMARY) * 8), metatileLayerType);
         }
     }
 }
@@ -818,7 +816,7 @@ static void BuyMenuDrawMapBg(void)
 static void BuyMenuDrawMapMetatile(s16 x, s16 y, const u16 *src, u8 metatileLayerType)
 {
     u16 offset1 = x * 2;
-    u16 offset2 = y * 64;
+    u16 offset2 = y * 64 + 64;
 
     switch (metatileLayerType)
     {
@@ -839,7 +837,6 @@ static void BuyMenuDrawMapMetatile(s16 x, s16 y, const u16 *src, u8 metatileLaye
 
 static void BuyMenuDrawMapMetatileLayer(u16 *dest, s16 offset1, s16 offset2, const u16 *src)
 {
-    // This function draws a whole 2x2 metatile.
     dest[offset1 + offset2] = src[0]; // top left
     dest[offset1 + offset2 + 1] = src[1]; // top right
     dest[offset1 + offset2 + 32] = src[2]; // bottom left
@@ -848,14 +845,13 @@ static void BuyMenuDrawMapMetatileLayer(u16 *dest, s16 offset1, s16 offset2, con
 
 static void BuyMenuCollectObjectEventData(void)
 {
-    s16 facingX;
-    s16 facingY;
-    u8 y;
-    u8 x;
-    u8 numObjects = 0;
+    s16 facingX, facingY;
+    u8 x, y, elevation;
+    u8 num = 0;
 
     GetXYCoordsOneStepInFrontOfPlayer(&facingX, &facingY);
-
+    elevation = PlayerGetElevation();
+    
     for (y = 0; y < OBJECT_EVENTS_COUNT; y++)
         sShopData->viewportObjects[y][OBJ_EVENT_ID] = OBJECT_EVENTS_COUNT;
 
@@ -863,32 +859,30 @@ static void BuyMenuCollectObjectEventData(void)
     {
         for (x = 0; x < 7; x++)
         {
-            u8 objEventId = GetObjectEventIdByXY(facingX - 4 + x, facingY - 2 + y);
-
-            if (objEventId != OBJECT_EVENTS_COUNT)
+            u8 eventObjId = GetObjectEventIdByPosition(facingX - 3 + x, facingY - 2 + y, elevation);
+            if (eventObjId != OBJECT_EVENTS_COUNT)
             {
-                sShopData->viewportObjects[numObjects][OBJ_EVENT_ID] = objEventId;
-                sShopData->viewportObjects[numObjects][X_COORD] = x;
-                sShopData->viewportObjects[numObjects][Y_COORD] = y;
-                sShopData->viewportObjects[numObjects][LAYER_TYPE] = MapGridGetMetatileLayerTypeAt(facingX - 4 + x, facingY - 2 + y);
+                sShopData->viewportObjects[num][OBJ_EVENT_ID] = eventObjId;
+                sShopData->viewportObjects[num][X_COORD] = x;
+                sShopData->viewportObjects[num][Y_COORD] = y;
 
-                switch (gObjectEvents[objEventId].facingDirection)
+                switch (gObjectEvents[eventObjId].facingDirection)
                 {
-                case DIR_SOUTH:
-                    sShopData->viewportObjects[numObjects][ANIM_NUM] = ANIM_STD_FACE_SOUTH;
-                    break;
-                case DIR_NORTH:
-                    sShopData->viewportObjects[numObjects][ANIM_NUM] = ANIM_STD_FACE_NORTH;
-                    break;
-                case DIR_WEST:
-                    sShopData->viewportObjects[numObjects][ANIM_NUM] = ANIM_STD_FACE_WEST;
-                    break;
-                case DIR_EAST:
-                default:
-                    sShopData->viewportObjects[numObjects][ANIM_NUM] = ANIM_STD_FACE_EAST;
-                    break;
+                    case DIR_SOUTH:
+                        sShopData->viewportObjects[num][ANIM_NUM] = 0;
+                        break;
+                    case DIR_NORTH:
+                        sShopData->viewportObjects[num][ANIM_NUM] = 1;
+                        break;
+                    case DIR_WEST:
+                        sShopData->viewportObjects[num][ANIM_NUM] = 2;
+                        break;
+                    case DIR_EAST:
+                    default:
+                        sShopData->viewportObjects[num][ANIM_NUM] = 3;
+                        break;
                 }
-                numObjects++;
+                num++;
             }
         }
     }
@@ -896,8 +890,7 @@ static void BuyMenuCollectObjectEventData(void)
 
 static void BuyMenuDrawObjectEvents(void)
 {
-    u8 i;
-    u8 spriteId;
+    u8 i, spriteId;
     const struct ObjectEventGraphicsInfo *graphicsInfo;
 
     for (i = 0; i < OBJECT_EVENTS_COUNT; i++)
@@ -905,21 +898,13 @@ static void BuyMenuDrawObjectEvents(void)
         if (sShopData->viewportObjects[i][OBJ_EVENT_ID] == OBJECT_EVENTS_COUNT)
             continue;
 
-        graphicsInfo = GetObjectEventGraphicsInfo(gObjectEvents[sShopData->viewportObjects[i][OBJ_EVENT_ID]].graphicsId);
-
+        graphicsInfo = GetObjectEventGraphicsInfo(gObjectEvents[sShopData->viewportObjects[i][OBJ_EVENT_ID]].graphicsId);        
         spriteId = CreateObjectGraphicsSprite(
             gObjectEvents[sShopData->viewportObjects[i][OBJ_EVENT_ID]].graphicsId,
             SpriteCallbackDummy,
-            (u16)sShopData->viewportObjects[i][X_COORD] * 16 + 8,
+            (u16)sShopData->viewportObjects[i][X_COORD] * 16 - 8,
             (u16)sShopData->viewportObjects[i][Y_COORD] * 16 + 48 - graphicsInfo->height / 2,
             2);
-
-        if (BuyMenuCheckIfObjectEventOverlapsMenuBg(sShopData->viewportObjects[i]) == TRUE)
-        {
-            gSprites[spriteId].subspriteTableNum = 4;
-            gSprites[spriteId].subspriteMode = SUBSPRITES_ON;
-        }
-
         StartSpriteAnim(&gSprites[spriteId], sShopData->viewportObjects[i][ANIM_NUM]);
     }
 }
@@ -941,7 +926,7 @@ static void BuyMenuCopyMenuBgToBg1TilemapBuffer(void)
     for (i = 0; i < 1024; i++)
     {
         if (src[i] != 0)
-            dest[i] = src[i] + 0xC3E3;
+            dest[i] = src[i] + 0xb3dc;
     }
 }
 
@@ -1037,12 +1022,12 @@ static void Task_BuyHowManyDialogueInit(u8 taskId)
     u16 quantityInBag = CountTotalItemQuantityInBag(tItemId);
     u16 maxQuantity;
 
-    DrawStdFrameWithCustomTileAndPalette(WIN_QUANTITY_IN_BAG, FALSE, 1, 13);
+    DrawStdFrameWithCustomTileAndPalette(WIN_QUANTITY_IN_BAG, FALSE, 0x212, 13);
     ConvertIntToDecimalStringN(gStringVar1, quantityInBag, STR_CONV_MODE_RIGHT_ALIGN, MAX_ITEM_DIGITS + 1);
     StringExpandPlaceholders(gStringVar4, gText_InBagVar1);
     BuyMenuPrint(WIN_QUANTITY_IN_BAG, gStringVar4, 0, 1, 0, COLORID_NORMAL);
     tItemCount = 1;
-    DrawStdFrameWithCustomTileAndPalette(WIN_QUANTITY_PRICE, FALSE, 1, 13);
+    DrawStdFrameWithCustomTileAndPalette(WIN_QUANTITY_PRICE, FALSE, 0x212, 13);
     BuyMenuPrintItemQuantityAndPrice(taskId);
     ScheduleBgCopyTilemapToVram(0);
 

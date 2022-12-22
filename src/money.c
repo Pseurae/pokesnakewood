@@ -132,7 +132,7 @@ void SubtractMoneyFromVar0x8005(void)
 
 void PrintMoneyAmountInMoneyBox(u8 windowId, int amount, u8 speed)
 {
-    PrintMoneyAmount(windowId, 38, 1, amount, speed);
+    PrintMoneyAmount(windowId, 12, 1, amount, speed);
 }
 
 void PrintMoneyAmount(u8 windowId, u8 x, u8 y, int amount, u8 speed)
@@ -173,7 +173,7 @@ void DrawMoneyBox(int amount, u8 x, u8 y)
     PutWindowTilemap(sMoneyBoxWindowId);
     CopyWindowToVram(sMoneyBoxWindowId, COPYWIN_MAP);
     PrintMoneyAmountInMoneyBoxWithBorder(sMoneyBoxWindowId, 0x214, 14, amount);
-    AddMoneyLabelObject((8 * x) + 19, (8 * y) + 11);
+    // AddMoneyLabelObject((8 * x) + 19, (8 * y) + 11);
 }
 
 void HideMoneyBox(void)
