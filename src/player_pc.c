@@ -284,7 +284,7 @@ static const struct ListMenuTemplate sListMenuTemplate_ItemStorage =
     .header_X = 0,
     .item_X = 8,
     .cursor_X = 0,
-    .upText_Y = 9,
+    .upText_Y = 2,
     .cursorPal = 2,
     .fillValue = 1,
     .cursorShadowPal = 3,
@@ -302,27 +302,27 @@ static const struct WindowTemplate sWindowTemplates_ItemStorage[ITEMPC_WIN_COUNT
         .tilemapLeft = 16,
         .tilemapTop = 1,
         .width = 13,
-        .height = 18,
+        .height = 12,
         .paletteNum = 15,
-        .baseBlock = 0x0001
+        .baseBlock = 0x1
     },
     [ITEMPC_WIN_MESSAGE] = {
         .bg = 0,
         .tilemapLeft = 1,
-        .tilemapTop = 13,
-        .width = 13,
-        .height = 6,
+        .tilemapTop = 15,
+        .width = 28,
+        .height = 4,
         .paletteNum = 15,
-        .baseBlock = 0x00EB
+        .baseBlock = 0xAA
     },
     [ITEMPC_WIN_ICON] = {
         .bg = 0,
         .tilemapLeft = 1,
-        .tilemapTop = 8,
+        .tilemapTop = 10,
         .width = 3,
         .height = 3,
         .paletteNum = 15,
-        .baseBlock = 0x0153
+        .baseBlock = 0x11A
     },
     [ITEMPC_WIN_TITLE] = {
         .bg = 0,
@@ -331,7 +331,7 @@ static const struct WindowTemplate sWindowTemplates_ItemStorage[ITEMPC_WIN_COUNT
         .width = 13,
         .height = 2,
         .paletteNum = 15,
-        .baseBlock = 0x0139
+        .baseBlock = 0x123
     },
     [ITEMPC_WIN_QUANTITY] = {
         .bg = 0,
@@ -340,7 +340,7 @@ static const struct WindowTemplate sWindowTemplates_ItemStorage[ITEMPC_WIN_COUNT
         .width = 6,
         .height = 2,
         .paletteNum = 15,
-        .baseBlock = 0x015C
+        .baseBlock = 0x13D
     },
     [ITEMPC_WIN_YESNO] = {
         .bg = 0,
@@ -349,7 +349,7 @@ static const struct WindowTemplate sWindowTemplates_ItemStorage[ITEMPC_WIN_COUNT
         .width = 5,
         .height = 4,
         .paletteNum = 15,
-        .baseBlock = 0x0168
+        .baseBlock = 0x149
     }
 };
 
@@ -1101,7 +1101,7 @@ static void ItemStorage_DrawItemIcon(u16 itemId)
             *spriteIdLoc = spriteId;
             gSprites[spriteId].oam.priority = 0;
             gSprites[spriteId].x2 = 24;
-            gSprites[spriteId].y2 = 80;
+            gSprites[spriteId].y2 = 96;
         }
     }
 }

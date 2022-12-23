@@ -178,7 +178,7 @@ void UpdateDayNightPalettes(void)
         gDayNight.hasTinted = FALSE;
         break;
     default:
-        if (gWeatherPtr->palProcessingState == WEATHER_PAL_STATE_IDLE)
+        if (gWeatherPtr->palProcessingState == WEATHER_PAL_STATE_IDLE && !gPaletteFade.active)
             CpuFastCopy(gPlttBufferUnfaded, gPlttBufferFaded, PLTT_SIZE);
         gDayNight.tintState = DN_TINT_STATE_BG;
         break;
