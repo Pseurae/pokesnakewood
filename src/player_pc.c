@@ -957,7 +957,7 @@ static u8 ItemStorage_AddWindow(u8 i)
     if (*windowIdLoc == WINDOW_NONE)
     {
         *windowIdLoc = AddWindow(&sWindowTemplates_ItemStorage[i]);
-        DrawStdFrameWithCustomTileAndPalette(*windowIdLoc, FALSE, 0x214, 0xE);
+        DrawStdFrameWithCustomTileAndPalette(*windowIdLoc, FALSE, 0x212, 0xE);
         ScheduleBgCopyTilemapToVram(0);
     }
     return *windowIdLoc;
@@ -1447,7 +1447,7 @@ static void ItemStorage_DoItemToss(u8 taskId)
         CopyItemName(gSaveBlock1Ptr->pcItems[pos].itemId, gStringVar1);
         ConvertIntToDecimalStringN(gStringVar2, tQuantity, STR_CONV_MODE_LEFT_ALIGN, 3);
         ItemStorage_PrintMessage(ItemStorage_GetMessage(MSG_OKAY_TO_THROW_AWAY));
-        CreateYesNoMenuWithCallbacks(taskId, &sWindowTemplates_ItemStorage[ITEMPC_WIN_YESNO], 1, 0, 1, 0x214, 0xE, &ItemTossYesNoFuncs);
+        CreateYesNoMenuWithCallbacks(taskId, &sWindowTemplates_ItemStorage[ITEMPC_WIN_YESNO], 1, 0, 1, 0x212, 0xE, &ItemTossYesNoFuncs);
     }
     else
     {
