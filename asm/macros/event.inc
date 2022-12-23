@@ -1749,7 +1749,7 @@
 	.byte \mode
 	.endm
 
-	.macro checkhmusage hm:req
+	.macro canpartyusehm hm:req
 	.byte 0xe7
 	.byte \hm
 	.endm

@@ -3,7 +3,7 @@ EventScript_CutTree::
 	lockall
 	goto_if_unset FLAG_BADGE01_GET, EventScript_CheckTreeCantCut
 	@ checkpartymove MOVE_CUT
-	checkhmusage 0
+	canpartyusehm 0
 	goto_if_eq VAR_RESULT, PARTY_SIZE, EventScript_CheckTreeCantCut
 	setfieldeffectargument 0, VAR_RESULT
 	bufferpartymonnick STR_VAR_1, VAR_RESULT
@@ -63,7 +63,7 @@ EventScript_RockSmash::
 	lockall
 	goto_if_unset FLAG_BADGE03_GET, EventScript_CantSmashRock
 	@ checkpartymove MOVE_ROCK_SMASH
-	checkhmusage 5
+	canpartyusehm 5
 	goto_if_eq VAR_RESULT, PARTY_SIZE, EventScript_CantSmashRock
 	setfieldeffectargument 0, VAR_RESULT
 	bufferpartymonnick STR_VAR_1, VAR_RESULT
@@ -128,7 +128,7 @@ EventScript_StrengthBoulder::
 	goto_if_unset FLAG_BADGE04_GET, EventScript_CantStrength
 	goto_if_set FLAG_SYS_USE_STRENGTH, EventScript_CheckActivatedBoulder
 	@ checkpartymove MOVE_STRENGTH
-	checkhmusage 3
+	canpartyusehm 3
 	goto_if_eq VAR_RESULT, PARTY_SIZE, EventScript_CantStrength
 	setfieldeffectargument 0, VAR_RESULT
 	msgbox Text_WantToStrength, MSGBOX_YESNO
@@ -188,7 +188,7 @@ Text_StrengthActivated:
 EventScript_UseWaterfall::
 	lockall
 	@ checkpartymove MOVE_WATERFALL
-	checkhmusage 6
+	canpartyusehm 6
 	goto_if_eq VAR_RESULT, PARTY_SIZE, EventScript_CantWaterfall
 	bufferpartymonnick STR_VAR_1, VAR_RESULT
 	setfieldeffectargument 0, VAR_RESULT
@@ -222,7 +222,7 @@ Text_MonUsedWaterfall:
 EventScript_UseDive::
 	lockall
 	@ checkpartymove MOVE_DIVE
-	checkhmusage 7
+	canpartyusehm 7
 	goto_if_eq VAR_RESULT, PARTY_SIZE, EventScript_CantDive
 	bufferpartymonnick STR_VAR_1, VAR_RESULT
 	setfieldeffectargument 0, VAR_RESULT
@@ -246,7 +246,7 @@ EventScript_EndDive::
 EventScript_UseDiveUnderwater::
 	lockall
 	@ checkpartymove MOVE_DIVE
-	checkhmusage 7
+	canpartyusehm 7
 	goto_if_eq VAR_RESULT, PARTY_SIZE, EventScript_CantSurface
 	bufferpartymonnick STR_VAR_1, VAR_RESULT
 	setfieldeffectargument 0, VAR_RESULT

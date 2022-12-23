@@ -763,15 +763,15 @@ static const u16 sFieldMoves[FIELD_MOVES_COUNT + 1] =
     [FIELD_MOVES_COUNT]       = FIELD_MOVES_COUNT
 };
 
-static const u8 sFieldTMs[FIELD_MOVE_WATERFALL + 1] = {
-    [FIELD_MOVE_CUT]          = ITEM_HM01_CUT - ITEM_TM01,
-    [FIELD_MOVE_FLASH]        = ITEM_HM05_FLASH - ITEM_TM01,
-    [FIELD_MOVE_ROCK_SMASH]   = ITEM_HM06_ROCK_SMASH - ITEM_TM01,
-    [FIELD_MOVE_STRENGTH]     = ITEM_HM04_STRENGTH - ITEM_TM01,
-    [FIELD_MOVE_SURF]         = ITEM_HM03_SURF - ITEM_TM01,
-    [FIELD_MOVE_FLY]          = ITEM_HM02_FLY - ITEM_TM01,
-    [FIELD_MOVE_DIVE]         = ITEM_HM08_DIVE - ITEM_TM01,
-    [FIELD_MOVE_WATERFALL]    = ITEM_HM07_WATERFALL - ITEM_TM01,
+static const u8 sFieldHMs[FIELD_MOVE_WATERFALL + 1] = {
+    [FIELD_MOVE_CUT]          = 0,
+    [FIELD_MOVE_FLASH]        = 4,
+    [FIELD_MOVE_ROCK_SMASH]   = 5,
+    [FIELD_MOVE_STRENGTH]     = 3,
+    [FIELD_MOVE_SURF]         = 2,
+    [FIELD_MOVE_FLY]          = 1,
+    [FIELD_MOVE_DIVE]         = 7,
+    [FIELD_MOVE_WATERFALL]    = 6,
 }; 
 
 struct

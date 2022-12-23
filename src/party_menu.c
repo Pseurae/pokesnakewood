@@ -2617,23 +2617,32 @@ static void SetPartyMonSelectionActions(struct Pokemon *mons, u8 slotId, u8 acti
     }
 }
 
-u8 CheckHMUsage(u8 hm)
+static bool8 CanUseHM(struct Pokemon *mon, u8 hm)
+{
+    u16 species = GetMonData(mon, MON_DATA_SPECIES, NULL);
+    if (!species)
+        return FALSE;
+
+    if (GetMonData(mon, MON_DATA_IS_EGG))
+        return FALSE;
+
+    if (MonKnowsMove(mon, sTMHMMoves[NUM_TECHNICAL_MACHINES + hm]) 
+        || (CanMonLearnTMHM(mon, NUM_TECHNICAL_MACHINES + hm) && CheckBagHasItem(ITEM_HM01 + hm, 1)))
+    {
+        return TRUE;
+    }
+
+    return FALSE;
+}
+
+u8 CanPartyUseHM(u8 hm)
 {
     u8 i;
 
     for (i = 0; i < PARTY_SIZE; i++)
     {
-        u16 species = GetMonData(&gPlayerParty[i], MON_DATA_SPECIES, NULL);
-        if (!species)
-            break;
-
-        if (!GetMonData(&gPlayerParty[i], MON_DATA_IS_EGG) 
-            && (MonKnowsMove(&gPlayerParty[i], sTMHMMoves[NUM_TECHNICAL_MACHINES + hm]) 
-            || CanMonLearnTMHM(&gPlayerParty[i], NUM_TECHNICAL_MACHINES + hm)
-            || CheckBagHasItem(ITEM_HM01 + hm, 1)))
-        {
+        if (CanUseHM(&gPlayerParty[i], hm))
             return i;
-        }
     }
     return PARTY_SIZE;
 }
@@ -2648,8 +2657,8 @@ static void SetPartyMonFieldSelectionActions(struct Pokemon *mons, u8 slotId)
     // Add field moves to action list
     for (i = 0; sFieldMoves[i] != FIELD_MOVES_COUNT; i++)
     {
-        if ((i <= FIELD_MOVE_WATERFALL && CanMonLearnTMHM(&mons[slotId], sFieldTMs[i]) && FlagGet(FLAG_BADGE01_GET + i)) ||
-            MonKnowsMove(&mons[slotId], sFieldMoves[i]))
+        if ((i <= FIELD_MOVE_WATERFALL && CanUseHM(&mons[slotId], sFieldHMs[i])) 
+            || MonKnowsMove(&mons[slotId], sFieldMoves[i]))
             AppendToList(sPartyMenuInternal->actions, &sPartyMenuInternal->numActions, MENU_FIELD_MOVES + i);
     }
 
@@ -3886,7 +3895,7 @@ static void FieldCallback_Surf(void)
 
 static bool8 SetUpFieldMove_Surf(void)
 {
-    if (PartyHasMonWithSurf() == TRUE && IsPlayerFacingSurfableFishableWater() == TRUE)
+    if (CanPartyUseHM(2) == TRUE && IsPlayerFacingSurfableFishableWater() == TRUE)
     {
         gFieldCallback2 = FieldCallback_PrepareFadeInFromMenu;
         gPostMenuFieldCallback = FieldCallback_Surf;
