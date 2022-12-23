@@ -2617,7 +2617,7 @@ static void SetPartyMonSelectionActions(struct Pokemon *mons, u8 slotId, u8 acti
     }
 }
 
-u8 CheckIfPartyLearnHM(u8 hm)
+u8 CheckHMUsage(u8 hm)
 {
     u8 i;
 
@@ -2629,7 +2629,8 @@ u8 CheckIfPartyLearnHM(u8 hm)
 
         if (!GetMonData(&gPlayerParty[i], MON_DATA_IS_EGG) 
             && (MonKnowsMove(&gPlayerParty[i], sTMHMMoves[NUM_TECHNICAL_MACHINES + hm]) 
-            || CanMonLearnTMHM(&gPlayerParty[i], NUM_TECHNICAL_MACHINES + hm)))
+            || CanMonLearnTMHM(&gPlayerParty[i], NUM_TECHNICAL_MACHINES + hm)
+            || CheckBagHasItem(ITEM_HM01 + hm, 1)))
         {
             return i;
         }

@@ -2341,5 +2341,5 @@ bool8 ScrCmd_setfieldtint(struct ScriptContext *ctx)
 bool8 ScrCmd_checkifpartylearnhm(struct ScriptContext *ctx)
 {
     u8 hm = ScriptReadByte(ctx);
-    gSpecialVar_Result = CheckIfPartyLearnHM(hm);
+    gSpecialVar_Result = CheckHMUsage(hm);
 }
