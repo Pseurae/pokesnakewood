@@ -91,5 +91,6 @@ void MoveDeleterForgetMove(void);
 void BufferMoveDeleterNicknameAndMove(void);
 void GetNumMovesSelectedMonHas(void);
 void MoveDeleterChooseMoveToForget(void);
+u8 CheckIfPartyLearnHM(u8 hm);
 
 #endif // GUARD_PARTY_MENU_H

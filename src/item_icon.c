@@ -10,7 +10,7 @@
 // EWRAM vars
 EWRAM_DATA u8 *gItemIconDecompressionBuffer = NULL;
 EWRAM_DATA u8 *gItemIcon4x4Buffer = NULL;
-static EWRAM_DATA u8 sObtainedItemIconSpriteId = MAX_SPRITES;
+static EWRAM_DATA u8 sObtainedItemIconSpriteId = 0;
 
 // const rom data
 #include "data/item_icon_table.h"
@@ -85,11 +85,11 @@ void CopyItemIconPicTo4x4Buffer(const void *src, void *dest)
         CpuCopy16(src + i * 96, dest + i * 128, 0x60);
 }
 
-u8 AddObtainedItemIconSprite(void)
+void AddObtainedItemIconSprite(void)
 {
     u16 itemId;
     
-    itemId = VarGet(VAR_0x8004);
+    itemId = gSpecialVar_0x8006;
     sObtainedItemIconSpriteId = AddItemIconSprite(3, 3, itemId);
 
     if (sObtainedItemIconSpriteId != MAX_SPRITES)
@@ -100,10 +100,15 @@ u8 AddObtainedItemIconSprite(void)
     }
 }
 
-u8 RemoveObtainedItemIconSprite(void)
+void RemoveObtainedItemIconSprite(void)
 {
     if (sObtainedItemIconSpriteId != MAX_SPRITES)
+    {
+        FreeSpriteTilesByTag(3);
+        FreeSpritePaletteByTag(3);
         DestroySprite(&gSprites[sObtainedItemIconSpriteId]);
+    }
+    sObtainedItemIconSpriteId = MAX_SPRITES;
 }
 
 u8 AddItemIconSprite(u16 tilesTag, u16 paletteTag, u16 itemId)

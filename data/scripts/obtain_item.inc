@@ -3,13 +3,13 @@
 
 Std_ObtainItem::
 	additem ITEMID, AMOUNT
+	copyvar VAR_0x8006, ITEMID
 	copyvar VAR_0x8007, VAR_RESULT
 	call EventScript_ObtainItemMessage
 	return
 
 EventScript_ObtainItemMessage::
 	bufferitemnameplural STR_VAR_2, ITEMID, AMOUNT
-	copyvar VAR_0x8004, ITEMID
 	checkitemtype ITEMID
 	call EventScript_BufferPocketNameAndTryFanfare
 	call_if_eq VAR_0x8007, TRUE, EventScript_ObtainedItem
@@ -51,10 +51,10 @@ EventScript_BufferBerriesPocket::
 	return
 
 EventScript_ObtainedItem::
-	callnative AddObtainedItemIconSprite
+	special AddObtainedItemIconSprite
 	message gText_ObtainedTheItem
 	waitfanfare
-	callnative RemoveObtainedItemIconSprite
+	special RemoveObtainedItemIconSprite
 	msgbox gText_PutItemInPocket, MSGBOX_DEFAULT
 	setvar VAR_RESULT, TRUE
 	return
@@ -101,6 +101,7 @@ Std_FindItem::
 	waitse
 	copyvar VAR_0x8004, ITEMID
 	copyvar VAR_0x8005, AMOUNT
+	copyvar VAR_0x8006, ITEMID
 	checkitemspace ITEMID, AMOUNT
 	copyvar VAR_0x8007, VAR_RESULT
 	bufferitemnameplural STR_VAR_2, ITEMID, AMOUNT
@@ -115,7 +116,7 @@ EventScript_PickUpItem::
 	removeobject VAR_LAST_TALKED
 	additem VAR_0x8004, VAR_0x8005
 	specialvar VAR_RESULT, BufferTMHMMoveName
-	callnative AddObtainedItemIconSprite
+	special AddObtainedItemIconSprite
 	copyvar VAR_0x8008, VAR_RESULT
 	call_if_eq VAR_0x8008, TRUE, EventScript_FoundTMHM
 	call_if_eq VAR_0x8008, FALSE, EventScript_FoundItem
@@ -125,7 +126,7 @@ EventScript_PickUpItem::
 	pyramid_inchallenge
 	goto_if_eq VAR_RESULT, TRUE, EventScript_PutBattlePyramidItemInBag
 	msgbox gText_PutItemInPocket, MSGBOX_DEFAULT
-	callnative RemoveObtainedItemIconSprite
+	special RemoveObtainedItemIconSprite
 	return
 
 EventScript_PutBattlePyramidItemInBag::

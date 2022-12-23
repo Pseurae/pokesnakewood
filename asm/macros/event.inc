@@ -1749,6 +1749,11 @@
 	.byte \mode
 	.endm
 
+	.macro checkifpartylearnhm hm:req
+	.byte 0xe7
+	.byte \hm
+	.endm
+
 @ Supplementary
 
 	.macro goto_if_unset flag:req, dest:req

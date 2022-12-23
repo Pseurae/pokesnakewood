@@ -2337,3 +2337,9 @@ bool8 ScrCmd_setfieldtint(struct ScriptContext *ctx)
 {
     gFieldTintMode = ScriptReadByte(ctx);
 }
+
+bool8 ScrCmd_checkifpartylearnhm(struct ScriptContext *ctx)
+{
+    u8 hm = ScriptReadByte(ctx);
+    gSpecialVar_Result = CheckIfPartyLearnHM(hm);
+}

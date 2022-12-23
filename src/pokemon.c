@@ -4074,18 +4074,6 @@ u8 GetHiddenPowerType(struct Pokemon *mon)
     return (moveType >= TYPE_MYSTERY) ? moveType + 1 : moveType;
 }
 
-bool8 CheckIfKnowsMove(struct Pokemon *mon, u16 moveId)
-{
-    u8 i;
-    for (i = 0; i < MAX_MON_MOVES; i++)
-    {
-        if (GetMonData(mon, i + MON_DATA_MOVE1, NULL) == moveId)
-            return TRUE;
-    }
-
-    return FALSE;
-}
-
 #define SET8(lhs) (lhs) = *data
 #define SET16(lhs) (lhs) = data[0] + (data[1] << 8)
 #define SET32(lhs) (lhs) = data[0] + (data[1] << 8) + (data[2] << 16) + (data[3] << 24)

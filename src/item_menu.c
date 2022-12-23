@@ -1240,6 +1240,12 @@ static void PrintItemSoldAmount(int windowId, int numSold, int moneyEarned)
     PrintMoneyAmount(windowId, 38, 1, moneyEarned, 0);
 }
 
+static void Bag_FillMessageBoxWithPalette(u32 a0)
+{
+    SetBgTilemapPalette(2, 0, 14, 30, 6, a0 + 1);
+    ScheduleBgCopyTilemapToVram(2);
+}
+
 static void Task_BagMenu_HandleInput(u8 taskId)
 {
     s16 *data = gTasks[taskId].data;
@@ -1297,6 +1303,7 @@ static void Task_BagMenu_HandleInput(u8 taskId)
             tListPosition = listPosition;
             tQuantity = BagGetQuantityByPocketPosition(gBagPosition.pocket + 1, listPosition);
             gSpecialVar_ItemId = BagGetItemIdByPocketPosition(gBagPosition.pocket + 1, listPosition);
+            Bag_FillMessageBoxWithPalette(1);
             sContextMenuFuncs[gBagPosition.location](taskId);
             break;
         }
@@ -1305,6 +1312,7 @@ static void Task_BagMenu_HandleInput(u8 taskId)
 
 static void ReturnToItemList(u8 taskId)
 {
+    Bag_FillMessageBoxWithPalette(0);
     CreatePocketScrollArrowPair();
     CreatePocketSwitchArrowPair();
     ClearWindowTilemap(WIN_TMHM_INFO_ICONS);

@@ -19,6 +19,7 @@
 #include "match_call.h"
 #include "metatile_behavior.h"
 #include "overworld.h"
+#include "party_menu.h"
 #include "pokemon.h"
 #include "safari_zone.h"
 #include "script.h"
@@ -447,7 +448,7 @@ static const u8 *GetInteractedMetatileScript(struct MapPosition *position, u8 me
 
 static const u8 *GetInteractedWaterScript(struct MapPosition *unused1, u8 metatileBehavior, u8 direction)
 {
-    if (FlagGet(FLAG_BADGE05_GET) == TRUE && PartyHasMonWithSurf() == TRUE && IsPlayerFacingSurfableFishableWater() == TRUE)
+    if (FlagGet(FLAG_BADGE05_GET) == TRUE && CheckIfPartyLearnHM(2) == TRUE && IsPlayerFacingSurfableFishableWater() == TRUE)
         return EventScript_UseSurf;
 
     if (MetatileBehavior_IsWaterfall(metatileBehavior) == TRUE)

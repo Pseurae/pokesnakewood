@@ -231,6 +231,7 @@ gScriptCmdTable::
 	.4byte ScrCmd_setname
 	.4byte ScrCmd_clearname
 	.4byte ScrCmd_setfieldtint
+	.4byte ScrCmd_checkifpartylearnhm
 
 gScriptCmdTableEnd::
 	.4byte ScrCmd_nop

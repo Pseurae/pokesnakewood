@@ -2617,6 +2617,26 @@ static void SetPartyMonSelectionActions(struct Pokemon *mons, u8 slotId, u8 acti
     }
 }
 
+u8 CheckIfPartyLearnHM(u8 hm)
+{
+    u8 i;
+
+    for (i = 0; i < PARTY_SIZE; i++)
+    {
+        u16 species = GetMonData(&gPlayerParty[i], MON_DATA_SPECIES, NULL);
+        if (!species)
+            break;
+
+        if (!GetMonData(&gPlayerParty[i], MON_DATA_IS_EGG) 
+            && (MonKnowsMove(&gPlayerParty[i], sTMHMMoves[NUM_TECHNICAL_MACHINES + hm]) 
+            || CanMonLearnTMHM(&gPlayerParty[i], NUM_TECHNICAL_MACHINES + hm)))
+        {
+            return i;
+        }
+    }
+    return PARTY_SIZE;
+}
+
 static void SetPartyMonFieldSelectionActions(struct Pokemon *mons, u8 slotId)
 {
     u8 i;
@@ -2627,8 +2647,8 @@ static void SetPartyMonFieldSelectionActions(struct Pokemon *mons, u8 slotId)
     // Add field moves to action list
     for (i = 0; sFieldMoves[i] != FIELD_MOVES_COUNT; i++)
     {
-        if ((i <= FIELD_MOVE_WATERFALL && CanMonLearnTMHM(&mons[slotId], sFieldTMs[i])) ||
-            CheckIfKnowsMove(&mons[slotId], sFieldMoves[i]))
+        if ((i <= FIELD_MOVE_WATERFALL && CanMonLearnTMHM(&mons[slotId], sFieldTMs[i]) && FlagGet(FLAG_BADGE01_GET + i)) ||
+            MonKnowsMove(&mons[slotId], sFieldMoves[i]))
             AppendToList(sPartyMenuInternal->actions, &sPartyMenuInternal->numActions, MENU_FIELD_MOVES + i);
     }
 

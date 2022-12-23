@@ -107,7 +107,7 @@ static void TMCase_MoveCursor_UpdatePrintedTMInfo(u16 itemId);
 static void PlaceHMTileInWindow(u8 windowId, u8 x, u8 y);
 static void HandlePrintMoneyOnHand(void);
 static void HandleCreateYesNoMenu(u8 taskId, const struct YesNoFuncTable * ptrs);
-static u8 AddTMContextMenu(u8 * a0, u8 a1);
+static u8 AddTMContextMenu(u8 * a0);
 static void RemoveTMContextMenu(u8 * a0);
 static u8 CreateTMSprite(u16 itemId);
 static void SetTMSpriteAnim(struct Sprite *sprite, u8 var);
@@ -303,25 +303,14 @@ static const struct WindowTemplate sYesNoWindowTemplate = {
     .baseBlock = 463
 };
 
-static const struct WindowTemplate sTMContextWindowTemplates[] = {
-    {
-        .bg = 1, 
-        .tilemapLeft = 24, 
-        .tilemapTop = 13, 
-        .width = 5, 
-        .height = 6, 
-        .paletteNum = 15, 
-        .baseBlock = 463
-    },
-    {
-        .bg = 1, 
-        .tilemapLeft = 24, 
-        .tilemapTop = 13, 
-        .width = 5, 
-        .height = 4, 
-        .paletteNum = 15, 
-        .baseBlock = 463
-    }
+static const struct WindowTemplate sTMContextWindowTemplates = {
+    .bg = 1, 
+    .tilemapLeft = 24, 
+    .tilemapTop = 15, 
+    .width = 5, 
+    .height = 4, 
+    .paletteNum = 15, 
+    .baseBlock = 463
 };
 
 static const struct OamData sTMSpriteOamData = {
@@ -867,15 +856,15 @@ static void Subtask_ReturnToTMCaseMain(u8 taskId)
 static void Task_ContextMenu_FromFieldBag(u8 taskId)
 {
     TMCase_SetWindowBorder2(2);
+    AddTMContextMenu(&sTMCaseDynamicResources->contextMenuWindowId);
+
     if (!MenuHelpers_IsLinkActive() && InUnionRoom() != TRUE)
     {
-        AddTMContextMenu(&sTMCaseDynamicResources->contextMenuWindowId, 0);
         sTMCaseDynamicResources->menuActionIndices = sMenuActionIndices_Field;
         sTMCaseDynamicResources->numMenuActions = NELEMS(sMenuActionIndices_Field);
     }
     else
     {
-        AddTMContextMenu(&sTMCaseDynamicResources->contextMenuWindowId, 1);
         sTMCaseDynamicResources->menuActionIndices = sMenuActionIndices_UnionRoom;
         sTMCaseDynamicResources->numMenuActions = NELEMS(sMenuActionIndices_UnionRoom);
     }
@@ -1336,11 +1325,11 @@ static void HandleCreateYesNoMenu(u8 taskId, const struct YesNoFuncTable *ptrs)
     CreateYesNoMenuWithCallbacks(taskId, &sYesNoWindowTemplate, FONT_SHORT, 0, 2, 0x78, 0x0E, ptrs);
 }
 
-static u8 AddTMContextMenu(u8 * a0, u8 a1)
+static u8 AddTMContextMenu(u8 *a0)
 {
     if (*a0 == 0xFF)
     {
-        *a0 = AddWindow(&sTMContextWindowTemplates[a1]);
+        *a0 = AddWindow(&sTMContextWindowTemplates);
         TMCase_SetWindowBorder2(*a0);
         ScheduleBgCopyTilemapToVram(0);
     }
