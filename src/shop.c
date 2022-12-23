@@ -50,12 +50,12 @@ enum {
 };
 
 enum {
+    WIN_MESSAGE,
     WIN_MONEY,
     WIN_ITEM_LIST,
     WIN_ITEM_DESCRIPTION,
     WIN_QUANTITY_IN_BAG,
     WIN_QUANTITY_PRICE,
-    WIN_MESSAGE,
 };
 
 enum {
@@ -262,6 +262,15 @@ static const struct BgTemplate sShopBuyMenuBgTemplates[] =
 
 static const struct WindowTemplate sShopBuyMenuWindowTemplates[] =
 {
+    [WIN_MESSAGE] = {
+        .bg = 0,
+        .tilemapLeft = 2,
+        .tilemapTop = 15,
+        .width = 27,
+        .height = 4,
+        .paletteNum = 15,
+        .baseBlock = 0x1,
+    },
     [WIN_MONEY] = {
         .bg = 0,
         .tilemapLeft = 1,
@@ -269,7 +278,7 @@ static const struct WindowTemplate sShopBuyMenuWindowTemplates[] =
         .width = 8,
         .height = 2,
         .paletteNum = 15,
-        .baseBlock = 0x1,
+        .baseBlock = 0x6D,
     },
     [WIN_ITEM_LIST] = {
         .bg = 0,
@@ -278,7 +287,7 @@ static const struct WindowTemplate sShopBuyMenuWindowTemplates[] =
         .width = 17,
         .height = 12,
         .paletteNum = 15,
-        .baseBlock = 0x11,
+        .baseBlock = 0x7D,
     },
     [WIN_ITEM_DESCRIPTION] = {
         .bg = 0,
@@ -287,7 +296,7 @@ static const struct WindowTemplate sShopBuyMenuWindowTemplates[] =
         .width = 25,
         .height = 6,
         .paletteNum = 15,
-        .baseBlock = 0xdd,
+        .baseBlock = 0x149,
     },
     [WIN_QUANTITY_IN_BAG] = {
         .bg = 0,
@@ -296,7 +305,7 @@ static const struct WindowTemplate sShopBuyMenuWindowTemplates[] =
         .width = 12,
         .height = 2,
         .paletteNum = 15,
-        .baseBlock = 0x173,
+        .baseBlock = 0x1Df,
     },
     [WIN_QUANTITY_PRICE] = {
         .bg = 0,
@@ -305,16 +314,7 @@ static const struct WindowTemplate sShopBuyMenuWindowTemplates[] =
         .width = 10,
         .height = 2,
         .paletteNum = 15,
-        .baseBlock = 0x18b,
-    },
-    [WIN_MESSAGE] = {
-        .bg = 0,
-        .tilemapLeft = 2,
-        .tilemapTop = 15,
-        .width = 27,
-        .height = 4,
-        .paletteNum = 15,
-        .baseBlock = 0x19f,
+        .baseBlock = 0x1F7,
     },
     DUMMY_WIN_TEMPLATE
 };
@@ -327,7 +327,7 @@ static const struct WindowTemplate sShopBuyMenuYesNoWindowTemplates =
     .width = 5,
     .height = 4,
     .paletteNum = 15,
-    .baseBlock = 0x020E,
+    .baseBlock = 0x1Df,
 };
 
 static const u8 sShopBuyMenuTextColors[][3] =
@@ -1079,7 +1079,7 @@ static void Task_BuyHowManyDialogueHandleInput(u8 taskId)
 
 static void BuyMenuConfirmPurchase(u8 taskId)
 {
-    CreateYesNoMenuWithCallbacks(taskId, &sShopBuyMenuYesNoWindowTemplates, 1, 0, 0, 1, 13, &sShopPurchaseYesNoFuncs);
+    CreateYesNoMenuWithCallbacks(taskId, &sShopBuyMenuYesNoWindowTemplates, 1, 0, 0, 0x212, 13, &sShopPurchaseYesNoFuncs);
 }
 
 static void BuyMenuTryMakePurchase(u8 taskId)
