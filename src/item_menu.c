@@ -807,6 +807,10 @@ static bool8 SetupBagMenu(void)
         gMain.state++;
         break;
     case 18:
+        SetGpuRegBits(REG_OFFSET_WININ, WININ_WIN0_CLR);
+        SetGpuRegBits(REG_OFFSET_DISPCNT, DISPCNT_WIN0_ON);
+        SetGpuReg(REG_OFFSET_BLDCNT, BLDCNT_TGT1_BG0 | BLDCNT_EFFECT_BLEND | BLDCNT_TGT2_BG2);
+        SetGpuReg(REG_OFFSET_BLDALPHA, BLDALPHA_BLEND(16, 0));
         // PrepareTMHMMoveWindow();
         gMain.state++;
         break;
@@ -970,6 +974,7 @@ static void BagMenu_MoveCursorCallback(s32 itemIndex, bool8 onInit, struct ListM
            AddBagItemIconSprite(BagGetItemIdByPocketPosition(gBagPosition.pocket + 1, itemIndex), gBagMenu->itemIconSlot);
         else
            AddBagItemIconSprite(ITEM_LIST_END, gBagMenu->itemIconSlot);
+        gSprites[gBagMenu->spriteIds[ITEMMENUSPRITE_ITEM + gBagMenu->itemIconSlot]].oam.objMode = ST_OAM_OBJ_BLEND;
         gBagMenu->itemIconSlot ^= 1;
         if (!gBagMenu->inhibitItemDescriptionPrint)
             PrintItemDescription(itemIndex);
@@ -1258,10 +1263,10 @@ static void Task_BagMenu_HandleInput(u8 taskId)
         switch (GetSwitchBagPocketDirection())
         {
         case SWITCH_POCKET_LEFT:
-            SwitchBagPocket(taskId, MENU_CURSOR_DELTA_LEFT, FALSE);
+            SwitchBagPocket(taskId, MENU_CURSOR_DELTA_LEFT, TRUE);
             return;
         case SWITCH_POCKET_RIGHT:
-            SwitchBagPocket(taskId, MENU_CURSOR_DELTA_RIGHT, FALSE);
+            SwitchBagPocket(taskId, MENU_CURSOR_DELTA_RIGHT, TRUE);
             return;
         default:
             if (JOY_NEW(SELECT_BUTTON))
@@ -1343,10 +1348,10 @@ static u8 GetSwitchBagPocketDirection(void)
 
 static void ChangeBagPocketId(u8 *bagPocketId, s8 deltaBagPocketId)
 {
-    if (deltaBagPocketId == MENU_CURSOR_DELTA_RIGHT && *bagPocketId == TMHM_POCKET - 1)
+    if (deltaBagPocketId == MENU_CURSOR_DELTA_RIGHT && *bagPocketId == BALLS_POCKET)
         *bagPocketId = 0;
     else if (deltaBagPocketId == MENU_CURSOR_DELTA_LEFT && *bagPocketId == 0)
-        *bagPocketId = TMHM_POCKET - 1;
+        *bagPocketId = BALLS_POCKET;
     else
         *bagPocketId += deltaBagPocketId;
 }
@@ -1371,23 +1376,9 @@ static void SwitchBagPocket(u8 taskId, s16 deltaBagPocketId, bool16 skipEraseLis
     }
     newPocket = gBagPosition.pocket;
     ChangeBagPocketId(&newPocket, deltaBagPocketId);
-    // if (deltaBagPocketId == MENU_CURSOR_DELTA_RIGHT)
-    // {
-    //     PrintPocketNames(gPocketNamesStringsTable[gBagPosition.pocket], gPocketNamesStringsTable[newPocket]);
-    //     CopyPocketNameToWindow(0);
-    // }
-    // else
-    // {
-    //     PrintPocketNames(gPocketNamesStringsTable[newPocket], gPocketNamesStringsTable[gBagPosition.pocket]);
-    //     CopyPocketNameToWindow(8);
-    // }
-    // DrawPocketIndicatorSquare(gBagPosition.pocket, FALSE);
-    // DrawPocketIndicatorSquare(newPocket, TRUE);
-    // FillBgTilemapBufferRect_Palette0(2, 11, 14, 2, 15, 16);
     ScheduleBgCopyTilemapToVram(2);
     SetBagVisualPocketId(newPocket, TRUE);
     RemoveBagSprite(ITEMMENUSPRITE_BALL);
-    // AddSwitchPocketRotatingBallSprite(deltaBagPocketId);
     SetTaskFuncWithFollowupFunc(taskId, Task_SwitchBagPocket, gTasks[taskId].func);
 }
 
@@ -1414,18 +1405,23 @@ static void Task_SwitchBagPocket(u8 taskId)
     switch (tPocketSwitchState)
     {
     case 0:
-        // DrawItemListBgRow(tPocketSwitchTimer);
-        if (!(++tPocketSwitchTimer & 1))
-        {
-            // if (tPocketSwitchDir == MENU_CURSOR_DELTA_RIGHT)
-            //     CopyPocketNameToWindow((u8)(tPocketSwitchTimer >> 1));
-            // else
-            //     CopyPocketNameToWindow((u8)(8 - (tPocketSwitchTimer >> 1)));
-        }
-        if (tPocketSwitchTimer == 16)
+        tPocketSwitchTimer += 2;
+        SetGpuReg(REG_OFFSET_BLDALPHA, BLDALPHA_BLEND(16 - tPocketSwitchTimer, tPocketSwitchTimer));
+        if (tPocketSwitchTimer >= 16)
             tPocketSwitchState++;
         break;
     case 1:
+        ClearWindowTilemap(WIN_POCKET_NAME);
+        ClearWindowTilemap(WIN_ITEM_LIST);
+        ClearWindowTilemap(WIN_DESCRIPTION);
+        DestroyListMenuTask(tListTaskId, &gBagPosition.scrollPosition[gBagPosition.pocket], &gBagPosition.cursorPosition[gBagPosition.pocket]);
+        ScheduleBgCopyTilemapToVram(0);
+        gSprites[gBagMenu->spriteIds[ITEMMENUSPRITE_ITEM + (gBagMenu->itemIconSlot ^ 1)]].invisible = TRUE;
+        BagDestroyPocketScrollArrowPair();
+        tPocketSwitchState++;
+        break;
+    case 2:
+        SetGpuReg(REG_OFFSET_BLDALPHA, BLDALPHA_BLEND(0, 16));
         ChangeBagPocketId(&gBagPosition.pocket, tPocketSwitchDir);
         LoadBagItemListBuffers(gBagPosition.pocket);
         tListTaskId = ListMenuInit(&gMultiuseListMenuTemplate, gBagPosition.scrollPosition[gBagPosition.pocket], gBagPosition.cursorPosition[gBagPosition.pocket]);
@@ -1436,7 +1432,17 @@ static void Task_SwitchBagPocket(u8 taskId)
         ScheduleBgCopyTilemapToVram(0);
         CreatePocketScrollArrowPair();
         CreatePocketSwitchArrowPair();
+        tPocketSwitchState++;
+        break;
+    case 3:
+        tPocketSwitchTimer -= 2;
+        SetGpuReg(REG_OFFSET_BLDALPHA, BLDALPHA_BLEND(16 - tPocketSwitchTimer, tPocketSwitchTimer));
+        if (tPocketSwitchTimer <= 0)
+            tPocketSwitchState++;
+        break;
+    case 4:
         SwitchTaskToFollowupFunc(taskId);
+        break;
     }
 }
 

@@ -21,6 +21,7 @@ struct TMCaseData
     const u8 *menuActionIndices;
     u8 numMenuActions;
     s16 seqId;
+    u16 itemId;
 };
 
 enum TMCaseType
