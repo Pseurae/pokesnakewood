@@ -171,6 +171,9 @@ static const u32 sBirchSpeechBgMap[] = INCBIN_U32("graphics/birch_speech/map.bin
 static const u16 sBirchSpeechBgGradientPal[] = INCBIN_U16("graphics/birch_speech/bg2.gbapal");
 static const u16 sBirchSpeechPlatformBlackPal[] = {RGB_BLACK, RGB_BLACK, RGB_BLACK, RGB_BLACK, RGB_BLACK, RGB_BLACK, RGB_BLACK, RGB_BLACK};
 
+static const u8 sMainMenuFrame_Gfx[] = INCBIN_U8("graphics/text_window/main_menu.4bpp");
+static const u16 sMainMenuFrame_Pal[] = INCBIN_U16("graphics/text_window/main_menu.gbapal");
+
 #define MENU_LEFT 2
 #define MENU_TOP_WIN0 1
 #define MENU_TOP_WIN1 5
@@ -438,6 +441,8 @@ enum
     ACTION_EREADER,
     ACTION_INVALID
 };
+
+EWRAM_DATA static u8 sContinueMonIconSpriteIds[PARTY_SIZE] = { MAX_SPRITES };
 
 #define MAIN_MENU_BORDER_TILE   0x1D5
 
@@ -1079,9 +1084,20 @@ static void Task_DisplayMainMenuInvalidActionError(u8 taskId)
 
 #undef tArrowTaskIsScrolled
 
+static void SetMonIconsAnim(u8 animNum)
+{
+    u8 i;
+    for (i = 0; i < gPlayerPartyCount; i++)
+    {
+        if (sContinueMonIconSpriteIds[i] != MAX_SPRITES)
+            StartSpriteAnim(&gSprites[sContinueMonIconSpriteIds[i]], animNum);
+    }
+}
+
 static void HighlightSelectedMainMenuItem(u8 menuType, u8 selectedMenuItem, s16 isScrolled)
 {
     SetGpuReg(REG_OFFSET_WIN0H, MENU_WIN_HCOORDS);
+    SetMonIconsAnim(4);
 
     switch (menuType)
     {
@@ -1103,6 +1119,7 @@ static void HighlightSelectedMainMenuItem(u8 menuType, u8 selectedMenuItem, s16 
             {
                 case 0:
                 default:
+                    SetMonIconsAnim(0);
                     SetGpuReg(REG_OFFSET_WIN0V, MENU_WIN_VCOORDS(2));
                     break;
                 case 1:
@@ -1118,6 +1135,7 @@ static void HighlightSelectedMainMenuItem(u8 menuType, u8 selectedMenuItem, s16 
             {
                 case 0:
                 default:
+                    SetMonIconsAnim(0);
                     SetGpuReg(REG_OFFSET_WIN0V, MENU_WIN_VCOORDS(2));
                     break;
                 case 1:
@@ -1136,6 +1154,7 @@ static void HighlightSelectedMainMenuItem(u8 menuType, u8 selectedMenuItem, s16 
             {
                 case 0:
                 default:
+                    SetMonIconsAnim(0);
                     SetGpuReg(REG_OFFSET_WIN0V, MENU_WIN_VCOORDS(2));
                     break;
                 case 1:
@@ -1441,13 +1460,14 @@ static void MainMenu_CreatePokeIcons(void)
         LoadMonIconPalette(species);
         spriteId = CreateMonIcon(species, SpriteCB_MonIcon, x, 68, 1, GetMonData(&gPlayerParty[i], MON_DATA_PERSONALITY), TRUE);
         gSprites[spriteId].oam.priority = 0;
+        sContinueMonIconSpriteIds[i] = spriteId;
     }
 }
 
 static void LoadMainMenuWindowFrameTiles(u8 bgId, u16 tileOffset)
 {
-    LoadBgTiles(bgId, GetWindowFrameTilesPal(gSaveBlock2Ptr->optionsWindowFrameType)->tiles, 0x120, tileOffset);
-    LoadPalette(GetWindowFrameTilesPal(gSaveBlock2Ptr->optionsWindowFrameType)->pal, 32, 32);
+    LoadBgTiles(bgId, sMainMenuFrame_Gfx, 0x120, tileOffset);
+    LoadPalette(sMainMenuFrame_Pal, 32, 32);
 }
 
 static void DrawMainMenuWindowBorder(const struct WindowTemplate *template, u16 baseTileNum)

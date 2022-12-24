@@ -22,6 +22,7 @@
 #include "load_save.h"
 #include "main.h"
 #include "menu.h"
+#include "money.h"
 #include "new_game.h"
 #include "option_menu.h"
 #include "overworld.h"
@@ -29,6 +30,8 @@
 #include "party_menu.h"
 #include "pokedex.h"
 #include "pokenav.h"
+#include "region_map.h"
+#include "rtc.h"
 #include "safari_zone.h"
 #include "save.h"
 #include "scanline_effect.h"
@@ -79,6 +82,7 @@ bool8 (*gMenuCallback)(void);
 
 // EWRAM
 EWRAM_DATA static u8 sSafariBallsWindowId = 0;
+EWRAM_DATA static u8 sInfoWindowId = 0;
 EWRAM_DATA static u8 sBattlePyramidFloorWindowId = 0;
 EWRAM_DATA static u8 sStartMenuCursorPos = 0;
 EWRAM_DATA static u8 sNumStartMenuActions = 0;
@@ -89,6 +93,8 @@ EWRAM_DATA static u8 (*sSaveDialogCallback)(void) = NULL;
 EWRAM_DATA static u8 sSaveDialogTimer = 0;
 EWRAM_DATA static bool8 sSavingComplete = FALSE;
 EWRAM_DATA static u8 sSaveInfoWindowId = 0;
+
+EWRAM_DATA static u8 sTimeUpdateTaskId = 0;
 
 // Menu action callbacks
 static bool8 StartMenuPokedexCallback(void);
@@ -138,6 +144,15 @@ static void Task_WaitForBattleTowerLinkSave(u8 taskId);
 static bool8 FieldCB_ReturnToFieldStartMenu(void);
 
 static const struct WindowTemplate sSafariBallsWindowTemplate = {0, 1, 1, 9, 4, 0xF, 8};
+static const struct WindowTemplate sInfoWindowTemplate = {
+    .bg = 0,
+    .tilemapLeft = 0,
+    .tilemapTop = 0,
+    .width = 20,
+    .height = 6,
+    .paletteNum = 15,
+    .baseBlock = 8
+};
 
 static const u8 *const sPyramidFloorNames[FRONTIER_STAGES_PER_CHALLENGE + 1] =
 {
@@ -219,6 +234,7 @@ static void BuildBattlePikeStartMenu(void);
 static void BuildBattlePyramidStartMenu(void);
 static void BuildMultiPartnerRoomStartMenu(void);
 static void ShowSafariBallsWindow(void);
+static void ShowInfoWindow(void);
 static void ShowPyramidFloorWindow(void);
 static void RemoveExtraStartMenuWindows(void);
 static bool32 PrintStartMenuActions(s8 *pIndex, u32 count);
@@ -391,6 +407,78 @@ static void ShowSafariBallsWindow(void)
     CopyWindowToVram(sSafariBallsWindowId, COPYWIN_GFX);
 }
 
+static const u8 sTimeFormat[] = _("{STR_VAR_1}:{STR_VAR_2}");
+
+static u8 *SetupInfoStringVar(u8 *strvar)
+{
+    strvar[0] = EXT_CTRL_CODE_BEGIN;
+    strvar[1] = EXT_CTRL_CODE_HIGHLIGHT;
+    strvar[2] = TEXT_COLOR_TRANSPARENT;
+    strvar[3] = EXT_CTRL_CODE_BEGIN;
+    strvar[4] = EXT_CTRL_CODE_COLOR;
+    strvar[5] = TEXT_COLOR_WHITE;
+    strvar[6] = EXT_CTRL_CODE_BEGIN;
+    strvar[7] = EXT_CTRL_CODE_SHADOW;
+    strvar[8] = TEXT_COLOR_DARK_GRAY;
+    return strvar + 9;
+}
+
+#define tUpdateTimer data[0]
+
+static void Task_UpdateTime(u8 taskId)
+{
+    s16 *data = gTasks[taskId].data;
+
+    switch (tUpdateTimer)
+    {
+        default:
+            tUpdateTimer++;
+            break;
+        case 10:
+            RtcCalcLocalTime();
+            break;
+        case 20:
+            FillWindowPixelRect(sInfoWindowId, PIXEL_FILL(0), 10, 20, 30, 10);
+            ConvertIntToDecimalStringN(gStringVar1, gLocalTime.hours, STR_CONV_MODE_LEADING_ZEROS, 2);
+            ConvertIntToDecimalStringN(gStringVar2, gLocalTime.minutes, STR_CONV_MODE_LEADING_ZEROS, 2);
+            StringExpandPlaceholders(SetupInfoStringVar(gStringVar3), sTimeFormat);
+            AddTextPrinterParameterized(sInfoWindowId, FONT_SMALL, gStringVar3, 10, 18, TEXT_SKIP_DRAW, NULL);
+            CopyWindowToVram(sInfoWindowId, COPYWIN_GFX);
+            tUpdateTimer = 0;
+            break;
+    }
+}
+
+#undef tUpdateTimer
+
+static void ShowInfoWindow(void)
+{
+    u8 *str, x;
+    sInfoWindowId = AddWindow(&sInfoWindowTemplate);
+    PutWindowTilemap(sInfoWindowId);
+
+    str = SetupInfoStringVar(gStringVar1);
+    GetMapName(str, gMapHeader.regionMapSectionId, 0);
+    AddTextPrinterParameterized(sInfoWindowId, FONT_SMALL, gStringVar1, 10, 5, TEXT_SKIP_DRAW, NULL);
+
+    str = SetupInfoStringVar(gStringVar1);
+    *str++ = CHAR_CURRENCY;
+
+    ConvertIntToDecimalStringN(str, GetMoney(&gSaveBlock1Ptr->money), STR_CONV_MODE_LEFT_ALIGN, 6);
+    x = GetStringRightAlignXOffset(FONT_SMALL, gStringVar1, 160);
+    AddTextPrinterParameterized(sInfoWindowId, FONT_SMALL, gStringVar1, x, 5, TEXT_SKIP_DRAW, NULL);
+
+    RtcCalcLocalTime();
+    ConvertIntToDecimalStringN(gStringVar1, gLocalTime.hours, STR_CONV_MODE_LEADING_ZEROS, 2);
+    ConvertIntToDecimalStringN(gStringVar2, gLocalTime.minutes, STR_CONV_MODE_LEADING_ZEROS, 2);
+    StringExpandPlaceholders(SetupInfoStringVar(gStringVar3), sTimeFormat);
+
+    AddTextPrinterParameterized(sInfoWindowId, FONT_SMALL, gStringVar3, 10, 18, TEXT_SKIP_DRAW, NULL);
+
+    CopyWindowToVram(sInfoWindowId, COPYWIN_GFX);
+    sTimeUpdateTaskId = CreateTask(Task_UpdateTime, 0);
+}
+
 static void ShowPyramidFloorWindow(void)
 {
     if (gSaveBlock2Ptr->frontier.curChallengeBattleNum == FRONTIER_STAGES_PER_CHALLENGE)
@@ -419,6 +507,12 @@ static void RemoveExtraStartMenuWindows(void)
         ClearStdWindowAndFrameToTransparent(sBattlePyramidFloorWindowId, FALSE);
         RemoveWindow(sBattlePyramidFloorWindowId);
     }
+    SetGpuReg(REG_OFFSET_WIN0V, 255);
+    ClearGpuRegBits(REG_OFFSET_BLDCNT, BLDCNT_TGT1_BG1 | BLDCNT_TGT1_BG2 | BLDCNT_TGT1_BG3 | BLDCNT_TGT1_OBJ | BLDCNT_TGT1_BD | BLDCNT_EFFECT_DARKEN);
+    ClearGpuRegBits(REG_OFFSET_WINOUT, WINOUT_WIN01_BG_ALL | WINOUT_WIN01_OBJ);
+    DestroyTask(sTimeUpdateTaskId);
+    ClearStdWindowAndFrameToTransparent(sInfoWindowId, TRUE);
+    RemoveWindow(sInfoWindowId);
 }
 
 static bool32 PrintStartMenuActions(s8 *pIndex, u32 count)
@@ -476,6 +570,7 @@ static bool32 InitStartMenuStep(void)
             ShowSafariBallsWindow();
         if (InBattlePyramid())
             ShowPyramidFloorWindow();
+        ShowInfoWindow();
         sInitStartMenuData[0]++;
         break;
     case 4:
@@ -485,6 +580,14 @@ static bool32 InitStartMenuStep(void)
     case 5:
         sStartMenuCursorPos = InitMenuNormal(GetStartMenuWindowId(), FONT_NORMAL, 0, 9, 16, sNumStartMenuActions, sStartMenuCursorPos);
         CopyWindowToVram(GetStartMenuWindowId(), COPYWIN_MAP);
+        sInitStartMenuData[0]++;
+        break;
+    case 6:
+        SetGpuReg(REG_OFFSET_WIN0V, 40);
+        SetGpuRegBits(REG_OFFSET_BLDCNT, BLDCNT_TGT1_BG1 | BLDCNT_TGT1_BG2 | BLDCNT_TGT1_BG3 | BLDCNT_TGT1_OBJ | BLDCNT_TGT1_BD | BLDCNT_EFFECT_DARKEN | BLDCNT_TGT2_ALL);
+        SetGpuReg(REG_OFFSET_WININ, WININ_WIN0_ALL);
+        SetGpuReg(REG_OFFSET_WINOUT, WINOUT_WIN01_BG_ALL | WINOUT_WIN01_OBJ);
+        SetGpuReg(REG_OFFSET_BLDY, 10);
         return TRUE;
     }
 
@@ -695,9 +798,7 @@ static bool8 StartMenuPlayerNameCallback(void)
 
 static bool8 StartMenuSaveCallback(void)
 {
-    if (InBattlePyramid())
-        RemoveExtraStartMenuWindows();
-
+    RemoveExtraStartMenuWindows();
     gMenuCallback = SaveStartCallback; // Display save menu
 
     return FALSE;
