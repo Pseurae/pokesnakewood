@@ -447,6 +447,9 @@ static void Task_UpdateTime(u8 taskId)
             StringExpandPlaceholders(SetupInfoStringVar(gStringVar3), tFlickerTimer ? sTimeFormat1 : sTimeFormat2);
             AddTextPrinterParameterized(sInfoWindowId, FONT_SMALL, gStringVar3, 10, 18, TEXT_SKIP_DRAW, NULL);
             CopyWindowToVram(sInfoWindowId, COPYWIN_GFX);
+            tUpdateTimer++;
+            break;
+        case 40:
             tFlickerTimer++;
             tFlickerTimer %= 2;
             tUpdateTimer = 0;

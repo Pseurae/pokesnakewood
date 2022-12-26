@@ -63,10 +63,10 @@ static const struct BgTemplate sBirchBgTemplates[2] = {
 
 static const struct WindowTemplate sIntroTextWindowTemplate = {
     .bg = 0,
-    .tilemapLeft = 1,
-    .tilemapTop = 1,
-    .width = 28,
-    .height = 18,
+    .tilemapLeft = 2,
+    .tilemapTop = 2,
+    .width = 26,
+    .height = 16,
     .paletteNum = 15,
     .baseBlock = 0x1
 };
@@ -317,7 +317,7 @@ static void Task_StartDisplayIntroText(u8 taskId)
         ClearDialogueWindow(tWindowId);
         FillWindowPixelBuffer(tWindowId, PIXEL_FILL(0));
         PutWindowTilemap(tWindowId);
-        AddTextPrinterParameterized2(tWindowId, FONT_SHORT, sText_NewGame_Intro[tTextIdx++], 0, NULL, TEXT_COLOR_WHITE, TEXT_COLOR_TRANSPARENT, TEXT_COLOR_TRANSPARENT);
+        AddTextPrinterParameterized2(tWindowId, FONT_NORMAL, sText_NewGame_Intro[tTextIdx++], 0, NULL, TEXT_COLOR_WHITE, TEXT_COLOR_TRANSPARENT, TEXT_COLOR_TRANSPARENT);
         ScheduleBgCopyTilemapToVram(0);
         BeginNormalPaletteFade(PALETTES_ALL, 0, 16, 0, RGB_BLACK);
         gTasks[taskId].func = Task_DisplayIntroText;
@@ -351,7 +351,7 @@ static void Task_DisplayIntroText(u8 taskId)
     case 2:
         SetGpuReg(REG_OFFSET_BLDY, 16);
         FillWindowPixelBuffer(tWindowId, PIXEL_FILL(0));
-        AddTextPrinterParameterized2(tWindowId, FONT_SHORT, sText_NewGame_Intro[tTextIdx++], 0, NULL, TEXT_COLOR_WHITE, TEXT_COLOR_TRANSPARENT, TEXT_COLOR_TRANSPARENT);
+        AddTextPrinterParameterized2(tWindowId, FONT_NORMAL, sText_NewGame_Intro[tTextIdx++], 0, NULL, TEXT_COLOR_WHITE, TEXT_COLOR_TRANSPARENT, TEXT_COLOR_TRANSPARENT);
         ScheduleBgCopyTilemapToVram(0);
         tState++;
         break;
@@ -513,12 +513,12 @@ static void Task_GenderSelection_YesNo(u8 taskId)
         if (gTasks[taskId].tGender == MALE)
         {
             gSprites[tMaySpriteId].invisible = TRUE;
-            CreateYesNoMenuParameterized(21, 6, 0xF3, 0xDF, 2, 15);
+            CreateYesNoMenuParameterized(22, 8, 0xF3, 0xDF, 2, 15);
         }
         else
         {
             gSprites[tBrendanSpriteId].invisible = TRUE;
-            CreateYesNoMenuParameterized(2, 6, 0xF3, 0xDF, 2, 15);
+            CreateYesNoMenuParameterized(1, 8, 0xF3, 0xDF, 2, 15);
         }
         gTasks[taskId].func = Task_GenderSelection_ProcessNameYesNoMenu;
     }
@@ -672,7 +672,7 @@ static void Task_NamingScreen_YesNo(u8 taskId)
 {
     if (!RunTextPrintersAndIsPrinter0Active())
     {
-        CreateYesNoMenuParameterized(2, 1, 0xF3, 0xDF, 2, 15);
+        CreateYesNoMenuParameterized(1, 8, 0xF3, 0xDF, 2, 15);
         gTasks[taskId].func = Task_NamingScreen_ProcessNameYesNoMenu;
     }
 }
