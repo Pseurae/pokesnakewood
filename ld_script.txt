@@ -347,6 +347,7 @@ SECTIONS {
         src/berry_pouch.o(.text);
         src/day_night.o(.text);
         src/number_input.o(.text);
+        src/intro_speech.o(.text);
     } =0
 
     script_data :
@@ -710,6 +711,7 @@ SECTIONS {
         src/berry_pouch.o(.rodata);
         src/day_night.o(.rodata);
         src/number_input.o(.rodata);
+        src/intro_speech.o(.rodata);
         src/mystery_event_msg.o(.rodata);
         data/mystery_gift.o(.rodata);
         src/m4a_tables.o(.rodata);

@@ -1,3 +1,14 @@
+@ Intro Text is 40 characters per line and 8 lines.
+
+gText_NewGame_IntroText1::
+	.string "Welcome to Pokemon Snakewood!\n"
+	.string "\n"
+	.string "Please be aware that this is a non-profit\n"
+	.string "fan game.\n"
+	.string "\n"
+	.string "If you paid for this game, please reclaim\n"
+	.string "your money immediately.$"
+
 gText_Birch_Welcome::
 	.string "Hi! Sorry to keep you waiting!\p"
 	.string "Welcome to the world of Pokémon!\p"

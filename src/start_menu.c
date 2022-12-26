@@ -407,7 +407,8 @@ static void ShowSafariBallsWindow(void)
     CopyWindowToVram(sSafariBallsWindowId, COPYWIN_GFX);
 }
 
-static const u8 sTimeFormat[] = _("{STR_VAR_1}:{STR_VAR_2}");
+static const u8 sTimeFormat1[] = _("{STR_VAR_1}:{STR_VAR_2}");
+static const u8 sTimeFormat2[] = _("{STR_VAR_1}{COLOR TRANSPARENT}{SHADOW TRANSPARENT}:{COLOR WHITE}{SHADOW DARK_GRAY}{STR_VAR_2}");
 
 static u8 *SetupInfoStringVar(u8 *strvar)
 {
@@ -424,6 +425,7 @@ static u8 *SetupInfoStringVar(u8 *strvar)
 }
 
 #define tUpdateTimer data[0]
+#define tFlickerTimer data[1]
 
 static void Task_UpdateTime(u8 taskId)
 {
@@ -436,20 +438,24 @@ static void Task_UpdateTime(u8 taskId)
             break;
         case 10:
             RtcCalcLocalTime();
+            tUpdateTimer++;
             break;
         case 20:
             FillWindowPixelRect(sInfoWindowId, PIXEL_FILL(0), 10, 20, 30, 10);
             ConvertIntToDecimalStringN(gStringVar1, gLocalTime.hours, STR_CONV_MODE_LEADING_ZEROS, 2);
             ConvertIntToDecimalStringN(gStringVar2, gLocalTime.minutes, STR_CONV_MODE_LEADING_ZEROS, 2);
-            StringExpandPlaceholders(SetupInfoStringVar(gStringVar3), sTimeFormat);
+            StringExpandPlaceholders(SetupInfoStringVar(gStringVar3), tFlickerTimer ? sTimeFormat1 : sTimeFormat2);
             AddTextPrinterParameterized(sInfoWindowId, FONT_SMALL, gStringVar3, 10, 18, TEXT_SKIP_DRAW, NULL);
             CopyWindowToVram(sInfoWindowId, COPYWIN_GFX);
+            tFlickerTimer++;
+            tFlickerTimer %= 2;
             tUpdateTimer = 0;
             break;
     }
 }
 
 #undef tUpdateTimer
+#undef tFlickerTimer
 
 static void ShowInfoWindow(void)
 {
@@ -471,7 +477,7 @@ static void ShowInfoWindow(void)
     RtcCalcLocalTime();
     ConvertIntToDecimalStringN(gStringVar1, gLocalTime.hours, STR_CONV_MODE_LEADING_ZEROS, 2);
     ConvertIntToDecimalStringN(gStringVar2, gLocalTime.minutes, STR_CONV_MODE_LEADING_ZEROS, 2);
-    StringExpandPlaceholders(SetupInfoStringVar(gStringVar3), sTimeFormat);
+    StringExpandPlaceholders(SetupInfoStringVar(gStringVar3), sTimeFormat1);
 
     AddTextPrinterParameterized(sInfoWindowId, FONT_SMALL, gStringVar3, 10, 18, TEXT_SKIP_DRAW, NULL);
 
