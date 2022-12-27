@@ -3961,6 +3961,7 @@ static void VBlankCB_AngledWipes(void)
 #define tFadeFromGrayIncrement data[5]
 #define tDelayTimer            data[6]
 #define tBlend                 data[7]
+#define tOldBldClt             data[8]
 
 static void CreateIntroTask(s16 fadeToGrayDelay, s16 fadeFromGrayDelay, s16 numFades, s16 fadeToGrayIncrement, s16 fadeFromGrayIncrement)
 {
@@ -3999,6 +4000,8 @@ static bool8 TransitionIntro_FadeToGray(struct Task *task)
     if (task->tBlend >= 16)
     {
         // Fade to gray complete, start fade back
+        task->tOldBldClt = GetGpuReg(REG_OFFSET_BLDCNT);
+        SetGpuReg(REG_OFFSET_BLDCNT, task->tOldBldClt & ~BLDCNT_TGT2_BG_ALL);
         task->tState++;
         task->tDelayTimer = task->tFadeFromGrayDelay;
     }
@@ -4014,6 +4017,7 @@ static bool8 TransitionIntro_FadeFromGray(struct Task *task)
         if (task->tBlend < 0)
             task->tBlend = 0;
         BlendPalettes(PALETTES_ALL, task->tBlend, RGB(11, 11, 11));
+        SetGpuReg(REG_OFFSET_BLDCNT, task->tOldBldClt);
     }
     if (task->tBlend == 0)
     {
