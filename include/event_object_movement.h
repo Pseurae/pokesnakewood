@@ -90,6 +90,19 @@ struct LockedAnimObjectEvents
     u8 count;
 };
 
+struct SpritePaletteReference
+{
+    u8 type;
+    u8 count;
+    u16 tag;
+};
+
+enum {
+    PAL_UNUSED,
+    PAL_NPC,
+    PAL_REFLECTION
+};
+
 extern const struct OamData gObjectEventBaseOam_32x8;
 extern const struct OamData gObjectEventBaseOam_32x32;
 extern const struct SpriteTemplate *const gFieldEffectObjectTemplatePointers[];
@@ -107,8 +120,6 @@ u8 GetObjectEventIdByXY(s16 x, s16 y);
 void SetObjectEventDirection(struct ObjectEvent *objectEvent, u8 direction);
 u8 GetFirstInactiveObjectEventId(void);
 void RemoveObjectEventByLocalIdAndMap(u8 localId, u8 mapNum, u8 mapGroup);
-void LoadPlayerObjectReflectionPalette(u16 tag, u8 slot);
-void LoadSpecialObjectReflectionPalette(u16 tag, u8 slot);
 void TryMoveObjectEventToMapCoords(u8 localId, u8 mapNum, u8 mapGroup, s16 x, s16 y);
 void PatchObjectPalette(u16 paletteTag, u8 paletteSlot);
 void SpawnObjectEventsOnReturnToField(s16 x, s16 y);
@@ -440,5 +451,11 @@ void SetVirtualObjectInvisibility(u8 virtualObjId, bool32 invisible);
 bool32 IsVirtualObjectInvisible(u8 virtualObjId);
 void SetVirtualObjectSpriteAnim(u8 virtualObjId, u8 animNum);
 bool32 IsVirtualObjectAnimating(u8 virtualObjId);
+
+u8 FindSpritePaletteReference(u8 type, u16 tag);
+u8 AddSpritePaletteReference(u8 type, u16 tag);
+u8 IncrementSpritePaletteReferenceCount(u8 idx);
+void DecrementSpritePaletteReferenceCount(u8 idx);
+void ClearSpritePaletteReferences(void);
 
 #endif //GUARD_EVENT_OBJECT_MOVEMENT_H

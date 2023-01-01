@@ -1,17 +1,21 @@
 #include "global.h"
+#include "field_effect_helpers.h"
+#include "day_night.h"
 #include "event_object_movement.h"
 #include "field_camera.h"
 #include "field_effect.h"
-#include "field_effect_helpers.h"
 #include "field_weather.h"
 #include "fieldmap.h"
 #include "gpu_regs.h"
 #include "metatile_behavior.h"
+#include "palette.h"
 #include "sound.h"
 #include "sprite.h"
 #include "trig.h"
+#include "util.h"
 #include "constants/field_effects.h"
 #include "constants/songs.h"
+#include "constants/rgb.h"
 
 #define OBJ_EVENT_PAL_TAG_NONE 0x11FF // duplicate of define in event_object_movement.c
 
@@ -40,14 +44,31 @@ static u32 ShowDisguiseFieldEffect(u8, u8, u8);
 #define sReflectionVerticalOffset   data[2]
 #define sIsStillReflection          data[7]
 
+static u8 GetReflectionPaletteSlot(u16 tag)
+{
+    u8 slot;
+    slot = FindSpritePaletteReference(PAL_REFLECTION, tag);
+    if (slot != 0xFF)
+    {
+        return IncrementSpritePaletteReferenceCount(slot);
+    }
+
+    slot = AddSpritePaletteReference(PAL_REFLECTION, tag);
+    if (slot == 0xFF)
+        return 0xFF;
+
+    IncrementSpritePaletteReferenceCount(slot);
+    return slot;
+}
+
 void SetUpReflection(struct ObjectEvent *objectEvent, struct Sprite *sprite, bool8 stillReflection)
 {
+    u8 paletteSlot;
     struct Sprite *reflectionSprite;
 
     reflectionSprite = &gSprites[CreateCopySpriteAt(sprite, sprite->x, sprite->y, 0x98)];
     reflectionSprite->callback = UpdateObjectReflectionSprite;
     reflectionSprite->oam.priority = 3;
-    reflectionSprite->oam.paletteNum = gReflectionEffectPaletteMap[reflectionSprite->oam.paletteNum];
     reflectionSprite->usingSheet = TRUE;
     reflectionSprite->anims = gDummySpriteAnimTable;
     StartSpriteAnim(reflectionSprite, 0);
@@ -57,6 +78,8 @@ void SetUpReflection(struct ObjectEvent *objectEvent, struct Sprite *sprite, boo
     reflectionSprite->sReflectionObjEventId = sprite->data[0];
     reflectionSprite->sReflectionObjEventLocalId = objectEvent->localId;
     reflectionSprite->sIsStillReflection = stillReflection;
+    paletteSlot = GetReflectionPaletteSlot(GetObjectEventGraphicsInfo(objectEvent->graphicsId)->paletteTag);
+    reflectionSprite->oam.paletteNum = paletteSlot;
     LoadObjectReflectionPalette(objectEvent, reflectionSprite);
 
     if (!stillReflection)
@@ -88,37 +111,33 @@ static void LoadObjectReflectionPalette(struct ObjectEvent *objectEvent, struct 
     {
         LoadObjectRegularReflectionPalette(objectEvent, reflectionSprite->oam.paletteNum);
     }
+
 }
 
 static void LoadObjectRegularReflectionPalette(struct ObjectEvent *objectEvent, u8 paletteIndex)
 {
     const struct ObjectEventGraphicsInfo *graphicsInfo;
+    u8 paletteNum;
 
     graphicsInfo = GetObjectEventGraphicsInfo(objectEvent->graphicsId);
-    if (graphicsInfo->reflectionPaletteTag != OBJ_EVENT_PAL_TAG_NONE)
-    {
-        if (graphicsInfo->paletteSlot == PALSLOT_PLAYER)
-            LoadPlayerObjectReflectionPalette(graphicsInfo->paletteTag, paletteIndex);
-        else if (graphicsInfo->paletteSlot == PALSLOT_NPC_SPECIAL)
-            LoadSpecialObjectReflectionPalette(graphicsInfo->paletteTag, paletteIndex);
-        else
-            PatchObjectPalette(GetObjectPaletteTag(paletteIndex), paletteIndex);
-        UpdateSpritePaletteWithWeather(paletteIndex);
-    }
+    PatchObjectPalette(graphicsInfo->paletteTag, paletteIndex);
+	BlendPalettes(gBitTable[(paletteIndex + 16)], 10, RGB(12, 20, 27)); //Make it blueish
+    LoadPalette(&gPlttBufferFaded[(paletteIndex + 16) << 4], (paletteIndex + 16) << 4, 0x20);
+    UpdateSpritePaletteWithWeather(paletteIndex);
 }
 
 // When walking on a bridge high above water (Route 120), the reflection is a solid dark blue color.
 // This is so the sprite blends in with the dark water metatile underneath the bridge.
-static void LoadObjectHighBridgeReflectionPalette(struct ObjectEvent *objectEvent, u8 paletteNum)
+static void LoadObjectHighBridgeReflectionPalette(struct ObjectEvent *objectEvent, u8 paletteIndex)
 {
     const struct ObjectEventGraphicsInfo *graphicsInfo;
+    u8 paletteNum;
 
     graphicsInfo = GetObjectEventGraphicsInfo(objectEvent->graphicsId);
-    if (graphicsInfo->reflectionPaletteTag != OBJ_EVENT_PAL_TAG_NONE)
-    {
-        PatchObjectPalette(graphicsInfo->reflectionPaletteTag, paletteNum);
-        UpdateSpritePaletteWithWeather(paletteNum);
-    }
+    PatchObjectPalette(graphicsInfo->paletteTag, paletteIndex);
+	BlendPalettes(gBitTable[(paletteIndex + 16)], 10, RGB(6, 10, 27)); //Make it blueish
+    LoadPalette(&gPlttBufferFaded[(paletteIndex + 16) << 4], (paletteIndex + 16) << 4, 0x20);
+    UpdateSpritePaletteWithWeather(paletteIndex);
 }
 
 static void UpdateObjectReflectionSprite(struct Sprite *reflectionSprite)
@@ -131,10 +150,12 @@ static void UpdateObjectReflectionSprite(struct Sprite *reflectionSprite)
     if (!objectEvent->active || !objectEvent->hasReflection || objectEvent->localId != reflectionSprite->sReflectionObjEventLocalId)
     {
         reflectionSprite->inUse = FALSE;
+        DecrementSpritePaletteReferenceCount(reflectionSprite->oam.paletteNum);
+        DestroySprite(reflectionSprite);
     }
     else
     {
-        reflectionSprite->oam.paletteNum = gReflectionEffectPaletteMap[mainSprite->oam.paletteNum];
+        // reflectionSprite->oam.paletteNum = gReflectionEffectPaletteMap[mainSprite->oam.paletteNum];
         reflectionSprite->oam.shape = mainSprite->oam.shape;
         reflectionSprite->oam.size = mainSprite->oam.size;
         reflectionSprite->oam.matrixNum = mainSprite->oam.matrixNum | ST_OAM_VFLIP;

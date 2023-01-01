@@ -74,7 +74,7 @@ static bool8 BlendColors(const u16 *src1, const u16 *src2, u8 coeff)
 
 static bool8 IsDayNightApplicable(void)
 {
-    return IsMapTypeOutdoors(gMapHeader.mapType);
+    return !IsMapTypeIndoors(gMapHeader.mapType);
 }
 
 static void UpdateCurrentTint(void)
