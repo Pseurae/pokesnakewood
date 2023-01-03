@@ -361,6 +361,7 @@ u8 *StringExpandPlaceholders(u8 *dest, const u8 *src)
             case EXT_CTRL_CODE_ENG:
             case EXT_CTRL_CODE_PAUSE_MUSIC:
             case EXT_CTRL_CODE_RESUME_MUSIC:
+            case EXT_CTRL_CODE_PLAYER_COLOR:
                 break;
             case EXT_CTRL_CODE_COLOR_HIGHLIGHT_SHADOW:
                 *dest++ = *src++;
@@ -683,6 +684,7 @@ u8 GetExtCtrlCodeLength(u8 code)
         [EXT_CTRL_CODE_ENG]                    = 1,
         [EXT_CTRL_CODE_PAUSE_MUSIC]            = 1,
         [EXT_CTRL_CODE_RESUME_MUSIC]           = 1,
+        [EXT_CTRL_CODE_PLAYER_COLOR]           = 1
     };
 
     u8 length = 0;

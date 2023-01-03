@@ -8,10 +8,64 @@ mapscripts Route103_MapScripts {
 }
 
 script Route103_EventScript_ProfBirch {
+	msgbox(Route103_Text_ProfBirch1, MSGBOX_NPC)
+	giveegg(SPECIES_TOGEPI)
+	msgbox("{COLOR DARK_GRAY}{PLAYER} received the {COLOR GREEN}egg{COLOR DARK_GRAY}.", MSGBOX_NPC)
+	msgbox(Route103_Text_ProfBirch2, MSGBOX_NPC)
+
+	msgbox(format("So, will you go?"), MSGBOX_YESNO)
+
+	while (var(VAR_RESULT) == NO)
+	{
+		msgbox(format(
+			"This is the only chance we've got at surviving this!\p"
+			"I know its too much to ask, you're the only person I can count on to do this."), MSGBOX_DEFAULT)
+		msgbox(format(
+			"So, will you go?"), MSGBOX_YESNO)
+	}
+
+	msgbox(Route103_Text_ProfBirch3, MSGBOX_NPC)
+	msgbox(format(
+		"{COLOR DARK_GRAY}Prof. Birch:{COLOR BLUE} Alright, {PLAYER}! I'll see you around."), MSGBOX_NPC)
+
+	fadescreen(FADE_TO_BLACK)
 	setflag(FLAG_ADVENTURE_STARTED)
 	setflag(FLAG_HIDE_ROUTE_103_RIVAL)
 	removeobject(LOCALID_BIRCH)
+	fadescreen(FADE_FROM_BLACK)
 	end
+}
+
+text Route103_Text_ProfBirch1 {
+	format(
+		"{COLOR DARK_GRAY}Prof. Birch:{COLOR BLUE} There you are!\p"
+		"Now, you're probably wondering why I've called you here.\p"
+		"Pokémon aren't known to breed out in the wild.\p"
+		"Yet, here lies a nest, complete with an {COLOR GREEN}egg{COLOR BLUE}!\p"
+		"Eggs only hatch in the presence of other pokémon, but I don't see the parent pokémon around.\p"
+		"So, I want you to take it along with you."
+	)
+}
+
+text Route103_Text_ProfBirch2 {
+	format(
+		"{COLOR DARK_GRAY}Prof. Birch:{COLOR BLUE} That's only one of the reasons I brought you here.\p"
+		"I also wanted to talk to you about the zombie invasion.\p"
+		"You probably don't remember yet, but three years ago, {COLOR GREEN}your brother{COLOR BLUE} was crowned the Champion of Hoenn.\p"
+		"Few weeks ago, he and {COLOR GREEN}May{COLOR BLUE} set off to find the source of the infection.\p"
+		"I haven't heard hide or hair of them since the last two weeks.\p"
+		"They're the strongest trainers in the region, so I'm not particularly worried about their safety.\p"
+		"But, you can't be too sure nowadays with all the monsters running rampant."
+	)
+}
+
+text Route103_Text_ProfBirch3 {
+	format(
+		"You should head towards {COLOR GREEN}Petalburg City{COLOR BLUE}.\n"
+		"There may be survivors that may have seen where they went.\p"
+		"Meanwhile, I'll try to repurpose the PC network to contact other survivors.\p"
+		"Also, have this."
+	)
 }
 
 raw `
