@@ -151,6 +151,7 @@ script OldaleTown_EventScript_BlockedPath {
 	applymovement(OBJ_EVENT_ID_PLAYER, OldaleTown_Movement_PlayerStepBack)
 	applymovement(LOCALID_FOOTPRINTS_MAN, OldaleTown_Movement_BackUp)
 	waitmovement(0)
+	textcolor(NPC_TEXT_COLOR_MALE)
 	msgbox(OldaleTown_Text_WaitDontComeInHere, MSGBOX_DEFAULT)
 	closemessage
 	applymovement(LOCALID_FOOTPRINTS_MAN, OldaleTown_Movement_ReturnToOriginalPosition)
@@ -208,7 +209,7 @@ text OldaleTown_Text_DiscoveredFootprints {
 }
 
 text OldaleTown_Text_FinishedSketchingFootprints {
-	format("I finished sketching the footprints of a rare Pokémon.\p"
-	"But it turns out they were only my own footprints…")
+	format("I've finished my shift.\p"
+	"You can go through now if you'd like, but be sure to stock up on supplies first.")
 }
 

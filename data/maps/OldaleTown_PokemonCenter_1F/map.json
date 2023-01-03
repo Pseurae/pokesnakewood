@@ -74,13 +74,6 @@
       "elevation": 3,
       "dest_map": "MAP_OLDALE_TOWN",
       "dest_warp_id": "1"
-    },
-    {
-      "x": 6,
-      "y": 8,
-      "elevation": 3,
-      "dest_map": "MAP_OLDALE_TOWN",
-      "dest_warp_id": "1"
     }
   ],
   "coord_events": [

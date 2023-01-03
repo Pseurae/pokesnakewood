@@ -541,7 +541,7 @@ static u8 AddDecorationWindow(u8 windowIndex)
         *windowId = AddWindow(&sDecorationWindowTemplates[windowIndex]);
     }
 
-    DrawStdFrameWithCustomTileAndPalette(*windowId, FALSE, 0x212, 14);
+    DrawStdFrameWithCustomTileAndPalette(*windowId, FALSE, 0x214, 14);
     ScheduleBgCopyTilemapToVram(0);
     return *windowId;
 }
@@ -616,7 +616,7 @@ static void HandleDecorationActionsMenuInput(u8 taskId)
 static void PrintCurMainMenuDescription(void)
 {
     FillWindowPixelBuffer(0, PIXEL_FILL(11));
-    AddTextPrinterParameterized2(0, FONT_NORMAL, sSecretBasePCMenuItemDescriptions[sDecorationActionsCursorPos], 0, 0, TEXT_COLOR_WHITE, TEXT_DYNAMIC_COLOR_2, TEXT_COLOR_DARK_GRAY);
+    AddTextPrinterParameterized2(0, FONT_NORMAL, sSecretBasePCMenuItemDescriptions[sDecorationActionsCursorPos], 0, 0, TEXT_COLOR_DARK_GRAY, TEXT_COLOR_WHITE, TEXT_COLOR_LIGHT_GRAY);
 }
 
 static void DecorationMenuAction_Decorate(u8 taskId)

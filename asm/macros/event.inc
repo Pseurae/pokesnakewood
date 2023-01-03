@@ -1735,22 +1735,13 @@
 	.byte 0xe3
 	.endm
 
-	.macro setname id:req
-	.byte 0xe4
-	.byte \id
-	.endm
-
-	.macro clearname
-	.byte 0xe5
-	.endm
-
 	.macro setfieldtint mode:req
-	.byte 0xe6
+	.byte 0xe4
 	.byte \mode
 	.endm
 
 	.macro canpartyusehm hm:req
-	.byte 0xe7
+	.byte 0xe5
 	.byte \hm
 	.endm
 

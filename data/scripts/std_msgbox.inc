@@ -9,10 +9,12 @@ Std_MsgboxNPC:
 
 Std_MsgboxSign:
 	lockall
+	signmsg
 	message NULL
 	waitmessage
 	waitbuttonpress
 	releaseall
+	normalmsg
 	return
 
 Std_MsgboxDefault:

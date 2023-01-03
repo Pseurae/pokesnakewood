@@ -2320,19 +2320,6 @@ bool8 ScrCmd_shownuminput(struct ScriptContext *ctx)
     }
 }
 
-bool8 ScrCmd_setname(struct ScriptContext *ctx)
-{
-    u8 index = ScriptReadByte(ctx);
-    SetCharacterName(index);
-    return FALSE;
-}
-
-bool8 ScrCmd_clearname(struct ScriptContext *ctx)
-{
-    ClearCharacterName();
-    return FALSE;
-}
-
 bool8 ScrCmd_setfieldtint(struct ScriptContext *ctx)
 {
     gFieldTintMode = ScriptReadByte(ctx);
@@ -2342,4 +2329,23 @@ bool8 ScrCmd_checkifpartylearnhm(struct ScriptContext *ctx)
 {
     u8 hm = ScriptReadByte(ctx);
     gSpecialVar_Result = CanPartyUseHM(hm);
+}
+
+bool8 ScrCmd_textcolor(struct ScriptContext *ctx)
+{
+    gSpecialVar_PrevTextColor = gSpecialVar_TextColor;
+    gSpecialVar_TextColor = ScriptReadByte(ctx);
+    return FALSE;
+}
+
+bool8 ScrCmd_normalmsg(struct ScriptContext *ctx)
+{
+    gSignMessage = FALSE;
+    return FALSE;
+}
+
+bool8 ScrCmd_signmsg(struct ScriptContext *ctx)
+{
+    gSignMessage = TRUE;
+    return FALSE;
 }

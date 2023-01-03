@@ -8,9 +8,7 @@
 #include "constants/character_names.h"
 
 static EWRAM_DATA u8 sFieldMessageBoxMode = 0;
-
-static EWRAM_DATA bool8 sDisplayNamebox = FALSE;
-static EWRAM_DATA u8 sCurrentCharacterName[20] = { 0x0 };
+EWRAM_DATA bool8 gSignMessage = 0;
 
 static void ExpandStringAndStartDrawFieldMessage(const u8 *, bool32);
 static void StartDrawFieldMessage(void);
@@ -31,12 +29,14 @@ void InitFieldMessageBox(void)
 static void Task_DrawFieldMessage(u8 taskId)
 {
     struct Task *task = &gTasks[taskId];
-    const u8 color[3] = { TEXT_DYNAMIC_COLOR_2, TEXT_COLOR_WHITE, TEXT_COLOR_DARK_GRAY };
 
     switch (task->tState)
     {
         case 0:
-            LoadMessageBoxAndBorderGfx();
+            if (gSignMessage)
+                LoadSignpostBoxAndBorderGfx();
+            else
+                LoadMessageBoxAndBorderGfx();
             task->tState++;
             break;
         case 1:
@@ -44,13 +44,6 @@ static void Task_DrawFieldMessage(u8 taskId)
             task->tState++;
             break;
         case 2:
-            if (sDisplayNamebox)
-            {
-                DrawNameboxFrame(1, TRUE);
-                AddTextPrinterParameterized4(1, FONT_SMALL, 3, 1, 0, 0, color, 0, sCurrentCharacterName);
-            }
-            task->tState++;
-        case 3:
             RunTextPrinters();
             if (!IsTextPrinterActive(0) && !IsTextPrinterActive(1))
             {
@@ -75,20 +68,6 @@ static void DestroyTask_DrawFieldMessage(void)
 }
 
 #include "data/text/character_names.h"
-
-bool8 SetCharacterName(u8 index)
-{
-    if (index < CHAR_NAME_COUNT)
-    {
-        sDisplayNamebox = TRUE;
-        StringExpandPlaceholders(sCurrentCharacterName, gCharacterNames[index]);
-    }
-}
-
-bool8 ClearCharacterName(void)
-{
-    sDisplayNamebox = FALSE;
-}
 
 bool8 ShowFieldMessage(const u8 *str)
 {
@@ -150,13 +129,13 @@ bool8 ShowFieldMessageFromBuffer(void)
 static void ExpandStringAndStartDrawFieldMessage(const u8 *str, bool32 allowSkippingDelayWithButtonPress)
 {
     StringExpandPlaceholders(gStringVar4, str);
-    AddTextPrinterForMessage(allowSkippingDelayWithButtonPress);
+    AddTextPrinterForMessageWithTextColor(allowSkippingDelayWithButtonPress);
     CreateTask_DrawFieldMessage();
 }
 
 static void StartDrawFieldMessage(void)
 {
-    AddTextPrinterForMessage(TRUE);
+    AddTextPrinterForMessageWithTextColor(TRUE);
     CreateTask_DrawFieldMessage();
 }
 
@@ -164,8 +143,6 @@ void HideFieldMessageBox(void)
 {
     DestroyTask_DrawFieldMessage();
     ClearDialogWindowAndFrame(0, TRUE);
-    ClearNameboxWindowAndFrame(1, TRUE);
-    sDisplayNamebox = FALSE;
     sFieldMessageBoxMode = FIELD_MESSAGE_BOX_HIDDEN;
 }
 

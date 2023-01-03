@@ -94,7 +94,7 @@ void AddObtainedItemIconSprite(void)
 
     if (sObtainedItemIconSpriteId != MAX_SPRITES)
     {
-        gSprites[sObtainedItemIconSpriteId].x2 = 220;
+        gSprites[sObtainedItemIconSpriteId].x2 = 214;
         gSprites[sObtainedItemIconSpriteId].y2 = 140;
         gSprites[sObtainedItemIconSpriteId].oam.priority = 0;
     }

@@ -266,7 +266,7 @@ static const struct WindowTemplate sShopBuyMenuWindowTemplates[] =
         .bg = 0,
         .tilemapLeft = 2,
         .tilemapTop = 15,
-        .width = 27,
+        .width = 26,
         .height = 4,
         .paletteNum = 15,
         .baseBlock = 0x1,
@@ -749,8 +749,9 @@ static void BuyMenuInitWindows(void)
 {
     InitWindows(sShopBuyMenuWindowTemplates);
     DeactivateAllTextPrinters();
-    LoadUserWindowBorderGfx(WIN_MONEY, 0x212, 0xD0);
-    LoadMessageBoxGfx(WIN_MONEY, 0xA, 0xE0);
+    LoadUserWindowBorderGfx(WIN_MONEY, 0x20B, 0xD0);
+    LoadStdBoxGfx(WIN_QUANTITY_IN_BAG, 0x216, 0xE0);
+    LoadMessageBoxGfx(WIN_MESSAGE, 0x21F, 0xF0);
     PutWindowTilemap(WIN_MONEY);
     PutWindowTilemap(WIN_ITEM_LIST);
     PutWindowTilemap(WIN_ITEM_DESCRIPTION);
@@ -763,7 +764,7 @@ static void BuyMenuPrint(u8 windowId, const u8 *text, u8 x, u8 y, s8 speed, u8 c
 
 static void BuyMenuDisplayMessage(u8 taskId, const u8 *text, TaskFunc callback)
 {
-    DisplayMessageAndContinueTask(taskId, WIN_MESSAGE, 10, 14, FONT_NORMAL, GetPlayerTextSpeedDelay(), text, callback);
+    DisplayMessageAndContinueTask(taskId, WIN_MESSAGE, 0x21F, 15, FONT_NORMAL, GetPlayerTextSpeedDelay(), text, callback);
     ScheduleBgCopyTilemapToVram(0);
 }
 
@@ -772,7 +773,7 @@ static void BuyMenuDrawGraphics(void)
     BuyMenuDrawMapGraphics();
     BuyMenuCopyMenuBgToBg1TilemapBuffer();
     AddMoneyLabelObject(19, 11);
-    PrintMoneyAmountInMoneyBoxWithBorder(WIN_MONEY, 0x212, 13, GetMoney(&gSaveBlock1Ptr->money));
+    PrintMoneyAmountInMoneyBoxWithBorder(WIN_MONEY, 0x20B, 13, GetMoney(&gSaveBlock1Ptr->money));
     ScheduleBgCopyTilemapToVram(0);
     ScheduleBgCopyTilemapToVram(1);
     ScheduleBgCopyTilemapToVram(2);
@@ -1022,12 +1023,12 @@ static void Task_BuyHowManyDialogueInit(u8 taskId)
     u16 quantityInBag = CountTotalItemQuantityInBag(tItemId);
     u16 maxQuantity;
 
-    DrawStdFrameWithCustomTileAndPalette(WIN_QUANTITY_IN_BAG, FALSE, 0x212, 13);
+    DrawStdFrameWithCustomTileAndPalette(WIN_QUANTITY_IN_BAG, FALSE, 0x216, 14);
     ConvertIntToDecimalStringN(gStringVar1, quantityInBag, STR_CONV_MODE_RIGHT_ALIGN, MAX_ITEM_DIGITS + 1);
     StringExpandPlaceholders(gStringVar4, gText_InBagVar1);
     BuyMenuPrint(WIN_QUANTITY_IN_BAG, gStringVar4, 0, 1, 0, COLORID_NORMAL);
     tItemCount = 1;
-    DrawStdFrameWithCustomTileAndPalette(WIN_QUANTITY_PRICE, FALSE, 0x212, 13);
+    DrawStdFrameWithCustomTileAndPalette(WIN_QUANTITY_PRICE, FALSE, 0x20B, 13);
     BuyMenuPrintItemQuantityAndPrice(taskId);
     ScheduleBgCopyTilemapToVram(0);
 
@@ -1079,7 +1080,7 @@ static void Task_BuyHowManyDialogueHandleInput(u8 taskId)
 
 static void BuyMenuConfirmPurchase(u8 taskId)
 {
-    CreateYesNoMenuWithCallbacks(taskId, &sShopBuyMenuYesNoWindowTemplates, 1, 0, 0, 0x212, 13, &sShopPurchaseYesNoFuncs);
+    CreateYesNoMenuWithCallbacks(taskId, &sShopBuyMenuYesNoWindowTemplates, 1, 0, 0, 0x20B, 13, &sShopPurchaseYesNoFuncs);
 }
 
 static void BuyMenuTryMakePurchase(u8 taskId)

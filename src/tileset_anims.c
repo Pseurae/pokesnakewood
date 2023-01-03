@@ -639,16 +639,12 @@ void InitTilesetAnim_Building(void)
 
 static void TilesetAnim_General(u16 timer)
 {
-    if (timer % 16 == 0)
-        QueueAnimTiles_General_Flower(timer / 16);
-    // if (timer % 16 == 1)
-        // QueueAnimTiles_General_Water(timer / 16);
+    if (timer % 8 == 0)
+        QueueAnimTiles_General_SandWaterEdge(timer / 8);
     if (timer % 16 == 1)
-        QueueAnimTiles_General_SandWaterEdge(timer / 16);
-    // if (timer % 16 == 3)
-        // QueueAnimTiles_General_Waterfall(timer / 16);
-    if (timer % 16 == 2)
         QueueAnimTiles_General_LandWaterEdge(timer / 16);
+    if (timer % 16 == 2)
+        QueueAnimTiles_General_Flower(timer / 16);
 }
 
 static void TilesetAnim_Building(u16 timer)
@@ -966,7 +962,7 @@ static void TilesetAnim_BattleFrontierOutsideEast(u16 timer)
 static void QueueAnimTiles_General_LandWaterEdge(u16 timer)
 {
     u16 i = timer % ARRAY_COUNT(gTilesetAnims_General_LandWaterEdge);
-    AppendTilesetAnimToBuffer(gTilesetAnims_General_LandWaterEdge[i], (u16 *)(BG_VRAM + TILE_OFFSET_4BPP(480)), 10 * TILE_SIZE_4BPP);
+    AppendTilesetAnimToBuffer(gTilesetAnims_General_LandWaterEdge[i], (u16 *)(BG_VRAM + TILE_OFFSET_4BPP(416)), 48 * TILE_SIZE_4BPP);
 }
 
 static void QueueAnimTiles_Lavaridge_Steam(u8 timer)

@@ -22,11 +22,7 @@ enum {
 
 // Window IDs for the item menu
 enum {
-    ITEMWIN_1x1,
-    ITEMWIN_1x2,
-    ITEMWIN_2x2,
-    ITEMWIN_2x3,
-    ITEMWIN_MESSAGE,
+    ITEMWIN_CONTEXT,
     ITEMWIN_YESNO_LOW,
     ITEMWIN_YESNO_HIGH,
     ITEMWIN_QUANTITY,

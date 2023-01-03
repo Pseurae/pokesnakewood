@@ -895,7 +895,7 @@ const struct Tileset gTileset_CeladonCity =
 const struct Tileset gTileset_FuchsiaCity =
 {
     .isCompressed = TRUE,
-    .isSecondary = FALSE,
+    .isSecondary = TRUE,
     .tiles = gTilesetTiles_FuchsiaCity,
     .palettes = gTilesetPalettes_FuchsiaCity,
     .metatiles = gMetatiles_FuchsiaCity,
@@ -911,5 +911,16 @@ const struct Tileset gTileset_LavenderTown =
     .palettes = gTilesetPalettes_LavenderTown,
     .metatiles = gMetatiles_LavenderTown,
     .metatileAttributes = gMetatileAttributes_LavenderTown,
+    .callback = NULL,
+};
+
+const struct Tileset gTileset_Route101 =
+{
+    .isCompressed = TRUE,
+    .isSecondary = TRUE,
+    .tiles = gTilesetTiles_Route101,
+    .palettes = gTilesetPalettes_Route101,
+    .metatiles = gMetatiles_Route101,
+    .metatileAttributes = gMetatileAttributes_Route101,
     .callback = NULL,
 };

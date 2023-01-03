@@ -4,6 +4,7 @@
 #include "event_object_movement.h"
 #include "field_effect.h"
 #include "field_player_avatar.h"
+#include "palette.h"
 #include "pokemon.h"
 #include "script.h"
 #include "script_movement.h"
@@ -179,7 +180,7 @@ static const struct SpriteTemplate sSpriteTemplate_ExclamationQuestionMark =
 static const struct SpriteTemplate sSpriteTemplate_HeartIcon =
 {
     .tileTag = TAG_NONE,
-    .paletteTag = FLDEFF_PAL_TAG_GENERAL_0,
+    .paletteTag = TAG_NONE,
     .oam = &sOamData_Icons,
     .anims = sSpriteAnimTable_Icons,
     .images = sSpriteImageTable_HeartIcon,
@@ -695,34 +696,52 @@ void TryPrepareSecondApproachingTrainer(void)
 
 u8 FldEff_ExclamationMarkIcon(void)
 {
+    u8 paletteSlot = GetObjectPaletteSlot(0x1100);
     u8 spriteId = CreateSpriteAtEnd(&sSpriteTemplate_ExclamationQuestionMark, 0, 0, 0x53);
 
+    PatchObjectPalette(0x1100, paletteSlot);
+
     if (spriteId != MAX_SPRITES)
+    {
         SetIconSpriteData(&gSprites[spriteId], FLDEFF_EXCLAMATION_MARK_ICON, 0);
+        gSprites[spriteId].oam.paletteNum = paletteSlot;
+    }
 
     return 0;
 }
 
 u8 FldEff_QuestionMarkIcon(void)
 {
+    u8 paletteSlot = GetObjectPaletteSlot(0x1100);
     u8 spriteId = CreateSpriteAtEnd(&sSpriteTemplate_ExclamationQuestionMark, 0, 0, 0x52);
 
+    PatchObjectPalette(0x1100, paletteSlot);
+
     if (spriteId != MAX_SPRITES)
-        SetIconSpriteData(&gSprites[spriteId], FLDEFF_QUESTION_MARK_ICON, 1);
+    {
+        SetIconSpriteData(&gSprites[spriteId], FLDEFF_EXCLAMATION_MARK_ICON, 0);
+        gSprites[spriteId].oam.paletteNum = paletteSlot;
+    }
 
     return 0;
 }
 
+extern const u16 gObjectEventPal_Npc2[];
+
 u8 FldEff_HeartIcon(void)
 {
+    u8 paletteSlot = GetObjectPaletteSlot(0x1103);
     u8 spriteId = CreateSpriteAtEnd(&sSpriteTemplate_HeartIcon, 0, 0, 0x52);
+
+    LoadPalette(gObjectEventPal_Npc2, 0x100 + (paletteSlot << 4), 0x20);
+    // gPlttBufferUnfaded[0x100 + (paletteSlot << 4) + 5] = 0x72ff;
 
     if (spriteId != MAX_SPRITES)
     {
         struct Sprite *sprite = &gSprites[spriteId];
 
         SetIconSpriteData(sprite, FLDEFF_HEART_ICON, 0);
-        sprite->oam.paletteNum = 2;
+        sprite->oam.paletteNum = paletteSlot;
     }
 
     return 0;
@@ -749,6 +768,7 @@ static void SpriteCB_TrainerIcons(struct Sprite *sprite)
     if (TryGetObjectEventIdByLocalIdAndMap(sprite->sLocalId, sprite->sMapNum, sprite->sMapGroup, &objEventId)
      || sprite->animEnded)
     {
+        DecrementSpritePaletteReferenceCount(sprite->oam.paletteNum);
         FieldEffectStop(sprite, sprite->sFldEffId);
     }
     else

@@ -458,4 +458,6 @@ u8 IncrementSpritePaletteReferenceCount(u8 idx);
 void DecrementSpritePaletteReferenceCount(u8 idx);
 void ClearSpritePaletteReferences(void);
 
+u8 GetObjectPaletteSlot(u16 tag);
+
 #endif //GUARD_EVENT_OBJECT_MOVEMENT_H

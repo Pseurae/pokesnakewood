@@ -199,11 +199,11 @@ gScriptCmdTable::
 	.4byte ScrCmd_setescapewarp             @ 0xc4
 	.4byte ScrCmd_waitmoncry                @ 0xc5
 	.4byte ScrCmd_bufferboxname             @ 0xc6
-	.4byte ScrCmd_nop1                      @ 0xc7
+	.4byte ScrCmd_textcolor                 @ 0xc7
 	.4byte ScrCmd_nop1                      @ 0xc8
 	.4byte ScrCmd_nop1                      @ 0xc9
-	.4byte ScrCmd_nop1                      @ 0xca
-	.4byte ScrCmd_nop1                      @ 0xcb
+	.4byte ScrCmd_signmsg                   @ 0xca
+	.4byte ScrCmd_normalmsg                 @ 0xcb
 	.4byte ScrCmd_nop1                      @ 0xcc
 	.4byte ScrCmd_setmoneventlegal          @ 0xcd
 	.4byte ScrCmd_checkmoneventlegal        @ 0xce
@@ -228,8 +228,6 @@ gScriptCmdTable::
 	.4byte ScrCmd_buffercontestname         @ 0xe1
 	.4byte ScrCmd_bufferitemnameplural      @ 0xe2
 	.4byte ScrCmd_shownuminput
-	.4byte ScrCmd_setname
-	.4byte ScrCmd_clearname
 	.4byte ScrCmd_setfieldtint
 	.4byte ScrCmd_checkifpartylearnhm
 

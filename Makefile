@@ -391,6 +391,10 @@ $(foreach src, $(ASM_SRCS), $(eval $(call ASM_DEP,$(patsubst $(ASM_SUBDIR)/%.s,$
 endif
 
 ifeq ($(NODEP),1)
+# Make sure map scripts get updated on a NODEP build
+$(OBJ_DIR)/$(DATA_ASM_SUBDIR)/event_scripts.o: $(DATA_ASM_SUBDIR)/event_scripts.s $(shell $(SCANINC) -I include -I "" $(DATA_ASM_SUBDIR)/event_scripts.s)
+	$(PREPROC) $< charmap.txt | $(CPP) -I include - | $(AS) $(ASFLAGS) -o $@
+
 $(DATA_ASM_BUILDDIR)/%.o: $(DATA_ASM_SUBDIR)/%.s
 	$(PREPROC) $< charmap.txt | $(CPP) -I include - | $(AS) $(ASFLAGS) -o $@
 else

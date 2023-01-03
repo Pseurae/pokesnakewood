@@ -180,30 +180,15 @@ script Route101_EventScript_ZombieBoy {
 	applymovement(LOCALID_BIRCH, Route101_Movement_BirchApproachPlayer)
 	waitmovement(0)
 
-	setname(CHAR_NAME_PROF_BIRCH)
 	msgbox(format("Whew…\pThanks {PLAYER}! I would have been a goner if you hadn’t come along."))
-
-	setname(CHAR_NAME_PLAYER)
 	msgbox(format("What was that thing!? And how do you even know my name?"))
-
-	setname(CHAR_NAME_PROF_BIRCH)
 	msgbox(format("It’s me, Prof. Birch. We’ve known each other for years!"))
 	msgbox(format("Also don't you remember the invasion of Hoenn by these monsters?"))
-
-	setname(CHAR_NAME_PLAYER)
 	msgbox(format("Oh, right. You see, I just woke up in that ruined town south of here, and realised that I had lost my memory."))
-
-	setname(CHAR_NAME_PROF_BIRCH)
 	msgbox(format("So, it’s true then? Littleroot has been destroyed?"))
-	
-	setname(CHAR_NAME_PROF_BIRCH)
 	msgbox(format("You don't remember, but it was our home, {PLAYER}."))
 	msgbox(format("Was anyone else there when you woke up? My daughter? Your brother?"))
-
-	setname(CHAR_NAME_PLAYER)
 	msgbox(format("No."))
-
-	setname(CHAR_NAME_PROF_BIRCH)
 	msgbox(format("Well, I daresay that you’ll get your memories back sooner or later. Meanwhile, we gotta get out of here."))
 	msgbox(format("There’s a barricaded town to the north of here. Follow me."))
 	closemessage

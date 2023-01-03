@@ -140,6 +140,7 @@ int ProcessPlayerFieldInput(struct FieldInput *input)
 
     gSpecialVar_LastTalked = 0;
     gSelectedObjectEvent = 0;
+    gSpecialVar_TextColor = 0xFF;
 
     playerDirection = GetPlayerFacingDirection();
     GetPlayerPosition(&position);

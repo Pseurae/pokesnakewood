@@ -226,8 +226,11 @@ const u16 gMetatileAttributes_ViridianCity[] = INCBIN_U16("data/tilesets/seconda
 const u16 gMetatiles_CeladonCity[] = INCBIN_U16("data/tilesets/secondary/celadon_city/metatiles.bin");
 const u16 gMetatileAttributes_CeladonCity[] = INCBIN_U16("data/tilesets/secondary/celadon_city/metatile_attributes.bin");
 
-const u16 gMetatiles_FuchsiaCity[] = INCBIN_U16("data/tilesets/primary/fuchsia_city/metatiles.bin");
-const u16 gMetatileAttributes_FuchsiaCity[] = INCBIN_U16("data/tilesets/primary/fuchsia_city/metatile_attributes.bin");
+const u16 gMetatiles_FuchsiaCity[] = INCBIN_U16("data/tilesets/secondary/fuchsia_city/metatiles.bin");
+const u16 gMetatileAttributes_FuchsiaCity[] = INCBIN_U16("data/tilesets/secondary/fuchsia_city/metatile_attributes.bin");
 
 const u16 gMetatiles_LavenderTown[] = INCBIN_U16("data/tilesets/secondary/lavender_town/metatiles.bin");
 const u16 gMetatileAttributes_LavenderTown[] = INCBIN_U16("data/tilesets/secondary/lavender_town/metatile_attributes.bin");
+
+const u16 gMetatiles_Route101[] = INCBIN_U16("data/tilesets/secondary/route_101/metatiles.bin");
+const u16 gMetatileAttributes_Route101[] = INCBIN_U16("data/tilesets/secondary/route_101/metatile_attributes.bin");

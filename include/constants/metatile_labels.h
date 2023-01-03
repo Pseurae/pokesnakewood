@@ -112,10 +112,10 @@
 #define METATILE_BrendansMaysHouse_MovingBox_Open    0x270
 
 // gTileset_Building
-#define METATILE_Building_PC_Off  0x004
-#define METATILE_Building_PC_On   0x005
-#define METATILE_Building_TV_Off  0x002
-#define METATILE_Building_TV_On   0x003
+#define METATILE_Building_PC_Off  0x062
+#define METATILE_Building_PC_On   0x063
+#define METATILE_Building_TV_Off  0x035
+#define METATILE_Building_TV_On   0x061
 
 // gTileset_Cave
 #define METATILE_Cave_CrackedFloor                       0x22F
@@ -210,7 +210,7 @@
 #define METATILE_General_CalmWater             0x170
 #define METATILE_General_CaveEntrance_Bottom   0x0A7
 #define METATILE_General_CaveEntrance_Top      0x09F
-#define METATILE_General_Door                  0x021
+#define METATILE_General_Door                  0x03D
 #define METATILE_General_Door_Contest          0x1DB
 #define METATILE_General_Door_Gym              0x1CD
 #define METATILE_General_Door_PokeCenter       0x061

@@ -97,12 +97,10 @@ enum {
 };
 
 enum {
+    WIN_MESSAGE,
     WIN_ITEM_LIST,
     WIN_DESCRIPTION,
     WIN_POCKET_NAME,
-    WIN_TMHM_INFO_ICONS,
-    WIN_TMHM_INFO,
-    WIN_MESSAGE, // Identical to ITEMWIN_MESSAGE. Unused?
 };
 
 // Item list ID for toSwapPos to indicate an item is not currently being swapped
@@ -139,7 +137,6 @@ static void DrawPocketIndicatorSquare(u8, bool8);
 static void CreatePocketScrollArrowPair(void);
 static void CreatePocketSwitchArrowPair(void);
 static void DestroyPocketSwitchArrowPair(void);
-static void PrepareTMHMMoveWindow(void);
 static bool8 IsWallysBag(void);
 static void Task_WallyTutorialBagMenu(u8);
 static void Task_BagMenu_HandleInput(u8);
@@ -161,7 +158,7 @@ static void Task_SwitchBagPocket(u8);
 static void Task_HandleSwappingItemsInput(u8);
 static void DoItemSwap(u8);
 static void CancelItemSwap(u8);
-static void PrintTMHMMoveData(u16);
+static void CreateContextMenu(void);
 static void PrintContextMenuItems(u8);
 static void PrintContextMenuItemGrid(u8, u8, u8);
 static void Task_ItemContext_SingleRow(u8);
@@ -299,30 +296,37 @@ static const struct MenuAction sItemMenuActions[] = {
 // these are all 2D arrays with a width of 2 but are represented as 1D arrays
 // ACTION_DUMMY is used to represent blank spaces
 static const u8 sContextMenuItems_ItemsPocket[] = {
-    ACTION_USE,         ACTION_GIVE,
-    ACTION_TOSS,        ACTION_CANCEL
+    ACTION_USE,
+    ACTION_GIVE,
+    ACTION_TOSS,
+    ACTION_CANCEL
 };
 
 static const u8 sContextMenuItems_KeyItemsPocket[] = {
-    ACTION_USE,         ACTION_REGISTER,
-    ACTION_DUMMY,       ACTION_CANCEL
+    ACTION_USE,
+    ACTION_REGISTER,
+    ACTION_CANCEL
 };
 
 
 static const u8 sContextMenuItems_BallsPocket[] = {
-    ACTION_GIVE,        ACTION_DUMMY,
-    ACTION_TOSS,        ACTION_CANCEL
+    ACTION_GIVE,
+    ACTION_TOSS,
+    ACTION_CANCEL
 };
 
 static const u8 sContextMenuItems_TmHmPocket[] = {
-    ACTION_USE,         ACTION_GIVE,
-    ACTION_DUMMY,       ACTION_CANCEL
+    ACTION_USE,
+    ACTION_GIVE,
+    ACTION_CANCEL
 };
 
 static const u8 sContextMenuItems_BerriesPocket[] = {
-    ACTION_CHECK_TAG,   ACTION_DUMMY,
-    ACTION_USE,         ACTION_GIVE,
-    ACTION_TOSS,        ACTION_CANCEL
+    ACTION_CHECK_TAG,
+    ACTION_USE,
+    ACTION_GIVE,
+    ACTION_TOSS,
+    ACTION_CANCEL
 };
 
 static const u8 sContextMenuItems_BattleUse[] = {
@@ -394,7 +398,6 @@ enum {
     COLORID_POCKET_NAME,
     COLORID_GRAY_CURSOR,
     COLORID_DESCRIPTION,
-    COLORID_TMHM_INFO,
     COLORID_NONE = 0xFF
 };
 static const u8 sFontColorTable[][3] = {
@@ -403,11 +406,19 @@ static const u8 sFontColorTable[][3] = {
     [COLORID_POCKET_NAME] = {TEXT_COLOR_TRANSPARENT, TEXT_COLOR_WHITE,      TEXT_COLOR_DARK_GRAY},
     [COLORID_GRAY_CURSOR] = {TEXT_COLOR_TRANSPARENT, TEXT_COLOR_LIGHT_GRAY, TEXT_COLOR_DARK_GRAY},
     [COLORID_DESCRIPTION] = {TEXT_COLOR_TRANSPARENT, TEXT_COLOR_WHITE,      TEXT_COLOR_DARK_GRAY},
-    [COLORID_TMHM_INFO]   = {TEXT_COLOR_TRANSPARENT, TEXT_DYNAMIC_COLOR_5,  TEXT_DYNAMIC_COLOR_1}
 };
 
 static const struct WindowTemplate sDefaultBagWindows[] =
 {
+    [WIN_MESSAGE] = {
+        .bg = 1,
+        .tilemapLeft = 2,
+        .tilemapTop = 15,
+        .width = 26,
+        .height = 4,
+        .paletteNum = 15,
+        .baseBlock = 431,
+    },
     [WIN_ITEM_LIST] = {
         .bg = 0,
         .tilemapLeft = 11,
@@ -435,39 +446,12 @@ static const struct WindowTemplate sDefaultBagWindows[] =
         .paletteNum = 15,
         .baseBlock = 415,
     },
-    [WIN_TMHM_INFO_ICONS] = {
-        .bg = 0,
-        .tilemapLeft = 1,
-        .tilemapTop = 13,
-        .width = 5,
-        .height = 6,
-        .paletteNum = 12,
-        .baseBlock = 433,
-    },
-    [WIN_TMHM_INFO] = {
-        .bg = 0,
-        .tilemapLeft = 7,
-        .tilemapTop = 13,
-        .width = 4,
-        .height = 6,
-        .paletteNum = 12,
-        .baseBlock = 463,
-    },
-    [WIN_MESSAGE] = {
-        .bg = 1,
-        .tilemapLeft = 2,
-        .tilemapTop = 15,
-        .width = 27,
-        .height = 4,
-        .paletteNum = 15,
-        .baseBlock = 487,
-    },
     DUMMY_WIN_TEMPLATE,
 };
 
 static const struct WindowTemplate sContextMenuWindowTemplates[] =
 {
-    [ITEMWIN_1x1] = {
+    [ITEMWIN_CONTEXT] = {
         .bg = 1,
         .tilemapLeft = 22,
         .tilemapTop = 17,
@@ -475,42 +459,6 @@ static const struct WindowTemplate sContextMenuWindowTemplates[] =
         .height = 2,
         .paletteNum = 15,
         .baseBlock = 541,
-    },
-    [ITEMWIN_1x2] = {
-        .bg = 1,
-        .tilemapLeft = 22,
-        .tilemapTop = 15,
-        .width = 7,
-        .height = 4,
-        .paletteNum = 15,
-        .baseBlock = 541,
-    },
-    [ITEMWIN_2x2] = {
-        .bg = 1,
-        .tilemapLeft = 15,
-        .tilemapTop = 15,
-        .width = 14,
-        .height = 4,
-        .paletteNum = 15,
-        .baseBlock = 541,
-    },
-    [ITEMWIN_2x3] = {
-        .bg = 1,
-        .tilemapLeft = 15,
-        .tilemapTop = 13,
-        .width = 14,
-        .height = 6,
-        .paletteNum = 15,
-        .baseBlock = 541,
-    },
-    [ITEMWIN_MESSAGE] = {
-        .bg = 1,
-        .tilemapLeft = 2,
-        .tilemapTop = 15,
-        .width = 27,
-        .height = 4,
-        .paletteNum = 15,
-        .baseBlock = 630,
     },
     [ITEMWIN_YESNO_LOW] = { // Yes/No tucked in corner, for toss confirm
         .bg = 1,
@@ -519,7 +467,7 @@ static const struct WindowTemplate sContextMenuWindowTemplates[] =
         .width = 5,
         .height = 4,
         .paletteNum = 15,
-        .baseBlock = 630,
+        .baseBlock = 555,
     },
     [ITEMWIN_YESNO_HIGH] = { // Yes/No higher up, positioned above a lower message box
         .bg = 1,
@@ -528,7 +476,7 @@ static const struct WindowTemplate sContextMenuWindowTemplates[] =
         .width = 5,
         .height = 4,
         .paletteNum = 15,
-        .baseBlock = 630,
+        .baseBlock = 555,
     },
     [ITEMWIN_QUANTITY] = { // Used for quantity of items to Toss/Deposit
         .bg = 1,
@@ -537,7 +485,7 @@ static const struct WindowTemplate sContextMenuWindowTemplates[] =
         .width = 5,
         .height = 2,
         .paletteNum = 15,
-        .baseBlock = 630,
+        .baseBlock = 575,
     },
     [ITEMWIN_QUANTITY_WIDE] = { // Used for quantity and price of items to Sell
         .bg = 1,
@@ -546,7 +494,7 @@ static const struct WindowTemplate sContextMenuWindowTemplates[] =
         .width = 10,
         .height = 2,
         .paletteNum = 15,
-        .baseBlock = 630,
+        .baseBlock = 575,
     },
     [ITEMWIN_MONEY] = {
         .bg = 1,
@@ -555,7 +503,7 @@ static const struct WindowTemplate sContextMenuWindowTemplates[] =
         .width = 10,
         .height = 2,
         .paletteNum = 15,
-        .baseBlock = 630,
+        .baseBlock = 595,
     },
 };
 
@@ -687,10 +635,9 @@ void VBlankCB_BagMenuRun(void)
 #define tQuantity          data[2]
 #define tNeverRead         data[3]
 #define tItemCount         data[8]
-#define tMsgWindowId       data[10]
-#define tPocketSwitchDir   data[11]
-#define tPocketSwitchTimer data[12]
-#define tPocketSwitchState data[13]
+#define tPocketSwitchDir   data[10]
+#define tPocketSwitchTimer data[11]
+#define tPocketSwitchState data[12]
 
 static void CB2_Bag(void)
 {
@@ -710,7 +657,7 @@ static void PrintPocketName(void)
 static void BagDrawDepositItemTextBox(void)
 {
     u32 x;
-    DrawStdFrameWithCustomTileAndPalette(2, FALSE, 1, 14);
+    DrawStdFrameWithCustomTileAndPalette(WIN_POCKET_NAME, FALSE, 28, 12);
     x = 0x40 - GetStringWidth(FONT_SMALL, gText_DepositItem, 0);
     AddTextPrinterParameterized(WIN_POCKET_NAME, FONT_SMALL, gText_DepositItem, x / 2, 1, 0, NULL);
 }
@@ -811,7 +758,6 @@ static bool8 SetupBagMenu(void)
         SetGpuRegBits(REG_OFFSET_DISPCNT, DISPCNT_WIN0_ON);
         SetGpuReg(REG_OFFSET_BLDCNT, BLDCNT_TGT1_BG0 | BLDCNT_EFFECT_BLEND | BLDCNT_TGT2_BG2);
         SetGpuReg(REG_OFFSET_BLDALPHA, BLDALPHA_BLEND(16, 0));
-        // PrepareTMHMMoveWindow();
         gMain.state++;
         break;
     case 19:
@@ -1201,9 +1147,9 @@ void DisplayItemMessage(u8 taskId, u8 fontId, const u8 *str, void (*callback)(u8
 {
     s16 *data = gTasks[taskId].data;
 
-    tMsgWindowId = AddItemMessageWindow(ITEMWIN_MESSAGE);
-    FillWindowPixelBuffer(tMsgWindowId, PIXEL_FILL(1));
-    DisplayMessageAndContinueTask(taskId, tMsgWindowId, 10, 13, fontId, GetPlayerTextSpeedDelay(), str, callback);
+    PutWindowTilemap(WIN_MESSAGE);
+    FillWindowPixelBuffer(WIN_MESSAGE, PIXEL_FILL(1));
+    DisplayMessageAndContinueTask(taskId, WIN_MESSAGE, 10, 13, fontId, GetPlayerTextSpeedDelay(), str, callback);
     ScheduleBgCopyTilemapToVram(1);
 }
 
@@ -1212,13 +1158,15 @@ void CloseItemMessage(u8 taskId)
     s16 *data = gTasks[taskId].data;
     u16 *scrollPos = &gBagPosition.scrollPosition[gBagPosition.pocket];
     u16 *cursorPos = &gBagPosition.cursorPosition[gBagPosition.pocket];
-    RemoveItemMessageWindow(ITEMWIN_MESSAGE);
+    ClearDialogWindowAndFrameToTransparent(WIN_MESSAGE, FALSE);
+    ClearWindowTilemap(WIN_MESSAGE);
     DestroyListMenuTask(tListTaskId, scrollPos, cursorPos);
     UpdatePocketItemList(gBagPosition.pocket);
     UpdatePocketListPosition(gBagPosition.pocket);
     LoadBagItemListBuffers(gBagPosition.pocket);
     tListTaskId = ListMenuInit(&gMultiuseListMenuTemplate, *scrollPos, *cursorPos);
     ScheduleBgCopyTilemapToVram(0);
+    ScheduleBgCopyTilemapToVram(1);
     ReturnToItemList(taskId);
 }
 
@@ -1320,8 +1268,6 @@ static void ReturnToItemList(u8 taskId)
     Bag_FillMessageBoxWithPalette(0);
     CreatePocketScrollArrowPair();
     CreatePocketSwitchArrowPair();
-    ClearWindowTilemap(WIN_TMHM_INFO_ICONS);
-    ClearWindowTilemap(WIN_TMHM_INFO);
     PutWindowTilemap(WIN_DESCRIPTION);
     ScheduleBgCopyTilemapToVram(0);
     gTasks[taskId].func = Task_BagMenu_HandleInput;
@@ -1691,34 +1637,35 @@ static void OpenContextMenu(u8 taskId)
             }
         }
     }
-    if (gBagPosition.pocket == TMHM_POCKET)
+
+    CopyItemName(gSpecialVar_ItemId, gStringVar1);
+    StringExpandPlaceholders(gStringVar4, gText_Var1IsSelected);
+    FillWindowPixelBuffer(WIN_DESCRIPTION, PIXEL_FILL(0));
+    BagMenu_Print(WIN_DESCRIPTION, FONT_SHORT, gStringVar4, 3, 3, 0, 0, 0, COLORID_DESCRIPTION);
+
+    CreateContextMenu();
+}
+
+static void CreateContextMenu(void)
+{
+    u8 height;
+    struct WindowTemplate template;
+
+    u8 *windowId = &gBagMenu->windowIds[ITEMWIN_CONTEXT];
+    if (*windowId == WINDOW_NONE)
     {
-        ClearWindowTilemap(WIN_DESCRIPTION);
-        PrintTMHMMoveData(gSpecialVar_ItemId);
-        PutWindowTilemap(WIN_TMHM_INFO_ICONS);
-        PutWindowTilemap(WIN_TMHM_INFO);
-        ScheduleBgCopyTilemapToVram(0);
+        height = gBagMenu->contextMenuNumItems * 2;
+        template = CreateWindowTemplate(1, 22, 19 - height, 7, height, 15, 541);
+        *windowId = AddWindow(&template);
+        DrawStdFrameWithCustomTileAndPalette(*windowId, FALSE, 1, 14);
+        ScheduleBgCopyTilemapToVram(1);
     }
-    else
-    {
-        CopyItemName(gSpecialVar_ItemId, gStringVar1);
-        StringExpandPlaceholders(gStringVar4, gText_Var1IsSelected);
-        FillWindowPixelBuffer(WIN_DESCRIPTION, PIXEL_FILL(0));
-        BagMenu_Print(WIN_DESCRIPTION, FONT_SHORT, gStringVar4, 3, 3, 0, 0, 0, COLORID_DESCRIPTION);
-    }
-    if (gBagMenu->contextMenuNumItems == 1)
-        PrintContextMenuItems(BagMenu_AddWindow(ITEMWIN_1x1));
-    else if (gBagMenu->contextMenuNumItems == 2)
-        PrintContextMenuItems(BagMenu_AddWindow(ITEMWIN_1x2));
-    else if (gBagMenu->contextMenuNumItems == 4)
-        PrintContextMenuItemGrid(BagMenu_AddWindow(ITEMWIN_2x2), 2, 2);
-    else
-        PrintContextMenuItemGrid(BagMenu_AddWindow(ITEMWIN_2x3), 2, 3);
+    PrintContextMenuItems(*windowId);
 }
 
 static void PrintContextMenuItems(u8 windowId)
 {
-    PrintMenuActionTexts(windowId, FONT_NARROW, 8, 1, 0, 16, gBagMenu->contextMenuNumItems, sItemMenuActions, gBagMenu->contextMenuItemsPtr);
+    PrintMenuActionTexts(windowId, FONT_SHORT, 8, 2, 0, 16, gBagMenu->contextMenuNumItems, sItemMenuActions, gBagMenu->contextMenuItemsPtr);
     InitMenuInUpperLeftCornerNormal(windowId, gBagMenu->contextMenuNumItems, 0);
 }
 
@@ -1734,10 +1681,7 @@ static void Task_ItemContext_Normal(u8 taskId)
 
     // Context menu width is never greater than 2 columns, so if
     // there are more than 2 items then there are multiple rows
-    if (gBagMenu->contextMenuNumItems <= 2)
-        gTasks[taskId].func = Task_ItemContext_SingleRow;
-    else
-        gTasks[taskId].func = Task_ItemContext_MultipleRows;
+    gTasks[taskId].func = Task_ItemContext_SingleRow;
 }
 
 static void Task_ItemContext_SingleRow(u8 taskId)
@@ -1824,14 +1768,7 @@ static bool8 IsValidContextMenuPos(s8 cursorPos)
 
 static void RemoveContextWindow(void)
 {
-    if (gBagMenu->contextMenuNumItems == 1)
-        BagMenu_RemoveWindow(ITEMWIN_1x1);
-    else if (gBagMenu->contextMenuNumItems == 2)
-        BagMenu_RemoveWindow(ITEMWIN_1x2);
-    else if (gBagMenu->contextMenuNumItems == 4)
-        BagMenu_RemoveWindow(ITEMWIN_2x2);
-    else
-        BagMenu_RemoveWindow(ITEMWIN_2x3);
+    BagMenu_RemoveWindow(ITEMWIN_CONTEXT);
 }
 
 static void ItemMenu_UseOutOfBattle(u8 taskId)
@@ -2192,7 +2129,8 @@ static void CancelSell(u8 taskId)
     s16 *data = gTasks[taskId].data;
 
     RemoveMoneyWindow();
-    RemoveItemMessageWindow(ITEMWIN_MESSAGE);
+    ClearDialogWindowAndFrameToTransparent(WIN_MESSAGE, FALSE);
+    ClearWindowTilemap(WIN_MESSAGE);
     BagMenu_PrintCursor(tListTaskId, COLORID_NORMAL);
     ReturnToItemList(taskId);
 }
@@ -2227,7 +2165,8 @@ static void Task_ChooseHowManyToSell(u8 taskId)
         BagMenu_PrintCursor(tListTaskId, COLORID_NORMAL);
         RemoveMoneyWindow();
         BagMenu_RemoveWindow(ITEMWIN_QUANTITY_WIDE);
-        RemoveItemMessageWindow(ITEMWIN_MESSAGE);
+        ClearDialogWindowAndFrameToTransparent(WIN_MESSAGE, FALSE);
+        ClearWindowTilemap(WIN_MESSAGE);
         ReturnToItemList(taskId);
     }
 }
@@ -2532,6 +2471,7 @@ static void LoadBagMenuTextWindows(void)
     DeactivateAllTextPrinters();
     LoadUserWindowBorderGfx(0, 1, 0xE0);
     LoadMessageBoxGfx(0, 10, 0xD0);
+    LoadStdBoxGfx(0, 28, 0xC0);
     // ListMenuLoadStdPalAt(0xC0, 1);
     LoadPalette(&sBagWindowPal, 0xF0, 0x20);
     for (i = 0; i <= WIN_POCKET_NAME; i++)
@@ -2617,66 +2557,6 @@ static void RemoveMoneyWindow(void)
 {
     BagMenu_RemoveWindow(ITEMWIN_MONEY);
     RemoveMoneyLabelObject();
-}
-
-static void PrepareTMHMMoveWindow(void)
-{
-    FillWindowPixelBuffer(WIN_TMHM_INFO_ICONS, PIXEL_FILL(0));
-    BlitMenuInfoIcon(WIN_TMHM_INFO_ICONS, MENU_INFO_ICON_TYPE, 0, 0);
-    BlitMenuInfoIcon(WIN_TMHM_INFO_ICONS, MENU_INFO_ICON_POWER, 0, 12);
-    BlitMenuInfoIcon(WIN_TMHM_INFO_ICONS, MENU_INFO_ICON_ACCURACY, 0, 24);
-    BlitMenuInfoIcon(WIN_TMHM_INFO_ICONS, MENU_INFO_ICON_PP, 0, 36);
-    CopyWindowToVram(WIN_TMHM_INFO_ICONS, COPYWIN_GFX);
-}
-
-static void PrintTMHMMoveData(u16 itemId)
-{
-    u8 i;
-    u16 moveId;
-    const u8 *text;
-
-    FillWindowPixelBuffer(WIN_TMHM_INFO, PIXEL_FILL(0));
-    if (itemId == ITEM_NONE)
-    {
-        for (i = 0; i < 4; i++)
-            BagMenu_Print(WIN_TMHM_INFO, FONT_NORMAL, gText_ThreeDashes, 7, i * 12, 0, 0, TEXT_SKIP_DRAW, COLORID_TMHM_INFO);
-        CopyWindowToVram(WIN_TMHM_INFO, COPYWIN_GFX);
-    }
-    else
-    {
-        moveId = ItemIdToBattleMoveId(itemId);
-        BlitMenuInfoIcon(WIN_TMHM_INFO, gBattleMoves[moveId].type + 1, 0, 0);
-
-        // Print TMHM power
-        if (gBattleMoves[moveId].power <= 1)
-        {
-            text = gText_ThreeDashes;
-        }
-        else
-        {
-            ConvertIntToDecimalStringN(gStringVar1, gBattleMoves[moveId].power, STR_CONV_MODE_RIGHT_ALIGN, 3);
-            text = gStringVar1;
-        }
-        BagMenu_Print(WIN_TMHM_INFO, FONT_NORMAL, text, 7, 12, 0, 0, TEXT_SKIP_DRAW, COLORID_TMHM_INFO);
-
-        // Print TMHM accuracy
-        if (gBattleMoves[moveId].accuracy == 0)
-        {
-            text = gText_ThreeDashes;
-        }
-        else
-        {
-            ConvertIntToDecimalStringN(gStringVar1, gBattleMoves[moveId].accuracy, STR_CONV_MODE_RIGHT_ALIGN, 3);
-            text = gStringVar1;
-        }
-        BagMenu_Print(WIN_TMHM_INFO, FONT_NORMAL, text, 7, 24, 0, 0, TEXT_SKIP_DRAW, COLORID_TMHM_INFO);
-
-        // Print TMHM pp
-        ConvertIntToDecimalStringN(gStringVar1, gBattleMoves[moveId].pp, STR_CONV_MODE_RIGHT_ALIGN, 3);
-        BagMenu_Print(WIN_TMHM_INFO, FONT_NORMAL, gStringVar1, 7, 36, 0, 0, TEXT_SKIP_DRAW, COLORID_TMHM_INFO);
-
-        CopyWindowToVram(WIN_TMHM_INFO, COPYWIN_GFX);
-    }
 }
 
 static void CB2_TMCaseGive(void)

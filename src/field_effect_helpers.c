@@ -195,14 +195,17 @@ extern const struct SpriteTemplate *const gFieldEffectObjectTemplatePointers[];
 
 u8 CreateWarpArrowSprite(void)
 {
-    u8 spriteId;
+    u8 spriteId, paletteSlot;
     struct Sprite *sprite;
 
+    paletteSlot = GetObjectPaletteSlot(0x1100);
+    PatchObjectPalette(0x1100, paletteSlot);
     spriteId = CreateSpriteAtEnd(gFieldEffectObjectTemplatePointers[FLDEFFOBJ_ARROW], 0, 0, 0x52);
     if (spriteId != MAX_SPRITES)
     {
         sprite = &gSprites[spriteId];
         sprite->oam.priority = 1;
+        sprite->oam.paletteNum = paletteSlot;
         sprite->coordOffsetEnabled = TRUE;
         sprite->invisible = TRUE;
     }

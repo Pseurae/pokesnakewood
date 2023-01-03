@@ -2,10 +2,13 @@
 .set AMOUNT, VAR_0x8001
 
 Std_ObtainItem::
+	copyvar VAR_PREV_TEXT_COLOR, VAR_TEXT_COLOR
+	textcolor NPC_TEXT_COLOR_NEUTRAL
 	additem ITEMID, AMOUNT
 	copyvar VAR_0x8006, ITEMID
 	copyvar VAR_0x8007, VAR_RESULT
 	call EventScript_ObtainItemMessage
+	copyvar VAR_TEXT_COLOR, VAR_PREV_TEXT_COLOR
 	return
 
 EventScript_ObtainItemMessage::
@@ -72,9 +75,12 @@ EventScript_PlayFanfareObtainedTMHM::
 	return
 
 Std_ObtainDecoration::
+	copyvar VAR_PREV_TEXT_COLOR, VAR_TEXT_COLOR
+	textcolor NPC_TEXT_COLOR_NEUTRAL
 	adddecoration ITEMID
 	copyvar VAR_0x8007, VAR_RESULT
 	call EventScript_ObtainDecorationMessage
+	copyvar VAR_TEXT_COLOR, VAR_PREV_TEXT_COLOR
 	return
 
 EventScript_ObtainDecorationMessage::
@@ -99,6 +105,8 @@ Std_FindItem::
 	lock
 	faceplayer
 	waitse
+	copyvar VAR_PREV_TEXT_COLOR, VAR_TEXT_COLOR
+	textcolor NPC_TEXT_COLOR_NEUTRAL
 	copyvar VAR_0x8004, ITEMID
 	copyvar VAR_0x8005, AMOUNT
 	copyvar VAR_0x8006, ITEMID
@@ -110,6 +118,7 @@ Std_FindItem::
 	call_if_eq VAR_0x8007, TRUE, EventScript_PickUpItem
 	call_if_eq VAR_0x8007, FALSE, EventScript_NoRoomToPickUpItem
 	release
+	copyvar VAR_TEXT_COLOR, VAR_PREV_TEXT_COLOR
 	return
 
 EventScript_PickUpItem::

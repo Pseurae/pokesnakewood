@@ -21,4 +21,6 @@ u8 GetFieldMessageBoxMode(void);
 void StopFieldMessage(void);
 void InitFieldMessageBox(void);
 
+extern u8 gSignMessage;
+
 #endif // GUARD_FIELD_MESSAGE_BOX_H
