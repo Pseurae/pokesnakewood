@@ -451,15 +451,6 @@ static const struct WindowTemplate sDefaultBagWindows[] =
 
 static const struct WindowTemplate sContextMenuWindowTemplates[] =
 {
-    [ITEMWIN_CONTEXT] = {
-        .bg = 1,
-        .tilemapLeft = 22,
-        .tilemapTop = 17,
-        .width = 7,
-        .height = 2,
-        .paletteNum = 15,
-        .baseBlock = 541,
-    },
     [ITEMWIN_YESNO_LOW] = { // Yes/No tucked in corner, for toss confirm
         .bg = 1,
         .tilemapLeft = 24,
@@ -505,6 +496,15 @@ static const struct WindowTemplate sContextMenuWindowTemplates[] =
         .paletteNum = 15,
         .baseBlock = 595,
     },
+    [ITEMWIN_SELECTED] = {
+        .bg = 1,
+        .tilemapLeft = 6,
+        .tilemapTop = 15,
+        .width = 14,
+        .height = 4,
+        .paletteNum = 15,
+        .baseBlock = 615,
+    }
 };
 
 EWRAM_DATA struct BagMenu *gBagMenu = 0;
@@ -1524,6 +1524,8 @@ static void CancelItemSwap(u8 taskId)
 
 static void OpenContextMenu(u8 taskId)
 {
+    u8 *windowId;
+
     switch (gBagPosition.location)
     {
     case ITEMMENULOCATION_BATTLE:
@@ -1638,11 +1640,12 @@ static void OpenContextMenu(u8 taskId)
         }
     }
 
+    ClearWindowTilemap(WIN_DESCRIPTION);
+    ScheduleBgCopyTilemapToVram(0);
+
     CopyItemName(gSpecialVar_ItemId, gStringVar1);
     StringExpandPlaceholders(gStringVar4, gText_Var1IsSelected);
-    FillWindowPixelBuffer(WIN_DESCRIPTION, PIXEL_FILL(0));
-    BagMenu_Print(WIN_DESCRIPTION, FONT_SHORT, gStringVar4, 3, 3, 0, 0, 0, COLORID_DESCRIPTION);
-
+    BagMenu_Print(BagMenu_AddWindow(ITEMWIN_SELECTED), FONT_SHORT, gStringVar4, 1, 2, 0, 0, 0, COLORID_NORMAL);
     CreateContextMenu();
 }
 
@@ -1769,6 +1772,7 @@ static bool8 IsValidContextMenuPos(s8 cursorPos)
 static void RemoveContextWindow(void)
 {
     BagMenu_RemoveWindow(ITEMWIN_CONTEXT);
+    BagMenu_RemoveWindow(ITEMWIN_SELECTED);
 }
 
 static void ItemMenu_UseOutOfBattle(u8 taskId)
@@ -2500,7 +2504,10 @@ static u8 BagMenu_AddWindow(u8 windowType)
     if (*windowId == WINDOW_NONE)
     {
         *windowId = AddWindow(&sContextMenuWindowTemplates[windowType]);
-        DrawStdFrameWithCustomTileAndPalette(*windowId, FALSE, 1, 14);
+        if (windowType == ITEMWIN_SELECTED)
+            DrawStdFrameWithCustomTileAndPalette(*windowId, FALSE, 28, 12);
+        else
+            DrawStdFrameWithCustomTileAndPalette(*windowId, FALSE, 1, 14);
         ScheduleBgCopyTilemapToVram(1);
     }
     return *windowId;

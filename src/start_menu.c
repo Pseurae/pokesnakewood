@@ -146,10 +146,10 @@ static bool8 FieldCB_ReturnToFieldStartMenu(void);
 static const struct WindowTemplate sSafariBallsWindowTemplate = {0, 1, 1, 9, 4, 0xF, 8};
 static const struct WindowTemplate sInfoWindowTemplate = {
     .bg = 0,
-    .tilemapLeft = 0,
-    .tilemapTop = 0,
-    .width = 20,
-    .height = 6,
+    .tilemapLeft = 1,
+    .tilemapTop = 1,
+    .width = 19,
+    .height = 4,
     .paletteNum = 15,
     .baseBlock = 8
 };
@@ -407,22 +407,10 @@ static void ShowSafariBallsWindow(void)
     CopyWindowToVram(sSafariBallsWindowId, COPYWIN_GFX);
 }
 
-static const u8 sTimeFormat1[] = _("{STR_VAR_1}:{STR_VAR_2}");
-static const u8 sTimeFormat2[] = _("{STR_VAR_1}{COLOR TRANSPARENT}{SHADOW TRANSPARENT}:{COLOR WHITE}{SHADOW DARK_GRAY}{STR_VAR_2}");
-
-static u8 *SetupInfoStringVar(u8 *strvar)
-{
-    strvar[0] = EXT_CTRL_CODE_BEGIN;
-    strvar[1] = EXT_CTRL_CODE_HIGHLIGHT;
-    strvar[2] = TEXT_COLOR_TRANSPARENT;
-    strvar[3] = EXT_CTRL_CODE_BEGIN;
-    strvar[4] = EXT_CTRL_CODE_COLOR;
-    strvar[5] = TEXT_COLOR_WHITE;
-    strvar[6] = EXT_CTRL_CODE_BEGIN;
-    strvar[7] = EXT_CTRL_CODE_SHADOW;
-    strvar[8] = TEXT_COLOR_DARK_GRAY;
-    return strvar + 9;
-}
+static const u8 sTimeFormat1[] = _("{STR_VAR_1}:{STR_VAR_2} {STR_VAR_3}");
+static const u8 sTimeFormat2[] = _("{STR_VAR_1}{COLOR TRANSPARENT}{SHADOW TRANSPARENT}:{COLOR DARK_GRAY}{SHADOW LIGHT_GRAY}{STR_VAR_2} {STR_VAR_3}");
+static const u8 sTimeAM[] = _("AM");
+static const u8 sTimePM[] = _("PM");
 
 #define tUpdateTimer data[0]
 #define tFlickerTimer data[1]
@@ -441,11 +429,14 @@ static void Task_UpdateTime(u8 taskId)
             tUpdateTimer++;
             break;
         case 20:
-            FillWindowPixelRect(sInfoWindowId, PIXEL_FILL(0), 10, 20, 30, 10);
-            ConvertIntToDecimalStringN(gStringVar1, gLocalTime.hours, STR_CONV_MODE_LEADING_ZEROS, 2);
+            FillWindowPixelRect(sInfoWindowId, PIXEL_FILL(1), 0, 17, 48, 17);
+
+            ConvertIntToDecimalStringN(gStringVar1, gLocalTime.hours % 13, STR_CONV_MODE_LEADING_ZEROS, 2);
             ConvertIntToDecimalStringN(gStringVar2, gLocalTime.minutes, STR_CONV_MODE_LEADING_ZEROS, 2);
-            StringExpandPlaceholders(SetupInfoStringVar(gStringVar3), tFlickerTimer ? sTimeFormat1 : sTimeFormat2);
-            AddTextPrinterParameterized(sInfoWindowId, FONT_SMALL, gStringVar3, 10, 18, TEXT_SKIP_DRAW, NULL);
+            StringExpandPlaceholders(gStringVar3, (gLocalTime.hours < 12) ? sTimeAM : sTimePM);
+
+            StringExpandPlaceholders(gStringVar4, tFlickerTimer ? sTimeFormat1 : sTimeFormat2);
+            AddTextPrinterParameterized(sInfoWindowId, FONT_SHORT, gStringVar4, 0, 17, TEXT_SKIP_DRAW, NULL);
             CopyWindowToVram(sInfoWindowId, COPYWIN_GFX);
             tUpdateTimer++;
             break;
@@ -463,26 +454,23 @@ static void Task_UpdateTime(u8 taskId)
 static void ShowInfoWindow(void)
 {
     u8 *str, x;
+
     sInfoWindowId = AddWindow(&sInfoWindowTemplate);
+    LoadStdBoxGfx(sInfoWindowId, 0x21F, 0xD0);
+    DrawStdFrameWithCustomTileAndPalette(sInfoWindowId, TRUE, 0x21F, 13);
     PutWindowTilemap(sInfoWindowId);
 
-    str = SetupInfoStringVar(gStringVar1);
-    GetMapName(str, gMapHeader.regionMapSectionId, 0);
-    AddTextPrinterParameterized(sInfoWindowId, FONT_SMALL, gStringVar1, 10, 5, TEXT_SKIP_DRAW, NULL);
-
-    str = SetupInfoStringVar(gStringVar1);
-    *str++ = CHAR_CURRENCY;
-
-    ConvertIntToDecimalStringN(str, GetMoney(&gSaveBlock1Ptr->money), STR_CONV_MODE_LEFT_ALIGN, 6);
-    x = GetStringRightAlignXOffset(FONT_SMALL, gStringVar1, 160);
-    AddTextPrinterParameterized(sInfoWindowId, FONT_SMALL, gStringVar1, x, 5, TEXT_SKIP_DRAW, NULL);
+    GetMapName(gStringVar1, gMapHeader.regionMapSectionId, 0);
+    AddTextPrinterParameterized(sInfoWindowId, FONT_SHORT, gStringVar1, 0, 1, TEXT_SKIP_DRAW, NULL);
 
     RtcCalcLocalTime();
-    ConvertIntToDecimalStringN(gStringVar1, gLocalTime.hours, STR_CONV_MODE_LEADING_ZEROS, 2);
-    ConvertIntToDecimalStringN(gStringVar2, gLocalTime.minutes, STR_CONV_MODE_LEADING_ZEROS, 2);
-    StringExpandPlaceholders(SetupInfoStringVar(gStringVar3), sTimeFormat1);
 
-    AddTextPrinterParameterized(sInfoWindowId, FONT_SMALL, gStringVar3, 10, 18, TEXT_SKIP_DRAW, NULL);
+    ConvertIntToDecimalStringN(gStringVar1, gLocalTime.hours % 12, STR_CONV_MODE_LEADING_ZEROS, 2);
+    ConvertIntToDecimalStringN(gStringVar2, gLocalTime.minutes, STR_CONV_MODE_LEADING_ZEROS, 2);
+    StringExpandPlaceholders(gStringVar3, (gLocalTime.hours < 12) ? sTimeAM : sTimePM);
+
+    StringExpandPlaceholders(gStringVar4, sTimeFormat1);
+    AddTextPrinterParameterized(sInfoWindowId, FONT_SHORT, gStringVar4, 0, 17, TEXT_SKIP_DRAW, NULL);
 
     CopyWindowToVram(sInfoWindowId, COPYWIN_GFX);
     sTimeUpdateTaskId = CreateTask(Task_UpdateTime, 0);
@@ -532,12 +520,12 @@ static bool32 PrintStartMenuActions(s8 *pIndex, u32 count)
     {
         if (sStartMenuItems[sCurrentStartMenuActions[index]].func.u8_void == StartMenuPlayerNameCallback)
         {
-            PrintPlayerNameOnWindow(GetStartMenuWindowId(), sStartMenuItems[sCurrentStartMenuActions[index]].text, 8, (index << 4) + 9);
+            PrintPlayerNameOnWindow(GetStartMenuWindowId(), sStartMenuItems[sCurrentStartMenuActions[index]].text, 8, index * 15);
         }
         else
         {
             StringExpandPlaceholders(gStringVar4, sStartMenuItems[sCurrentStartMenuActions[index]].text);
-            AddTextPrinterParameterized(GetStartMenuWindowId(), FONT_NORMAL, gStringVar4, 8, (index << 4) + 9, TEXT_SKIP_DRAW, NULL);
+            AddTextPrinterParameterized(GetStartMenuWindowId(), FONT_SHORT, gStringVar4, 8, index * 15, TEXT_SKIP_DRAW, NULL);
         }
 
         index++;
@@ -587,7 +575,7 @@ static bool32 InitStartMenuStep(void)
             sInitStartMenuData[0]++;
         break;
     case 5:
-        sStartMenuCursorPos = InitMenuNormal(GetStartMenuWindowId(), FONT_NORMAL, 0, 9, 16, sNumStartMenuActions, sStartMenuCursorPos);
+        sStartMenuCursorPos = InitMenuNormal(GetStartMenuWindowId(), FONT_SHORT, 0, 0, 15, sNumStartMenuActions, sStartMenuCursorPos);
         CopyWindowToVram(GetStartMenuWindowId(), COPYWIN_MAP);
         sInitStartMenuData[0]++;
         break;
@@ -1441,38 +1429,38 @@ static void ShowSaveInfoWindow(void)
     // Print region name
     yOffset = 1;
     BufferSaveMenuText(SAVE_MENU_LOCATION, gStringVar4, TEXT_COLOR_GREEN);
-    AddTextPrinterParameterized(sSaveInfoWindowId, FONT_NORMAL, gStringVar4, 0, yOffset, TEXT_SKIP_DRAW, NULL);
+    AddTextPrinterParameterized(sSaveInfoWindowId, FONT_SHORT, gStringVar4, 0, yOffset, TEXT_SKIP_DRAW, NULL);
 
     // Print player name
     yOffset += 16;
-    AddTextPrinterParameterized(sSaveInfoWindowId, FONT_NORMAL, gText_SavingPlayer, 0, yOffset, TEXT_SKIP_DRAW, NULL);
+    AddTextPrinterParameterized(sSaveInfoWindowId, FONT_SHORT, gText_SavingPlayer, 0, yOffset, TEXT_SKIP_DRAW, NULL);
     BufferSaveMenuText(SAVE_MENU_NAME, gStringVar4, color);
-    xOffset = GetStringRightAlignXOffset(FONT_NORMAL, gStringVar4, 0x70);
+    xOffset = GetStringRightAlignXOffset(FONT_SHORT, gStringVar4, 0x70);
     PrintPlayerNameOnWindow(sSaveInfoWindowId, gStringVar4, xOffset, yOffset);
 
     // Print badge count
     yOffset += 16;
-    AddTextPrinterParameterized(sSaveInfoWindowId, FONT_NORMAL, gText_SavingBadges, 0, yOffset, TEXT_SKIP_DRAW, NULL);
+    AddTextPrinterParameterized(sSaveInfoWindowId, FONT_SHORT, gText_SavingBadges, 0, yOffset, TEXT_SKIP_DRAW, NULL);
     BufferSaveMenuText(SAVE_MENU_BADGES, gStringVar4, color);
-    xOffset = GetStringRightAlignXOffset(FONT_NORMAL, gStringVar4, 0x70);
-    AddTextPrinterParameterized(sSaveInfoWindowId, FONT_NORMAL, gStringVar4, xOffset, yOffset, TEXT_SKIP_DRAW, NULL);
+    xOffset = GetStringRightAlignXOffset(FONT_SHORT, gStringVar4, 0x70);
+    AddTextPrinterParameterized(sSaveInfoWindowId, FONT_SHORT, gStringVar4, xOffset, yOffset, TEXT_SKIP_DRAW, NULL);
 
     if (FlagGet(FLAG_SYS_POKEDEX_GET) == TRUE)
     {
         // Print pokedex count
         yOffset += 16;
-        AddTextPrinterParameterized(sSaveInfoWindowId, FONT_NORMAL, gText_SavingPokedex, 0, yOffset, TEXT_SKIP_DRAW, NULL);
+        AddTextPrinterParameterized(sSaveInfoWindowId, FONT_SHORT, gText_SavingPokedex, 0, yOffset, TEXT_SKIP_DRAW, NULL);
         BufferSaveMenuText(SAVE_MENU_CAUGHT, gStringVar4, color);
-        xOffset = GetStringRightAlignXOffset(FONT_NORMAL, gStringVar4, 0x70);
-        AddTextPrinterParameterized(sSaveInfoWindowId, FONT_NORMAL, gStringVar4, xOffset, yOffset, TEXT_SKIP_DRAW, NULL);
+        xOffset = GetStringRightAlignXOffset(FONT_SHORT, gStringVar4, 0x70);
+        AddTextPrinterParameterized(sSaveInfoWindowId, FONT_SHORT, gStringVar4, xOffset, yOffset, TEXT_SKIP_DRAW, NULL);
     }
 
     // Print play time
     yOffset += 16;
-    AddTextPrinterParameterized(sSaveInfoWindowId, FONT_NORMAL, gText_SavingTime, 0, yOffset, TEXT_SKIP_DRAW, NULL);
+    AddTextPrinterParameterized(sSaveInfoWindowId, FONT_SHORT, gText_SavingTime, 0, yOffset, TEXT_SKIP_DRAW, NULL);
     BufferSaveMenuText(SAVE_MENU_PLAY_TIME, gStringVar4, color);
-    xOffset = GetStringRightAlignXOffset(FONT_NORMAL, gStringVar4, 0x70);
-    AddTextPrinterParameterized(sSaveInfoWindowId, FONT_NORMAL, gStringVar4, xOffset, yOffset, TEXT_SKIP_DRAW, NULL);
+    xOffset = GetStringRightAlignXOffset(FONT_SHORT, gStringVar4, 0x70);
+    AddTextPrinterParameterized(sSaveInfoWindowId, FONT_SHORT, gStringVar4, xOffset, yOffset, TEXT_SKIP_DRAW, NULL);
 
     CopyWindowToVram(sSaveInfoWindowId, COPYWIN_GFX);
 }
