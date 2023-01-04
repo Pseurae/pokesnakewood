@@ -172,7 +172,11 @@ static void UpdateObjectReflectionSprite(struct Sprite *reflectionSprite)
         reflectionSprite->coordOffsetEnabled = mainSprite->coordOffsetEnabled;
 
         if (objectEvent->hideReflection == TRUE)
+        {
             reflectionSprite->invisible = TRUE;
+            DecrementSpritePaletteReferenceCount(reflectionSprite->oam.paletteNum);
+            DestroySprite(reflectionSprite);
+        }
 
         if (reflectionSprite->sIsStillReflection == FALSE)
         {
@@ -259,7 +263,7 @@ u32 FldEff_Shadow(void)
 
     objectEventId = GetObjectEventIdByLocalIdAndMap(gFieldEffectArguments[0], gFieldEffectArguments[1], gFieldEffectArguments[2]);
     graphicsInfo = GetObjectEventGraphicsInfo(gObjectEvents[objectEventId].graphicsId);
-    spriteId = CreateSpriteAtEnd(gFieldEffectObjectTemplatePointers[sShadowEffectTemplateIds[graphicsInfo->shadowSize]], 0, 0, 0x94);
+    spriteId = CreateSpriteAtEnd(gFieldEffectObjectTemplatePointers[sShadowEffectTemplateIds[graphicsInfo->shadowSize]], 0, 0, 0x95);
     
     if (graphicsInfo->shadowSize == 3)
         return 0;

@@ -81,6 +81,7 @@ enum
 bool8 (*gMenuCallback)(void);
 
 // EWRAM
+EWRAM_DATA static u8 sClockWindowId = 0;
 EWRAM_DATA static u8 sSafariBallsWindowId = 0;
 EWRAM_DATA static u8 sBattlePyramidFloorWindowId = 0;
 EWRAM_DATA static u8 sStartMenuCursorPos = 0;
@@ -93,7 +94,7 @@ EWRAM_DATA static u8 sSaveDialogTimer = 0;
 EWRAM_DATA static bool8 sSavingComplete = FALSE;
 EWRAM_DATA static u8 sSaveInfoWindowId = 0;
 
-EWRAM_DATA static u8 sTimeUpdateTaskId = 0;
+EWRAM_DATA static u8 sClockUpdateTaskId = 0;
 
 // Menu action callbacks
 static bool8 StartMenuPokedexCallback(void);
@@ -143,6 +144,15 @@ static void Task_WaitForBattleTowerLinkSave(u8 taskId);
 static bool8 FieldCB_ReturnToFieldStartMenu(void);
 
 static const struct WindowTemplate sSafariBallsWindowTemplate = {0, 1, 1, 9, 4, 0xF, 8};
+static const struct WindowTemplate sClockWindowTemplate = {
+    .bg = 0,
+    .tilemapLeft = 1,
+    .tilemapTop = 1,
+    .width = 6,
+    .height = 2,
+    .paletteNum = 15,
+    .baseBlock = 8
+};
 
 static const u8 *const sPyramidFloorNames[FRONTIER_STAGES_PER_CHALLENGE + 1] =
 {
@@ -225,6 +235,7 @@ static void BuildBattlePyramidStartMenu(void);
 static void BuildMultiPartnerRoomStartMenu(void);
 static void ShowSafariBallsWindow(void);
 static void ShowPyramidFloorWindow(void);
+static void ShowClockWindow(void);
 static void RemoveExtraStartMenuWindows(void);
 static bool32 PrintStartMenuActions(s8 *pIndex, u32 count);
 static bool32 InitStartMenuStep(void);
@@ -411,6 +422,66 @@ static void ShowPyramidFloorWindow(void)
     CopyWindowToVram(sBattlePyramidFloorWindowId, COPYWIN_GFX);
 }
 
+static const u8 sTimeFormat1[] = _("{STR_VAR_1}:{STR_VAR_2} {STR_VAR_3}");
+static const u8 sTimeFormat2[] = _("{STR_VAR_1}{COLOR TRANSPARENT}{SHADOW TRANSPARENT}:{COLOR DARK_GRAY}{SHADOW LIGHT_GRAY}{STR_VAR_2} {STR_VAR_3}");
+static const u8 sTimeAM[] = _("AM");
+static const u8 sTimePM[] = _("PM");
+
+#define tUpdateTimer data[0]
+#define tFlickerTimer data[1]
+
+static void Task_UpdateClockWindow(u8 taskId)
+{
+    s16 *data = gTasks[taskId].data;
+
+    switch (tUpdateTimer)
+    {
+    default:
+        tUpdateTimer++;
+        break;
+    case 10:
+        RtcCalcLocalTime();
+        tUpdateTimer++;
+        break;
+    case 20:
+        FillWindowPixelBuffer(sClockWindowId, PIXEL_FILL(1));
+        ConvertIntToDecimalStringN(gStringVar1, gLocalTime.hours % 12, STR_CONV_MODE_LEADING_ZEROS, 2);
+        ConvertIntToDecimalStringN(gStringVar2, gLocalTime.minutes, STR_CONV_MODE_LEADING_ZEROS, 2);
+        StringExpandPlaceholders(gStringVar3, (gLocalTime.hours < 12) ? sTimeAM : sTimePM);
+        StringExpandPlaceholders(gStringVar4, tFlickerTimer ? sTimeFormat1 : sTimeFormat2);
+        AddTextPrinterParameterized(sClockWindowId, FONT_SHORT, gStringVar4, 1, 1, TEXT_SKIP_DRAW, NULL);
+        CopyWindowToVram(sClockWindowId, COPYWIN_GFX);
+        tUpdateTimer++;
+        break;
+    case 40:
+        tFlickerTimer++;
+        tFlickerTimer %= 2;
+        tUpdateTimer = 0;
+        break;
+    }
+}
+
+#undef tUpdateTimer
+#undef tFlickerTimer
+
+static void ShowClockWindow(void)
+{
+    sClockWindowId = AddWindow(&sClockWindowTemplate);
+    PutWindowTilemap(sClockWindowId);
+    LoadStdBoxGfx(sClockWindowId, 0x21F, 0xD0);
+    DrawStdFrameWithCustomTileAndPalette(sClockWindowId, FALSE, 0x21F, 13);
+
+    ConvertIntToDecimalStringN(gStringVar1, gLocalTime.hours % 12, STR_CONV_MODE_LEADING_ZEROS, 2);
+    ConvertIntToDecimalStringN(gStringVar2, gLocalTime.minutes, STR_CONV_MODE_LEADING_ZEROS, 2);
+    StringExpandPlaceholders(gStringVar3, (gLocalTime.hours < 12) ? sTimeAM : sTimePM);
+
+    StringExpandPlaceholders(gStringVar4, sTimeFormat1);
+
+    AddTextPrinterParameterized(sClockWindowId, FONT_SHORT, gStringVar4, 1, 1, TEXT_SKIP_DRAW, NULL);
+    CopyWindowToVram(sClockWindowId, COPYWIN_GFX);
+    sClockUpdateTaskId = CreateTask(Task_UpdateClockWindow, 0);
+}
+
 static void RemoveExtraStartMenuWindows(void)
 {
     if (GetSafariZoneFlag())
@@ -419,15 +490,17 @@ static void RemoveExtraStartMenuWindows(void)
         CopyWindowToVram(sSafariBallsWindowId, COPYWIN_GFX);
         RemoveWindow(sSafariBallsWindowId);
     }
-    if (InBattlePyramid())
+    else if (InBattlePyramid())
     {
         ClearStdWindowAndFrameToTransparent(sBattlePyramidFloorWindowId, FALSE);
         RemoveWindow(sBattlePyramidFloorWindowId);
     }
-    SetGpuReg(REG_OFFSET_WIN0V, 255);
-    ClearGpuRegBits(REG_OFFSET_BLDCNT, BLDCNT_TGT1_BG1 | BLDCNT_TGT1_BG2 | BLDCNT_TGT1_BG3 | BLDCNT_TGT1_OBJ | BLDCNT_TGT1_BD | BLDCNT_EFFECT_DARKEN);
-    ClearGpuRegBits(REG_OFFSET_WINOUT, WINOUT_WIN01_BG_ALL | WINOUT_WIN01_OBJ);
-    DestroyTask(sTimeUpdateTaskId);
+    else
+    {
+        ClearStdWindowAndFrameToTransparent(sClockWindowId, FALSE);
+        RemoveWindow(sClockWindowId);
+        DestroyTask(sClockUpdateTaskId);
+    }
 }
 
 static bool32 PrintStartMenuActions(s8 *pIndex, u32 count)
@@ -485,6 +558,8 @@ static bool32 InitStartMenuStep(void)
             ShowSafariBallsWindow();
         if (InBattlePyramid())
             ShowPyramidFloorWindow();
+        else
+            ShowClockWindow();
         sInitStartMenuData[0]++;
         break;
     case 4:

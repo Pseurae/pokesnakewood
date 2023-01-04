@@ -1465,6 +1465,7 @@ static void OverworldBasic(void)
     UpdateTilesetAnimations();
     UpdateDayNightPalettes();
     DoScheduledBgTilemapCopiesToVram();
+    RemoveObjectEventsOutsideView();
 }
 
 // This CB2 is used when starting

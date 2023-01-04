@@ -447,6 +447,7 @@ const u8 gInitialMovementTypeFacingDirections[] = {
 #define OBJ_EVENT_PAL_TAG_BERRY_2                 0x1125
 #define OBJ_EVENT_PAL_TAG_BERRY_3                 0x1126
 #define OBJ_EVENT_PAL_TAG_BERRY_4                 0x1127
+#define OBJ_EVENT_PAL_TAG_ITEM_BALL               0x1128
 #define OBJ_EVENT_PAL_TAG_NONE                    0x11FF
 
 #include "data/object_events/object_event_graphics_info_pointers.h"
@@ -497,6 +498,7 @@ static const struct SpritePalette sObjectEventSpritePalettes[] = {
     {gObjectEventPal_Berry2,                OBJ_EVENT_PAL_TAG_BERRY_2},
     {gObjectEventPal_Berry3,                OBJ_EVENT_PAL_TAG_BERRY_3},
     {gObjectEventPal_Berry4,                OBJ_EVENT_PAL_TAG_BERRY_4},
+    {gObjectEventPal_ItemBall,              OBJ_EVENT_PAL_TAG_ITEM_BALL},
     {},
 };
 
@@ -1437,10 +1439,10 @@ void TrySpawnObjectEvents(s16 cameraX, s16 cameraY)
 
     if (gMapHeader.events != NULL)
     {
-        s16 left = gSaveBlock1Ptr->pos.x - 2;
-        s16 right = gSaveBlock1Ptr->pos.x + MAP_OFFSET_W + 2;
-        s16 top = gSaveBlock1Ptr->pos.y;
-        s16 bottom = gSaveBlock1Ptr->pos.y + MAP_OFFSET_H + 2;
+        s16 left = gSaveBlock1Ptr->pos.x - 1;
+        s16 right = gSaveBlock1Ptr->pos.x + MAP_OFFSET_W;
+        s16 top = gSaveBlock1Ptr->pos.y + 1;
+        s16 bottom = gSaveBlock1Ptr->pos.y + MAP_OFFSET_H - 1;
 
         if (InBattlePyramid())
             objectCount = GetNumBattlePyramidObjectEvents();
@@ -1486,10 +1488,10 @@ void RemoveObjectEventsOutsideView(void)
 
 static void RemoveObjectEventIfOutsideView(struct ObjectEvent *objectEvent)
 {
-    s16 left =   gSaveBlock1Ptr->pos.x - 2;
-    s16 right =  gSaveBlock1Ptr->pos.x + 17;
-    s16 top =    gSaveBlock1Ptr->pos.y;
-    s16 bottom = gSaveBlock1Ptr->pos.y + 16;
+    s16 left = gSaveBlock1Ptr->pos.x - 1;
+    s16 right = gSaveBlock1Ptr->pos.x + MAP_OFFSET_W;
+    s16 top = gSaveBlock1Ptr->pos.y + 1;
+    s16 bottom = gSaveBlock1Ptr->pos.y + MAP_OFFSET_H - 1;
 
     if (objectEvent->currentCoords.x >= left && objectEvent->currentCoords.x <= right
      && objectEvent->currentCoords.y >= top && objectEvent->currentCoords.y <= bottom)
@@ -1778,6 +1780,7 @@ void SetObjectEventSpritePosByLocalIdAndMap(u8 localId, u8 mapNum, u8 mapGroup, 
 void FreeAndReserveObjectSpritePalettes(void)
 {
     FreeAllSpritePalettes();
+    ClearSpritePaletteReferences();
     gReservedSpritePaletteCount = OBJ_PALSLOT_COUNT;
 }
 
@@ -1937,7 +1940,7 @@ void UpdateObjectEventsForCameraUpdate(s16 x, s16 y)
 {
     UpdateObjectEventCoordsForCameraUpdate();
     TrySpawnObjectEvents(x, y);
-    RemoveObjectEventsOutsideView();
+    // RemoveObjectEventsOutsideView();
 }
 
 #define sLinkedSpriteId data[0]
@@ -8758,14 +8761,14 @@ void DecrementSpritePaletteReferenceCount(u8 idx)
 
     if (!sSpritePaletteReferences[idx].count)
     {
-        FillDNPalette(0x100 + (idx << 4), 0x20);
+        FillPalette(0, 0x100 + (idx << 4), 0x20);
         sSpritePaletteReferences[idx].type = PAL_UNUSED;
     }
 }
 
 void ClearSpritePaletteReferences(void)
 {
-    FillDNPalette(0x100, 0x20 * 16);
+    FillPalette(0, 0x100, 0x20 * 16);
     memset(sSpritePaletteReferences, 0, sizeof(sSpritePaletteReferences));
 }
 
