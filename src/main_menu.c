@@ -1060,10 +1060,16 @@ static void MainMenu_CreatePokeIcons(u8 windowId)
         x = 40 + 0x20 * i;
 
         species = GetMonData(&gPlayerParty[i], MON_DATA_SPECIES);
-        LoadMonIconPalette(species);
-        spriteId = CreateMonIcon(species, SpriteCB_MonIcon, x, 68, 1, GetMonData(&gPlayerParty[i], MON_DATA_PERSONALITY), TRUE);
-        gSprites[spriteId].oam.priority = 0;
-        sContinueMonIconSpriteIds[i] = spriteId;
+        if (species != SPECIES_NONE)
+        {
+            if (GetMonData(&gPlayerParty[i], MON_DATA_IS_EGG))
+                species = SPECIES_EGG;
+
+            LoadMonIconPalette(species);
+            spriteId = CreateMonIcon(species, SpriteCB_MonIcon, x, 68, 1, GetMonData(&gPlayerParty[i], MON_DATA_PERSONALITY), TRUE);
+            gSprites[spriteId].oam.priority = 0;
+            sContinueMonIconSpriteIds[i] = spriteId;
+        }
     }
 }
 

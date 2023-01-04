@@ -1,10 +1,6 @@
 const LOCALID_BIRCH = 2
 
 mapscripts Route103_MapScripts {
-	MAP_SCRIPT_ON_TRANSITION {
-		call(ProfBirch_EventScript_UpdateLocation)
-		end
-	}
 }
 
 script Route103_EventScript_ProfBirch {
@@ -68,6 +64,36 @@ text Route103_Text_ProfBirch3 {
 	)
 }
 
+script Route103_EventScript_RouteSign {
+	msgbox(
+		"Route 103\n"
+		"{DOWN_ARROW} Oldale Town", 
+		MSGBOX_SIGN
+	)
+	end
+}
+
+script Route103_EventScript_Boy {
+	msgbox(Route103_Text_ShouldHaveBroughtPotion, MSGBOX_NPC)
+	end
+}
+
+script Route103_EventScript_Man {
+	msgbox(Route103_Text_ShortcutToOldale, MSGBOX_NPC)
+	end
+}
+
+text Route103_Text_ShouldHaveBroughtPotion {
+	format("My Pokémon is staggeringly tired… I should have brought a Potion…")
+}
+
+text Route103_Text_ShortcutToOldale {
+	format(
+		"If you cross the sea from here, it'll be a shortcut to Oldale Town.\p"
+		"Fufufu, that's useful, isn't it?"
+	)
+}
+
 raw `
 .set LOCALID_RIVAL, 2
 
@@ -75,18 +101,6 @@ Route103_EventScript_OpenAlteringCave::
 	setmetatile 45, 5, METATILE_General_CaveEntrance_Top, TRUE
 	setmetatile 45, 6, METATILE_General_CaveEntrance_Bottom, FALSE
 	return
-
-Route103_EventScript_Boy::
-	msgbox Route103_Text_ShouldHaveBroughtPotion, MSGBOX_NPC
-	end
-
-Route103_EventScript_Man::
-	msgbox Route103_Text_ShortcutToOldale, MSGBOX_NPC
-	end
-
-Route103_EventScript_RouteSign::
-	msgbox Route103_Text_RouteSign, MSGBOX_SIGN
-	end
 
 Route103_EventScript_Daisy::
 	trainerbattle_single TRAINER_DAISY, Route103_Text_DaisyIntro, Route103_Text_DaisyDefeated
@@ -174,15 +188,6 @@ Route103_EventScript_Isabelle::
 	trainerbattle_single TRAINER_ISABELLE, Route103_Text_IsabelleIntro, Route103_Text_IsabelleDefeated
 	msgbox Route103_Text_IsabellePostBattle, MSGBOX_AUTOCLOSE
 	end
-
-Route103_Text_ShouldHaveBroughtPotion:
-	.string "My Pokémon is staggeringly tired…\n"
-	.string "I should have brought a Potion…$"
-
-Route103_Text_ShortcutToOldale:
-	.string "If you cross the sea from here,\n"
-	.string "it'll be a shortcut to Oldale Town.\p"
-	.string "Fufufu, that's useful, isn't it?$"
 
 Route103_Text_RouteSign:
 	.string "Route 103\n"
