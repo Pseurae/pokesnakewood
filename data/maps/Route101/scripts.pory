@@ -176,21 +176,21 @@ script Route101_EventScript_ZombieBoy {
 	applymovement(LOCALID_BIRCH, Route101_Movement_BirchApproachPlayer)
 	waitmovement(0)
 
-	msgbox(format("{COLOR DARK_GRAY}Prof. Oak:{COLOR BLUE} Whew…\pThanks {PLAYER}! I would have been a goner if you hadn’t come along."))
+	msgbox(format("{COLOR DARK_GRAY}Prof. Birch:{COLOR BLUE} Whew…\pThanks {PLAYER}! I would have been a goner if you hadn’t come along."))
 	msgbox(format("{COLOR DARK_GRAY}{PLAYER}:{PLAYER_COLOR} What was that thing!? And how do you even know my name?"))
-	msgbox(format("{COLOR DARK_GRAY}Prof. Oak:{COLOR BLUE} It’s me, Prof. Birch. We’ve known each other for years!\p"
+	msgbox(format("{COLOR DARK_GRAY}Prof. Birch:{COLOR BLUE} It’s me, Prof. Birch. We’ve known each other for years!\p"
 		"Also don't you remember the invasion of Hoenn by these monsters?"))
 
 	msgbox(format("{COLOR DARK_GRAY}{PLAYER}:{PLAYER_COLOR} Oh, right. You see, I just woke up in that ruined town south of here, and realised that I had lost my memory."))
 	
-	msgbox(format("{COLOR DARK_GRAY}Prof. Oak:{COLOR BLUE} So, it’s true then? Littleroot has been destroyed?"
+	msgbox(format("{COLOR DARK_GRAY}Prof. Birch:{COLOR BLUE} So, it’s true then? Littleroot has been destroyed?"
 		"You don't remember, but it was our home, {PLAYER}.\p"
 		"Was anyone else there when you woke up? My daughter? Your brother?"))
 
 	msgbox(format("{COLOR DARK_GRAY}{PLAYER}:{PLAYER_COLOR} No."))
 
-	msgbox(format("{COLOR DARK_GRAY}Prof. Oak:{COLOR BLUE} Well, I daresay that you’ll get your memories back sooner or later. Meanwhile, we gotta get out of here."))
-	msgbox(format("There’s a barricaded town to the north of here. Follow me."))
+	msgbox(format("{COLOR DARK_GRAY}Prof. Birch:{COLOR BLUE} Well, I daresay that you’ll get your memories back sooner or later. Meanwhile, we gotta get out of here."))
+	msgbox(format("{COLOR BLUE}There’s a barricaded town to the north of here. Follow me."))
 	closemessage
 
 	special(HealPlayerParty)
