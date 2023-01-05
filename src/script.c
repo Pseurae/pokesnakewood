@@ -472,5 +472,5 @@ void InitRamScript_NoObjectEvent(u8 *script, u16 scriptSize)
 void GetObjectEventTrainerRangeFromTemplate(void)
 {
     gSpecialVar_0x800A = gMapHeader.events->objectEvents[gSpecialVar_LastTalked - 1].trainerRange_berryTreeId;
-    gSpecialVar_0x800B = gMapHeader.events->objectEvents[gSpecialVar_LastTalked - 1].movementRangeX;
+    gSpecialVar_0x800B = max(gMapHeader.events->objectEvents[gSpecialVar_LastTalked - 1].movementRangeX, 1);
 }
