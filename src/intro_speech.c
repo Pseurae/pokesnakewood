@@ -77,7 +77,7 @@ static const struct WindowTemplate sIntroSpeechMessageTemplates[] = {
         .bg = 0,
         .tilemapLeft = 2,
         .tilemapTop = 15,
-        .width = 27,
+        .width = 26,
         .height = 4,
         .paletteNum = 15,
         .baseBlock = 1
@@ -915,11 +915,7 @@ static void StartFadePlatformOut(u8 taskId, u8 delay)
 
 static void ShowDialogueWindow(u8 windowId, u8 copyToVram)
 {
-    CallWindowFunction(windowId, CreateDialogueWindowBorder);
-    FillWindowPixelBuffer(windowId, PIXEL_FILL(11));
-    PutWindowTilemap(windowId);
-    if (copyToVram == TRUE)
-        CopyWindowToVram(windowId, COPYWIN_FULL);
+    DrawDialogFrameWithCustomTileAndPalette(windowId, copyToVram, 0xFC, GetWindowAttribute(windowId, WINDOW_PALETTE_NUM));
 }
 
 static void CreateDialogueWindowBorder(u8 bg, u8 tilemapLeft, u8 tilemapTop, u8 width, u8 height, u8 palNum)
@@ -938,12 +934,6 @@ static void CreateDialogueWindowBorder(u8 bg, u8 tilemapLeft, u8 tilemapTop, u8 
 
 static void ClearDialogueWindow(u8 windowId)
 {
-    u8 bgColor = TEXT_DYNAMIC_COLOR_2;
-    u8 maxCharWidth = GetFontAttribute(FONT_NORMAL, FONTATTR_MAX_LETTER_WIDTH);
-    u8 maxCharHeight = GetFontAttribute(FONT_NORMAL, FONTATTR_MAX_LETTER_HEIGHT);
-    u8 winWidth = GetWindowAttribute(windowId, WINDOW_WIDTH);
-    u8 winHeight = GetWindowAttribute(windowId, WINDOW_HEIGHT);
-
-    FillWindowPixelRect(windowId, bgColor, 0, 0, maxCharWidth * winWidth, maxCharHeight * winHeight);
+    FillWindowPixelBuffer(windowId, PIXEL_FILL(1));
     CopyWindowToVram(windowId, COPYWIN_GFX);
 }
