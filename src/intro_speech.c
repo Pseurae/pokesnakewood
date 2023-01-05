@@ -317,7 +317,7 @@ static void Task_StartDisplayIntroText(u8 taskId)
         ClearDialogueWindow(tWindowId);
         FillWindowPixelBuffer(tWindowId, PIXEL_FILL(0));
         PutWindowTilemap(tWindowId);
-        AddTextPrinterParameterized2(tWindowId, FONT_NORMAL, sText_NewGame_Intro[tTextIdx++], 0, NULL, TEXT_COLOR_WHITE, TEXT_COLOR_TRANSPARENT, TEXT_COLOR_TRANSPARENT);
+        AddTextPrinterParameterized2(tWindowId, FONT_SHORT, sText_NewGame_Intro[tTextIdx++], 0, NULL, TEXT_COLOR_WHITE, TEXT_COLOR_TRANSPARENT, TEXT_COLOR_TRANSPARENT);
         ScheduleBgCopyTilemapToVram(0);
         BeginNormalPaletteFade(PALETTES_ALL, 0, 16, 0, RGB_BLACK);
         gTasks[taskId].func = Task_DisplayIntroText;
