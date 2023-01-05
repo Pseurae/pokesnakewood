@@ -213,7 +213,7 @@ static const struct WindowTemplate sWindowTemplates_MainMenu[] =
         .paletteNum = 15,
         .baseBlock = 0x35
     },
-    // Has saved game
+    // Has saved game with Pokemon
     // CONTINUE
     {
         .bg = 0,
@@ -244,7 +244,7 @@ static const struct WindowTemplate sWindowTemplates_MainMenu[] =
         .paletteNum = 15,
         .baseBlock = 0x139
     },
-    // Has saved game with Pokemon
+    // Has saved game with no Pokemon
     // CONTINUE
     {
         .bg = 0,
@@ -323,8 +323,8 @@ static const struct WindowTemplate sNewGameBirchSpeechTextWindows[] =
 static const u16 sMainMenuBgPal[] = INCBIN_U16("graphics/interface/main_menu_bg.gbapal");
 static const u16 sMainMenuTextPal[] = INCBIN_U16("graphics/interface/main_menu_text.gbapal");
 
-static const u8 sTextColor_Headers[] = {TEXT_DYNAMIC_COLOR_1, TEXT_DYNAMIC_COLOR_2, TEXT_DYNAMIC_COLOR_3};
-static const u8 sTextColor_MenuInfo[] = {TEXT_DYNAMIC_COLOR_1, TEXT_COLOR_WHITE, TEXT_DYNAMIC_COLOR_3};
+static const u8 sTextColor_Headers[] = {TEXT_DYNAMIC_COLOR_1, TEXT_COLOR_DARK_GRAY, TEXT_COLOR_LIGHT_GRAY};
+static const u8 sTextColor_MenuInfo[] = {TEXT_DYNAMIC_COLOR_1, TEXT_COLOR_WHITE, TEXT_COLOR_LIGHT_GRAY};
 
 static const struct BgTemplate sMainMenuBgTemplates[] = {
     {
@@ -585,6 +585,8 @@ static void Task_WaitForBatteryDryErrorWindow(u8 taskId)
     }
 }
 
+static const u8 sPokeBorderGfx[] = INCBIN_U8("graphics/text_window/poke_border.4bpp");
+
 static void Task_DisplayMainMenu(u8 taskId)
 {
     s16 *data = gTasks[taskId].data;
@@ -600,17 +602,17 @@ static void Task_DisplayMainMenu(u8 taskId)
         SetGpuReg(REG_OFFSET_BLDALPHA, BLDALPHA_BLEND(7, 11));
         SetGpuReg(REG_OFFSET_BLDY, 7);
 
-        palette = RGB_BLACK;
-        LoadPalette(&palette, 254, 2);
-
         palette = RGB_WHITE;
         LoadPalette(&palette, 250, 2);
 
-        palette = RGB(12, 12, 12);
+        palette = RGB_BLACK;
         LoadPalette(&palette, 251, 2);
 
-        palette = RGB(26, 26, 25);
-        LoadPalette(&palette, 252, 2);
+        // palette = RGB(12, 12, 12);
+        // LoadPalette(&palette, 251, 2);
+
+        // palette = RGB(26, 26, 25);
+        // LoadPalette(&palette, 252, 2);
 
         // Note: If there is no save file, the save block is zeroed out,
         // so the default gender is MALE.
@@ -984,8 +986,8 @@ static void MainMenu_FormatSavegameText(u8 windowId)
 static void MainMenu_FormatSavegamePlayer(u8 windowId)
 {
     StringExpandPlaceholders(gStringVar4, gText_ContinueMenuPlayer);
-    AddTextPrinterParameterized3(windowId, FONT_SHORT, 0x58, 15, sTextColor_MenuInfo, TEXT_SKIP_DRAW, gStringVar4);
-    AddTextPrinterParameterized3(windowId, FONT_SHORT, GetStringRightAlignXOffset(FONT_SHORT, gSaveBlock2Ptr->playerName, 0xC0), 15, sTextColor_MenuInfo, TEXT_SKIP_DRAW, gSaveBlock2Ptr->playerName);
+    AddTextPrinterParameterized3(windowId, FONT_SHORT, 0x58, 17, sTextColor_MenuInfo, TEXT_SKIP_DRAW, gStringVar4);
+    AddTextPrinterParameterized3(windowId, FONT_SHORT, GetStringRightAlignXOffset(FONT_SHORT, gSaveBlock2Ptr->playerName, 0xC0), 17, sTextColor_MenuInfo, TEXT_SKIP_DRAW, gSaveBlock2Ptr->playerName);
 }
 
 static void MainMenu_FormatSavegameTime(u8 windowId)
@@ -994,11 +996,11 @@ static void MainMenu_FormatSavegameTime(u8 windowId)
     u8 *ptr;
 
     StringExpandPlaceholders(gStringVar4, gText_ContinueMenuTime);
-    AddTextPrinterParameterized3(windowId, FONT_SHORT, 0x58, 30, sTextColor_MenuInfo, TEXT_SKIP_DRAW, gStringVar4);
+    AddTextPrinterParameterized3(windowId, FONT_SHORT, 0x58, 31, sTextColor_MenuInfo, TEXT_SKIP_DRAW, gStringVar4);
     ptr = ConvertIntToDecimalStringN(str, gSaveBlock2Ptr->playTimeHours, STR_CONV_MODE_LEFT_ALIGN, 3);
     *ptr = CHAR_COLON;
     ConvertIntToDecimalStringN(ptr + 1, gSaveBlock2Ptr->playTimeMinutes, STR_CONV_MODE_LEADING_ZEROS, 2);
-    AddTextPrinterParameterized3(windowId, FONT_SHORT, GetStringRightAlignXOffset(FONT_SHORT, str, 0xC0), 30, sTextColor_MenuInfo, TEXT_SKIP_DRAW, str);
+    AddTextPrinterParameterized3(windowId, FONT_SHORT, GetStringRightAlignXOffset(FONT_SHORT, str, 0xC0), 31, sTextColor_MenuInfo, TEXT_SKIP_DRAW, str);
 }
 
 static void MainMenu_FormatSavegamePokedex(u8 windowId)
@@ -1038,12 +1040,12 @@ static void MainMenu_FormatSavegameBadges(u8 windowId)
 
 static void MainMenu_CreatePlayerSprite(u8 windowId)
 {
-    u8 spriteId = CreateObjectGraphicsSprite(sGenderObjectSprite[gSaveBlock2Ptr->playerGender], SpriteCallbackDummy, 40, 35, 0);
+    u8 spriteId = CreateObjectGraphicsSprite(sGenderObjectSprite[gSaveBlock2Ptr->playerGender], SpriteCallbackDummy, 40, 34, 0);
     StartSpriteAnim(&gSprites[spriteId], 0);
     gSprites[spriteId].oam.priority = 0;
     spriteId = CreateSpriteAtEnd(gFieldEffectObjectTemplatePointers[1], 0, 0, 0x94);
     gSprites[spriteId].x = 40;
-    gSprites[spriteId].y = 35 + (32 >> 1) - 4;
+    gSprites[spriteId].y = 34 + (32 >> 1) - 4;
     gSprites[spriteId].oam.priority = 0;
     gSprites[spriteId].callback = SpriteCallbackDummy;
     gSprites[spriteId].oam.objMode = ST_OAM_OBJ_BLEND;
@@ -1055,9 +1057,10 @@ static void MainMenu_CreatePokeIcons(u8 windowId)
     u8 i, x, spriteId;
     u16 species;
 
-    for (i = 0; i < gPlayerPartyCount; i++)
+    for (i = 0; i < PARTY_SIZE; i++)
     {
         x = 40 + 0x20 * i;
+        BlitBitmapToWindow(2, sPokeBorderGfx, x - 32, 50, 32, 32);
 
         species = GetMonData(&gPlayerParty[i], MON_DATA_SPECIES);
         if (species != SPECIES_NONE)
@@ -1066,7 +1069,7 @@ static void MainMenu_CreatePokeIcons(u8 windowId)
                 species = SPECIES_EGG;
 
             LoadMonIconPalette(species);
-            spriteId = CreateMonIcon(species, SpriteCB_MonIcon, x, 68, 1, GetMonData(&gPlayerParty[i], MON_DATA_PERSONALITY), TRUE);
+            spriteId = CreateMonIcon(species, SpriteCB_MonIcon, x, 70, 1, GetMonData(&gPlayerParty[i], MON_DATA_PERSONALITY), TRUE);
             gSprites[spriteId].oam.priority = 0;
             sContinueMonIconSpriteIds[i] = spriteId;
         }
