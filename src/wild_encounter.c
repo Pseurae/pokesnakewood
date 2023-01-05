@@ -70,9 +70,19 @@ static const u16 sRoute119WaterTileData[] =
     92, 139,  NUM_FISHING_SPOTS_1 + NUM_FISHING_SPOTS_2,
 };
 
-void DisableWildEncounters(bool8 disabled)
+void EnableWildEncounters(void)
 {
-    sWildEncountersDisabled = disabled;
+    sWildEncountersDisabled = FALSE;
+}
+
+void DisableWildEncounters(void)
+{
+    sWildEncountersDisabled = TRUE;
+}
+
+bool8 IsWildEncountersDisabled(void)
+{
+    return sWildEncountersDisabled;
 }
 
 // Each fishing spot on Route 119 is given a number between 1 and NUM_FISHING_SPOTS inclusive.

@@ -83,7 +83,7 @@ static EWRAM_DATA u8 sCurrentReflectionType = 0;
 static EWRAM_DATA u16 sCurrentSpecialObjectPaletteTag = 0;
 static EWRAM_DATA struct LockedAnimObjectEvents *sLockedAnimObjectEvents = {0};
 
-static EWRAM_DATA struct SpritePaletteReference sSpritePaletteReferences[16] = { 0 };
+EWRAM_DATA struct SpritePaletteReference sSpritePaletteReferences[16] = { 0 };
 
 static void MoveCoordsInDirection(u32, s16 *, s16 *, s16, s16);
 static bool8 ObjectEventExecSingleMovementAction(struct ObjectEvent *, struct Sprite *);
@@ -1238,6 +1238,7 @@ static u8 TrySetupObjectEventSprite(struct ObjectEventTemplate *objectEventTempl
     objectEvent = &gObjectEvents[objectEventId];
     graphicsInfo = GetObjectEventGraphicsInfo(objectEvent->graphicsId);
     paletteSlot = GetObjectPaletteSlot(graphicsInfo->paletteTag);
+    IncrementSpritePaletteReferenceCount(paletteSlot);
     PatchObjectPalette(graphicsInfo->paletteTag, paletteSlot);
 
     if (objectEvent->movementType == MOVEMENT_TYPE_INVISIBLE)
@@ -1394,7 +1395,7 @@ u8 CreateObjectGraphicsSprite(u16 graphicsId, void (*callback)(struct Sprite *),
 // or any of the other data normally associated with object events.
 u8 CreateVirtualObject(u8 graphicsId, u8 virtualObjId, s16 x, s16 y, u8 elevation, u8 direction)
 {
-    u8 spriteId;
+    u8 spriteId, paletteSlot;
     struct Sprite *sprite;
     struct SpriteTemplate spriteTemplate;
     const struct SubspriteTable *subspriteTables;
@@ -1417,9 +1418,11 @@ u8 CreateVirtualObject(u8 graphicsId, u8 virtualObjId, s16 x, s16 y, u8 elevatio
         sprite->coordOffsetEnabled = TRUE;
         sprite->sVirtualObjId = virtualObjId;
         sprite->sVirtualObjElev = elevation;
-        sprite->oam.paletteNum = GetObjectPaletteSlot(graphicsInfo->paletteTag);
-        PatchObjectPalette(graphicsInfo->paletteTag, sprite->oam.paletteNum | 0xf0);
+        paletteSlot = GetObjectPaletteSlot(graphicsInfo->paletteTag);
+        IncrementSpritePaletteReferenceCount(paletteSlot);
+        PatchObjectPalette(graphicsInfo->paletteTag, paletteSlot | 0xf0);
 
+        sprite->oam.paletteNum = paletteSlot;
         if (subspriteTables != NULL)
         {
             SetSubspriteTables(sprite, subspriteTables);
@@ -1539,15 +1542,13 @@ static void SpawnObjectEventOnReturnToField(u8 objectEventId, s16 x, s16 y)
     CopyObjectGraphicsInfoToSpriteTemplate_WithMovementType(objectEvent->graphicsId, objectEvent->movementType, &spriteTemplate, &subspriteTables);
     spriteTemplate.images = &spriteFrameImage;
 
-    *(u16 *)&spriteTemplate.paletteTag = TAG_NONE;
-    paletteSlot = GetObjectPaletteSlot(graphicsInfo->paletteTag);
-    PatchObjectPalette(graphicsInfo->paletteTag, paletteSlot);
-    *(u16 *)&spriteTemplate.paletteTag = TAG_NONE;
-
     i = CreateSprite(&spriteTemplate, 0, 0, 0);
     if (i != MAX_SPRITES)
     {
         sprite = &gSprites[i];
+        paletteSlot = GetObjectPaletteSlot(graphicsInfo->paletteTag);
+        IncrementSpritePaletteReferenceCount(paletteSlot);
+        PatchObjectPalette(graphicsInfo->paletteTag, paletteSlot);
         GetMapCoordsFromSpritePos(x + objectEvent->currentCoords.x, y + objectEvent->currentCoords.y, &sprite->x, &sprite->y);
         sprite->centerToCornerVecX = -(graphicsInfo->width >> 1);
         sprite->centerToCornerVecY = -(graphicsInfo->height >> 1);
@@ -1604,6 +1605,7 @@ void ObjectEventSetGraphicsId(struct ObjectEvent *objectEvent, u8 graphicsId)
     graphicsInfo = GetObjectEventGraphicsInfo(graphicsId);
     sprite = &gSprites[objectEvent->spriteId];
     paletteSlot = GetObjectPaletteSlot(graphicsInfo->paletteTag);
+    IncrementSpritePaletteReferenceCount(paletteSlot);
     PatchObjectPalette(graphicsInfo->paletteTag, paletteSlot);
     sprite->oam.shape = graphicsInfo->oam->shape;
     sprite->oam.size = graphicsInfo->oam->size;
@@ -1672,9 +1674,11 @@ static void SetBerryTreeGraphics(struct ObjectEvent *objectEvent, struct Sprite 
         if (berryId > ITEM_TO_BERRY(LAST_BERRY_INDEX))
             berryId = 0;
 
-        ObjectEventSetGraphicsId(objectEvent, gBerryTreeObjectEventGraphicsIdTablePointers[berryId][berryStage]);
+        DecrementSpritePaletteReferenceCount(sprite->oam.paletteNum);
+        ObjectEventSetGraphicsId(objectEvent, gBerryTreeObjectEventGraphicsIdTable[berryStage]);
         sprite->images = gBerryTreePicTablePointers[berryId];
 
+        DecrementSpritePaletteReferenceCount(sprite->oam.paletteNum);
         paletteTag = OBJ_EVENT_PAL_TAG_BERRY_1 + gBerryTreePaletteSlotTablePointers[berryId][berryStage] - 2;
         paletteSlot = GetObjectPaletteSlot(paletteTag);
         PatchObjectPalette(paletteTag, paletteSlot);
@@ -8754,12 +8758,16 @@ u8 IncrementSpritePaletteReferenceCount(u8 idx)
 
 void DecrementSpritePaletteReferenceCount(u8 idx)
 {
-    if (!sSpritePaletteReferences[idx].count)
+    if (sSpritePaletteReferences[idx].type == PAL_UNUSED)
+    {
+        FillPalette(0, 0x100 + (idx << 4), 0x20);
         return;
+    }
 
-    sSpritePaletteReferences[idx].count--;
+    if (sSpritePaletteReferences[idx].count > 0)
+        sSpritePaletteReferences[idx].count--;
 
-    if (!sSpritePaletteReferences[idx].count)
+    if (sSpritePaletteReferences[idx].count == 0)
     {
         FillPalette(0, 0x100 + (idx << 4), 0x20);
         sSpritePaletteReferences[idx].type = PAL_UNUSED;
@@ -8777,14 +8785,7 @@ u8 GetObjectPaletteSlot(u16 tag)
     u8 slot;
     slot = FindSpritePaletteReference(PAL_NPC, tag);
     if (slot != 0xFF)
-    {
-        return IncrementSpritePaletteReferenceCount(slot);
-    }
+        return slot;
 
-    slot = AddSpritePaletteReference(PAL_NPC, tag);
-    if (slot == 0xFF)
-        return 0xFF;
-
-    IncrementSpritePaletteReferenceCount(slot);
-    return slot;
+    return AddSpritePaletteReference(PAL_NPC, tag);
 }

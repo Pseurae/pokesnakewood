@@ -12,7 +12,7 @@ palettes = [
     "graphics/object_events/pics/people/lass.png",
     "graphics/object_events/pics/people/nurse.png",
     "graphics/object_events/pics/people/camper.png",
-    "graphics/object_events/pics/people/little_boy.png",
+    "graphics/object_events/pics/people/gentleman.png",
 ]
 
 def closest_color(c, palette):

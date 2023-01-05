@@ -537,3 +537,7 @@ gSpecials::
 	def_special TrySetBattleTowerLinkType
 	def_special AddObtainedItemIconSprite
 	def_special RemoveObtainedItemIconSprite
+	def_special EnableWildEncounters
+	def_special DisableWildEncounters
+	def_special IsWildEncountersDisabled
+
