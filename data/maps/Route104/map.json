@@ -368,7 +368,7 @@
       "x": 37,
       "y": 61,
       "elevation": 0,
-      "var": "VAR_TEMP_0",
+      "var": "VAR_ROUTE104_STATE",
       "var_value": "0",
       "script": "Route104_EventScript_StartPeekoRescue"
     },
@@ -377,7 +377,7 @@
       "x": 37,
       "y": 60,
       "elevation": 0,
-      "var": "VAR_TEMP_0",
+      "var": "VAR_ROUTE104_STATE",
       "var_value": "0",
       "script": "Route104_EventScript_StartPeekoRescue"
     },
@@ -386,7 +386,7 @@
       "x": 37,
       "y": 62,
       "elevation": 0,
-      "var": "VAR_TEMP_0",
+      "var": "VAR_ROUTE104_STATE",
       "var_value": "0",
       "script": "Route104_EventScript_StartPeekoRescue"
     },
@@ -395,7 +395,7 @@
       "x": 37,
       "y": 63,
       "elevation": 0,
-      "var": "VAR_TEMP_0",
+      "var": "VAR_ROUTE104_STATE",
       "var_value": "0",
       "script": "Route104_EventScript_StartPeekoRescue"
     }

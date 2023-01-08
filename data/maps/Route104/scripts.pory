@@ -1,7 +1,17 @@
 script Route104_EventScript_StartPeekoRescue {
 	lockall
-	applypath(OBJ_EVENT_ID_PLAYER, 26, 59, 2)
+	initcutscene
+	special(SpawnCameraObject)
+	applypath(OBJ_EVENT_ID_CAMERA, 26, 59, 2)
 	waitmovement(0)
+	special(RemoveCameraObject)
+
+	fadescreen(FADE_TO_BLACK)
+	special(FocusCameraOnPlayer)
+	exitcutscene
+	fadescreen(FADE_FROM_BLACK)
+
+	setvar(VAR_ROUTE104_STATE, 1)
 	releaseall
 	end
 }
@@ -17,7 +27,6 @@ Route104_MapScripts::
 	.byte 0
 
 Route104_OnFrame:
-	map_script_2 VAR_BOARD_BRINEY_BOAT_STATE, 1, Route104_EventScript_StartSailToDewford
 	.2byte 0
 
 Route104_EventScript_StartSailToDewford::
@@ -26,8 +35,6 @@ Route104_EventScript_StartSailToDewford::
 	end
 
 Route104_OnTransition:
-	call Common_EventScript_SetupRivalGfxId
-	call Route104_EventScript_TrySetRivalPos
 	call Route104_EventScript_ShowOrHideWhiteHerbFlorist
 	end
 

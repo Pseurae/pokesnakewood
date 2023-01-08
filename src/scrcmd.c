@@ -2352,16 +2352,54 @@ bool8 ScrCmd_signmsg(struct ScriptContext *ctx)
     return FALSE;
 }
 
+static bool8 InitCutsceneTimer(void)
+{
+    if (++sPauseCounter == 16)
+    {
+        return TRUE;
+    }
+    else if (sPauseCounter <= 10)
+    {
+        SetGpuReg(REG_OFFSET_WIN0V, WIN_RANGE(sPauseCounter, 160 - sPauseCounter));
+        return FALSE;
+    }
+    else
+    {
+        SetGpuReg(REG_OFFSET_WIN0V, WIN_RANGE(10, 150));
+        return FALSE;
+    }
+}
+
 bool8 ScrCmd_initcutscene(struct ScriptContext *ctx)
 {
-    SetGpuReg(REG_OFFSET_WIN0V, WIN_RANGE(10, 150));
-    return FALSE;
+    sPauseCounter = 0;
+    SetupNativeScript(ctx, InitCutsceneTimer);
+    return TRUE;
+}
+
+static bool8 ExitCutsceneTimer(void)
+{
+    if (++sPauseCounter == 16)
+    {
+        return TRUE;
+    }
+    else if (sPauseCounter <= 10)
+    {
+        SetGpuReg(REG_OFFSET_WIN0V, WIN_RANGE(10 - sPauseCounter, 150 + sPauseCounter));
+        return FALSE;
+    }
+    else
+    {
+        SetGpuReg(REG_OFFSET_WIN0V, WIN_RANGE(0, 255));
+        return FALSE;
+    }
 }
 
 bool8 ScrCmd_exitcutscene(struct ScriptContext *ctx)
 {
-    SetGpuReg(REG_OFFSET_WIN0V, WIN_RANGE(0, 255));
-    return FALSE;
+    sPauseCounter = 0;
+    SetupNativeScript(ctx, ExitCutsceneTimer);
+    return TRUE;
 }
 
 bool8 ScrCmd_applypath(struct ScriptContext *ctx)

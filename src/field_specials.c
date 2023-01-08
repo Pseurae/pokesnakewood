@@ -1224,6 +1224,15 @@ void RemoveCameraObject(void)
     RemoveObjectEventByLocalIdAndMap(OBJ_EVENT_ID_CAMERA, gSaveBlock1Ptr->location.mapNum, gSaveBlock1Ptr->location.mapGroup);
 }
 
+void FocusCameraOnPlayer(void)
+{
+    struct ObjectEvent *playerObjEvent = &gObjectEvents[gPlayerAvatar.objectEventId];
+    MoveCameraAndRedrawMap(
+        playerObjEvent->currentCoords.x - gSaveBlock1Ptr->pos.x, 
+        playerObjEvent->currentCoords.y - gSaveBlock1Ptr->pos.y
+    );
+}
+
 u8 GetPokeblockNameByMonNature(void)
 {
     return CopyMonFavoritePokeblockName(GetNature(&gPlayerParty[GetLeadMonIndex()]), gStringVar1);
