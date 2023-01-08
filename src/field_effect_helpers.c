@@ -204,11 +204,11 @@ u8 CreateWarpArrowSprite(void)
 
     paletteSlot = GetObjectPaletteSlot(0x1100);
     PatchObjectPalette(0x1100, paletteSlot);
-    spriteId = CreateSpriteAtEnd(gFieldEffectObjectTemplatePointers[FLDEFFOBJ_ARROW], 0, 0, 0x52);
+    spriteId = CreateSpriteAtEnd(gFieldEffectObjectTemplatePointers[FLDEFFOBJ_ARROW], 0, 0, 0x95);
     if (spriteId != MAX_SPRITES)
     {
         sprite = &gSprites[spriteId];
-        sprite->oam.priority = 1;
+        sprite->oam.priority = 2;
         sprite->oam.paletteNum = paletteSlot;
         sprite->coordOffsetEnabled = TRUE;
         sprite->invisible = TRUE;

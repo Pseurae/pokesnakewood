@@ -200,8 +200,8 @@ gScriptCmdTable::
 	.4byte ScrCmd_waitmoncry                @ 0xc5
 	.4byte ScrCmd_bufferboxname             @ 0xc6
 	.4byte ScrCmd_textcolor                 @ 0xc7
-	.4byte ScrCmd_nop1                      @ 0xc8
-	.4byte ScrCmd_nop1                      @ 0xc9
+	.4byte ScrCmd_initcutscene              @ 0xc8
+	.4byte ScrCmd_exitcutscene              @ 0xc9
 	.4byte ScrCmd_signmsg                   @ 0xca
 	.4byte ScrCmd_normalmsg                 @ 0xcb
 	.4byte ScrCmd_nop1                      @ 0xcc
@@ -229,7 +229,9 @@ gScriptCmdTable::
 	.4byte ScrCmd_bufferitemnameplural      @ 0xe2
 	.4byte ScrCmd_shownuminput
 	.4byte ScrCmd_setfieldtint
-	.4byte ScrCmd_checkifpartylearnhm
+	.4byte ScrCmd_canpartyusehm
+	.4byte ScrCmd_applypath
+	.4byte ScrCmd_applypathat
 
 gScriptCmdTableEnd::
 	.4byte ScrCmd_nop

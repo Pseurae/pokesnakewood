@@ -1542,29 +1542,23 @@
 	.2byte \box
 	.endm
 
-	@ Used only in FireRed/LeafGreen, does nothing in Emerald.
 	.macro textcolor color:req
 	.byte 0xc7
 	.byte \color
 	.endm
 
-	@ Used only in FireRed/LeafGreen, does nothing in Emerald.
-	.macro loadhelp text:req
+	.macro initcutscene
 	.byte 0xc8
-	.4byte \text
 	.endm
 
-	@ Used only in FireRed/LeafGreen, does nothing in Emerald.
-	.macro unloadhelp
+	.macro exitcutscene
 	.byte 0xc9
 	.endm
 
-	@ Used only in FireRed/LeafGreen, does nothing in Emerald.
 	.macro signmsg
 	.byte 0xca
 	.endm
 
-	@ Used only in FireRed/LeafGreen, does nothing in Emerald.
 	.macro normalmsg
 	.byte 0xcb
 	.endm
@@ -1743,6 +1737,24 @@
 	.macro canpartyusehm hm:req
 	.byte 0xe5
 	.byte \hm
+	.endm
+
+	.macro applypath index:req, x:req, y:req, mode=1, map
+		.ifb \map
+			.byte 0xe6
+			.2byte \index
+			.2byte \x
+			.2byte \y
+			.byte \mode
+		.else
+			@ Really only useful if the object has followed from one map to another (e.g. Wally during the catching event).
+			.byte 0xe7
+			.2byte \index
+			.2byte \x
+			.2byte \y
+			.byte \mode
+			map \map
+		.endif
 	.endm
 
 @ Supplementary

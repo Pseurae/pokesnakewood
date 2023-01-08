@@ -152,3 +152,4 @@
 	.include "src/berry_pouch.o"
 	.include "src/day_night.o"
 	.include "src/intro_speech.o"
+	.include "src/pathfinding.o"

@@ -1,3 +1,11 @@
+script Route104_EventScript_StartPeekoRescue {
+	lockall
+	applypath(OBJ_EVENT_ID_PLAYER, 26, 59, 2)
+	waitmovement(0)
+	releaseall
+	end
+}
+
 raw `
 @ NOTE: Route 104's sail to Dewford script references local IDs from Dewford's map.
 @  These are labeled in DewfordTown/scripts.inc

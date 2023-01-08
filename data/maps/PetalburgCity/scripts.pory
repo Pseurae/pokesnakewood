@@ -11,11 +11,21 @@ script PetalburgCity_EventScript_WallyHouseSign {
 }
 
 script PetalburgCity_EventScript_GymSign {
+	applypath(OBJ_EVENT_ID_PLAYER, 12, 2, 2)
+	waitmovement(0)
 	msgbox(
 		"Petalburg City Pokémon Gym\n"
 		"Leader: Norman\l"
 		"“A man in pursuit of power!”", 
 		MSGBOX_SIGN
+	)
+	end
+}
+
+script PetalburgCity_EventScript_GymIsLocked {
+	msgbox(
+		"The gym is locked from the inside.",
+		MSGBOX_NPC
 	)
 	end
 }
