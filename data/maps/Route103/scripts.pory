@@ -57,7 +57,7 @@ text Route103_Text_ProfBirch2 {
 
 text Route103_Text_ProfBirch3 {
 	format(
-		"You should head towards {COLOR GREEN}Petalburg City{COLOR BLUE}.\n"
+		"You should head towards {COLOR GREEN}Petalburg City{COLOR BLUE}.\p"
 		"There may be survivors that may have seen where they went.\p"
 		"Meanwhile, I'll try to repurpose the PC network to contact other survivors.\p"
 		"Also, have this."

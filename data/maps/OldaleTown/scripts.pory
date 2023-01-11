@@ -209,7 +209,7 @@ text OldaleTown_Text_DiscoveredFootprints {
 }
 
 text OldaleTown_Text_FinishedSketchingFootprints {
-	format("I've finished my shift.\p"
+	format("I've finished my watch.\p"
 	"You can go through now if you'd like, but be sure to stock up on supplies first.")
 }
 

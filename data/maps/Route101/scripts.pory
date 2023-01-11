@@ -1,5 +1,5 @@
 const LOCALID_BIRCH = 1
-const LOCALID_ZIGZAGOON = 2
+const LOCALID_ZYOUNGSTER = 2
 
 mapscripts Route101_MapScripts {
 	MAP_SCRIPT_ON_FRAME_TABLE [
@@ -18,24 +18,24 @@ script Route101_EventScript_StartBirchRescue {
 	lockall
 	playbgm(MUS_HELP, TRUE)
 	special(DisableWildEncounters)
-	msgbox("AHHHH! He-Help! Someone!", MSGBOX_DEFAULT)
+	msgbox("{COLOR BLUE}AHHHH! He-Help! Someone!", MSGBOX_DEFAULT)
 	closemessage
 	setobjectxy(LOCALID_BIRCH, 0, 15)
-	setobjectxy(LOCALID_ZIGZAGOON, 0, 16)
+	setobjectxy(LOCALID_ZYOUNGSTER, 0, 16)
 	initcutscene
 	applymovement(OBJ_EVENT_ID_PLAYER, Route101_Movement_EnterScene)
 	applymovement(LOCALID_BIRCH, Route101_Movement_BirchRunAway1)
-	applymovement(LOCALID_ZIGZAGOON, Route101_Movement_ZigzagoonChase1)
+	applymovement(LOCALID_ZYOUNGSTER, Route101_Movement_ZigzagoonChase1)
 	waitmovement(0)
-	applymovement(LOCALID_ZIGZAGOON, Route101_Movement_ZigzagoonChaseInCircles)
+	applymovement(LOCALID_ZYOUNGSTER, Route101_Movement_ZigzagoonChaseInCircles)
 	applymovement(LOCALID_BIRCH, Route101_Movement_BirchRunInCircles)
 	waitmovement(0)
 	applymovement(LOCALID_BIRCH, Common_Movement_WalkInPlaceFasterRight)
 	waitmovement(0)
-	applymovement(LOCALID_ZIGZAGOON, Route101_Movement_ZigzagoonFaceBirch)
+	applymovement(LOCALID_ZYOUNGSTER, Route101_Movement_ZigzagoonFaceBirch)
 	applymovement(LOCALID_BIRCH, Route101_Movement_BirchFaceZigzagoon)
 	waitmovement(0)
-	msgbox("Hey-you! Help me out here!", MSGBOX_DEFAULT)
+	msgbox("{COLOR BLUE}Hey-you! Help me out here!", MSGBOX_DEFAULT)
 	closemessage
 	exitcutscene
 	setvar(VAR_ROUTE101_STATE, 2)
@@ -170,11 +170,14 @@ script Route101_EventScript_ZombieBoy {
 	faceplayer
 	setflag(FLAG_SYS_POKEMON_GET)
 	setflag(FLAG_RESCUED_BIRCH)
-	fadescreen(FADE_TO_BLACK)
-	waitmovement(0)
-	setwildbattle(SPECIES_ZIGZAGOON, 5)
-	dowildbattle
-	removeobject(LOCALID_ZIGZAGOON)
+	release
+	trainerbattle_single(TRAINER_ZOMBIE_ROUTE_101, "Grrrrr...", "Grrrrr...", Route101_EventScript_ZombieBoyDefeat)
+	end
+}
+
+script Route101_EventScript_ZombieBoyDefeat {
+	msgbox("The zombie turned to dust.", MSGBOX_AUTOCLOSE)
+	removeobject(LOCALID_ZYOUNGSTER)
 	applymovement(LOCALID_BIRCH, Route101_Movement_BirchApproachPlayer)
 	waitmovement(0)
 
