@@ -14,6 +14,7 @@
 #include "intro_speech.h"
 #include "link.h"
 #include "main.h"
+#include "main_menu.h"
 #include "menu.h"
 #include "list_menu.h"
 #include "mystery_event_menu.h"
@@ -288,38 +289,6 @@ static const struct WindowTemplate sWindowTemplates_MainMenu[] =
     DUMMY_WIN_TEMPLATE
 };
 
-static const struct WindowTemplate sNewGameBirchSpeechTextWindows[] =
-{
-    {
-        .bg = 0,
-        .tilemapLeft = 2,
-        .tilemapTop = 15,
-        .width = 27,
-        .height = 4,
-        .paletteNum = 15,
-        .baseBlock = 1
-    },
-    {
-        .bg = 0,
-        .tilemapLeft = 3,
-        .tilemapTop = 5,
-        .width = 6,
-        .height = 4,
-        .paletteNum = 15,
-        .baseBlock = 0x6D
-    },
-    {
-        .bg = 0,
-        .tilemapLeft = 3,
-        .tilemapTop = 2,
-        .width = 9,
-        .height = 10,
-        .paletteNum = 15,
-        .baseBlock = 0x85
-    },
-    DUMMY_WIN_TEMPLATE
-};
-
 static const u16 sMainMenuBgPal[] = INCBIN_U16("graphics/interface/main_menu_bg.gbapal");
 static const u16 sMainMenuTextPal[] = INCBIN_U16("graphics/interface/main_menu_text.gbapal");
 
@@ -386,7 +355,7 @@ enum
 
 EWRAM_DATA static u8 sContinueMonIconSpriteIds[PARTY_SIZE] = { MAX_SPRITES };
 
-#define MAIN_MENU_BORDER_TILE   0x1D5
+#define MAIN_MENU_BORDER_TILE 0x23D
 
 static void CB2_MainMenu(void)
 {
@@ -959,11 +928,11 @@ static void HighlightSelectedMainMenuItem(u8 menuType, u8 selectedMenuItem, s16 
 
 static void CreateMainMenuErrorWindow(const u8 *str)
 {
-    FillWindowPixelBuffer(7, PIXEL_FILL(1));
-    AddTextPrinterParameterized(7, FONT_NORMAL, str, 0, 1, 2, 0);
-    PutWindowTilemap(7);
-    CopyWindowToVram(7, COPYWIN_GFX);
+    FillWindowPixelBuffer(8, PIXEL_FILL(1));
     DrawMainMenuWindowBorder(&sWindowTemplates_MainMenu[8], MAIN_MENU_BORDER_TILE);
+    AddTextPrinterParameterized(8, FONT_SHORT, str, 1, 1, 2, 0);
+    PutWindowTilemap(8);
+    CopyWindowToVram(8, COPYWIN_GFX);
     SetGpuReg(REG_OFFSET_WIN0H, WIN_RANGE(9, DISPLAY_WIDTH - 9));
     SetGpuReg(REG_OFFSET_WIN0V, WIN_RANGE(113, DISPLAY_HEIGHT - 1));
 }
@@ -1069,7 +1038,7 @@ static void MainMenu_CreatePokeIcons(u8 windowId)
                 species = SPECIES_EGG;
 
             LoadMonIconPalette(species);
-            spriteId = CreateMonIcon(species, SpriteCB_MonIcon, x, 70, 1, GetMonData(&gPlayerParty[i], MON_DATA_PERSONALITY), TRUE);
+            spriteId = CreateMonIcon(species, SpriteCB_MonIcon, x, 70, 1, GetMonData(&gPlayerParty[i], MON_DATA_PERSONALITY));
             gSprites[spriteId].oam.priority = 0;
             sContinueMonIconSpriteIds[i] = spriteId;
         }

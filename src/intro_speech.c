@@ -176,7 +176,7 @@ static void Task_GenderSelection_Cleanup(u8);
 // Naming Screen
 static void Task_StartNamingScreen(u8);
 static void Task_NamingScreen(u8);
-static void NamingScreen_SetDefaultName(u8);
+// static void NamingScreen_SetDefaultName(u8);
 static void CB2_ReturnFromNamingScreen(void);
 static void Task_NamingScreen_WaitForYesNo(u8);
 static void Task_NamingScreen_YesNo(u8);
@@ -633,7 +633,7 @@ static void Task_NamingScreen(u8 taskId)
     }
 }
 
-static void NamingScreen_SetDefaultName(u8 nameId)
+void NamingScreen_SetDefaultName(u8 nameId)
 {
     const u8 *name;
     u8 i;

@@ -653,7 +653,7 @@ static bool8 BerryPouchLoadGfx(void)
 
 static bool8 AllocateListMenuBuffers(void)
 {
-    sListMenuItems = Alloc(MAX_BERRY_INDEX * sizeof(struct ListMenuItem));
+    sListMenuItems = Alloc(LAST_BERRY_INDEX * sizeof(struct ListMenuItem));
     if (sListMenuItems == NULL)
         return FALSE;
     sListMenuStrbuf = Alloc(sBerryPouch->listMenuNumItems * 27);
