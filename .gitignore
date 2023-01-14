@@ -31,12 +31,10 @@ build/
 *.ddump
 .idea/
 porymap.*.cfg
-prefabs.json
 .vscode/
 *.a
 .fuse_hidden*
 *.sna
 *.diff
 *.sym
-*.js
 data/maps/*/scripts.inc

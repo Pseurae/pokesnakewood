@@ -10,9 +10,7 @@ extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Girl1;
 extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Boy2;
 extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Girl2;
 extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_LittleBoy;
-extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_LittleBoyZombie;
 extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_LittleGirl;
-extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_LittleGirlZombie;
 extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Boy3;
 extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Girl3;
 extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_RichBoy;
@@ -36,7 +34,6 @@ extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Picnicker;
 extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Man3;
 extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Woman5;
 extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Youngster;
-extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_YoungsterZombie;
 extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_BugCatcher;
 extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_PsychicM;
 extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_SchoolKidM;
@@ -491,9 +488,6 @@ const struct ObjectEventGraphicsInfo *const gObjectEventGraphicsInfoPointers[NUM
     [OBJ_EVENT_GFX_LUGIA] =                    &gObjectEventGraphicsInfo_Lugia,
     [OBJ_EVENT_GFX_HOOH] =                     &gObjectEventGraphicsInfo_HoOh,
     [OBJ_EVENT_GFX_TM_BALL] =                  &gObjectEventGraphicsInfo_TMBall,
-    [OBJ_EVENT_GFX_LITTLE_BOY_ZOMBIE] =        &gObjectEventGraphicsInfo_LittleBoyZombie,
-    [OBJ_EVENT_GFX_LITTLE_GIRL_ZOMBIE] =       &gObjectEventGraphicsInfo_LittleGirlZombie,
-    [OBJ_EVENT_GFX_YOUNGSTER_ZOMBIE] =         &gObjectEventGraphicsInfo_YoungsterZombie,
 };
 
 const struct ObjectEventGraphicsInfo *const gMauvilleOldManGraphicsInfoPointers[] = {

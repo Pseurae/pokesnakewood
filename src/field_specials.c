@@ -1212,6 +1212,12 @@ void IsGrassTypeInParty(void)
     gSpecialVar_Result = FALSE;
 }
 
+static void UpdateSavedPos(void)
+{
+    gSaveBlock1Ptr->savedPos.x = gSaveBlock1Ptr->pos.x;
+    gSaveBlock1Ptr->savedPos.y = gSaveBlock1Ptr->pos.y;
+}
+
 void SpawnCameraObject(void)
 {
     u8 obj = SpawnSpecialObjectEventParameterized(OBJ_EVENT_GFX_BOY_1,
@@ -1221,6 +1227,7 @@ void SpawnCameraObject(void)
                                                   gSaveBlock1Ptr->pos.y + MAP_OFFSET,
                                                   3);
     gObjectEvents[obj].invisible = TRUE;
+    UpdateSavedPos();
     CameraObjectSetFollowedSpriteId(gObjectEvents[obj].spriteId);
 }
 
@@ -1230,13 +1237,17 @@ void RemoveCameraObject(void)
     RemoveObjectEventByLocalIdAndMap(OBJ_EVENT_ID_CAMERA, gSaveBlock1Ptr->location.mapNum, gSaveBlock1Ptr->location.mapGroup);
 }
 
-void FocusCameraOnPlayer(void)
+void TeleportCamera(void)
 {
-    struct ObjectEvent *playerObjEvent = &gObjectEvents[gPlayerAvatar.objectEventId];
-    MoveCameraAndRedrawMap(
-        playerObjEvent->currentCoords.x - gSaveBlock1Ptr->pos.x, 
-        playerObjEvent->currentCoords.y - gSaveBlock1Ptr->pos.y
-    );
+    UpdateSavedPos();
+    MoveCameraAndRedrawMap(gSpecialVar_0x8004 - gSaveBlock1Ptr->pos.x,
+                           gSpecialVar_0x8005 - gSaveBlock1Ptr->pos.y);
+}
+
+void ReturnCameraToPlayer(void)
+{
+    MoveCameraAndRedrawMap(gSaveBlock1Ptr->savedPos.x - gSaveBlock1Ptr->pos.x,
+                           gSaveBlock1Ptr->savedPos.y - gSaveBlock1Ptr->pos.y);
 }
 
 u8 GetPokeblockNameByMonNature(void)

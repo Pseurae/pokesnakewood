@@ -13,17 +13,23 @@ def process_content(content, pattern: re.Pattern):
             string = string.replace('\n    "', "")
 
         string = string.replace('\n    "', " ")
-        string = string.replace('\\n"', " ")
+        string = string.replace('\\n"', "")
 
         s = ""
-        for line in textwrap.wrap(string, 35):
-            s += '\n    "' + line + '\\n"'
+        lines = textwrap.wrap(string, 35)
+        for i, line in enumerate(lines):
+            if i == 0:
+                s += '' + line + '\\n"'
+            elif i == len(lines):
+                s += '\n    "' + line + '\\n"'
+            else:
+                s += '\n    "' + line + '"'
 
         content = content[:search.start(0)] + s + content[search.end(0):]
 
     return content
 
-string_pattern = re.compile(r'(?<=_\()([^)]*)(?=\))')
+string_pattern = re.compile(r'("[^)]*")(?=\))')
 
 def perform_decap(path, string_pattern, is_glob=False):
     if is_glob:

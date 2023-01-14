@@ -2,9 +2,9 @@
 #define GUARD_CONSTANTS_OPPONENTS_H
 
 #define TRAINER_NONE                          0
-#define TRAINER_ZOMBIE_ROUTE_101                      1
-#define TRAINER_GRUNT_AQUA_HIDEOUT_1          2
-#define TRAINER_GRUNT_AQUA_HIDEOUT_2          3
+#define TRAINER_ZOMBIE_ROUTE_101              1
+#define TRAINER_ZOMBIE_ROUTE_104_1            2
+#define TRAINER_ZOMBIE_ROUTE_104_2            3
 #define TRAINER_GRUNT_AQUA_HIDEOUT_3          4
 #define TRAINER_GRUNT_AQUA_HIDEOUT_4          5
 #define TRAINER_GRUNT_SEAFLOOR_CAVERN_1       6

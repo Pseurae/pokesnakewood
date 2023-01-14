@@ -187,8 +187,8 @@ void UpdateDayNightPalettes(void)
 
 void LoadDNPalette(const void *src, u16 offset, u16 size)
 {
-    // CpuCopy16(src, &sPlttBufferDayNight[offset], size);
-    // ApplyGlobalTintToPaletteEntries(sPlttBufferDayNight + offset, size);
+    CpuCopy16(src, &sPlttBufferDayNight[offset], size);
+    ApplyGlobalTintToPaletteEntries(sPlttBufferDayNight + offset, size);
     CpuCopy16(src, &gPlttBufferUnfaded[offset], size);
 
     if (IsDayNightApplicable() && !gDayNight.isDisabled)

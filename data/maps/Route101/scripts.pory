@@ -2,6 +2,11 @@ const LOCALID_BIRCH = 1
 const LOCALID_ZYOUNGSTER = 2
 
 mapscripts Route101_MapScripts {
+	MAP_SCRIPT_ON_LOAD {
+		if (var(VAR_ROUTE101_STATE) == 2) {
+			special(DisableWildEncounters)
+		}
+	}
 	MAP_SCRIPT_ON_FRAME_TABLE [
 		VAR_ROUTE101_STATE, 0: Route101_EventScript_HideMapNamePopup
 	]
@@ -176,8 +181,8 @@ script Route101_EventScript_ZombieBoy {
 }
 
 script Route101_EventScript_ZombieBoyDefeat {
-	msgbox("The zombie turned to dust.", MSGBOX_AUTOCLOSE)
 	removeobject(LOCALID_ZYOUNGSTER)
+	msgbox("The zombie turned to dust.", MSGBOX_AUTOCLOSE)
 	applymovement(LOCALID_BIRCH, Route101_Movement_BirchApproachPlayer)
 	waitmovement(0)
 

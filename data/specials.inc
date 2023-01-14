@@ -288,7 +288,8 @@ gSpecials::
 	def_special ShowGlassWorkshopMenu
 	def_special SpawnCameraObject
 	def_special RemoveCameraObject
-	def_special FocusCameraOnPlayer
+	def_special TeleportCamera
+	def_special ReturnCameraToPlayer
 	def_special GetPokeblockNameByMonNature
 	def_special GetSecretBaseNearbyMapName
 	def_special CheckRelicanthWailord

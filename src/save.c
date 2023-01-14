@@ -993,8 +993,8 @@ void Task_LinkFullSave(u8 taskId)
     case 2:
         if (IsLinkTaskFinished())
         {
-            if (!tInBattleTower)
-                SaveMapView();
+            // if (!tInBattleTower)
+            //     SaveMapView();
             tState = 3;
         }
         break;

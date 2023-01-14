@@ -1,42 +1,10 @@
-script Route104_EventScript_StartPeekoRescue {
-	lockall
-	initcutscene
-	special(SpawnCameraObject)
-	applypath(OBJ_EVENT_ID_CAMERA, 26, 59, 2)
-	waitmovement(0)
-	special(RemoveCameraObject)
-
-	fadescreen(FADE_TO_BLACK)
-	special(FocusCameraOnPlayer)
-	exitcutscene
-	fadescreen(FADE_FROM_BLACK)
-
-	setvar(VAR_ROUTE104_STATE, 1)
-	releaseall
-	end
-}
-
 raw `
 @ NOTE: Route 104's sail to Dewford script references local IDs from Dewford's map.
 @  These are labeled in DewfordTown/scripts.inc
 .set LOCALID_RIVAL, 34
 
 Route104_MapScripts::
-	map_script MAP_SCRIPT_ON_FRAME_TABLE, Route104_OnFrame
-	map_script MAP_SCRIPT_ON_TRANSITION, Route104_OnTransition
 	.byte 0
-
-Route104_OnFrame:
-	.2byte 0
-
-Route104_EventScript_StartSailToDewford::
-	lockall
-	goto Route104_EventScript_SailToDewford
-	end
-
-Route104_OnTransition:
-	call Route104_EventScript_ShowOrHideWhiteHerbFlorist
-	end
 
 Route104_EventScript_ShowOrHideWhiteHerbFlorist::
 	goto_if_unset FLAG_MET_PRETTY_PETAL_SHOP_OWNER, Route104_EventScript_HideWhiteHerbFlorist
@@ -74,7 +42,7 @@ Route104_EventScript_RivalTrigger::
 	waitmovement 0
 	delay 10
 	addobject LOCALID_RIVAL
-	clearflag FLAG_HIDE_ROUTE_104_RIVAL
+	clearflag FLAG_HIDE_ROUTE_104_BRINEY_PEEKO
 	applymovement OBJ_EVENT_ID_PLAYER, Route104_Movement_PlayerBackUp
 	waitmovement 0
 	applymovement LOCALID_RIVAL, Route104_Movement_RivalExitBrineysCottage

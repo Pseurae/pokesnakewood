@@ -981,7 +981,7 @@ static bool8 BattlePyramidRetireCallback(void)
 
 static void InitSave(void)
 {
-    SaveMapView();
+    // SaveMapView();
     sSaveDialogCallback = SaveConfirmSaveCallback;
     sSavingComplete = FALSE;
 }

@@ -63,7 +63,7 @@ EventScript_ObtainedItem:: @ 8271B95
 
 EventScript_ObtainedItemMessage:
 	message gText_ObtainedTheItem
-	return
+	goto EventScript_ContinueObtainedItem
 
 EventScript_ContinueObtainedItem:
 	waitfanfare
