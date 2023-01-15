@@ -27,7 +27,6 @@
 #include "wild_encounter.h"
 #include "window.h"
 #include "constants/abilities.h"
-#include "constants/battle_frontier.h"
 #include "constants/event_objects.h"
 #include "constants/region_map_sections.h"
 #include "constants/songs.h"
@@ -148,7 +147,6 @@ static const struct MatchCallText *GetBattleMatchCallText(int, u8 *);
 static const struct MatchCallText *GetGeneralMatchCallText(int, u8 *);
 static bool32 ShouldTrainerRequestBattle(int);
 static void BuildMatchCallString(int, const struct MatchCallText *, u8 *);
-static u16 GetFrontierStreakInfo(u16, u32 *);
 static void PopulateMatchCallStringVars(int, const s8 *);
 static void PopulateMatchCallStringVar(int, int, u8 *);
 static bool32 MatchCall_LoadGfx(u8);
@@ -163,7 +161,6 @@ static void PopulateTrainerName(int, u8 *);
 static void PopulateMapName(int, u8 *);
 static void PopulateSpeciesFromTrainerLocation(int, u8 *);
 static void PopulateSpeciesFromTrainerParty(int, u8 *);
-static void PopulateBattleFrontierFacilityName(int, u8 *);
 static void PopulateBattleFrontierStreak(int, u8 *);
 
 #define TEXT_ID(topic, id) (((topic) << 8) | ((id) & 0xFF))
@@ -1594,39 +1591,6 @@ static const struct MatchCallText *GetGeneralMatchCallText(int matchCallId, u8 *
     u32 topic, id;
     u16 rand;
 
-    rand = Random();
-    if (!(rand & 1))
-    {
-        // Count the number of facilities with a win streak
-        for (count = 0, i = 0; i < NUM_FRONTIER_FACILITIES; i++)
-        {
-            if (GetFrontierStreakInfo(i, &topic) > 1)
-                count++;
-        }
-
-        if (count)
-        {
-            // At least one facility with a win streak
-            // Randomly choose one to have a call about
-            count = Random() % count;
-            for (i = 0; i < NUM_FRONTIER_FACILITIES; i++)
-            {
-                sBattleFrontierStreakInfo.streak = GetFrontierStreakInfo(i, &topic);
-                if (sBattleFrontierStreakInfo.streak < 2)
-                    continue;
-
-                if (!count)
-                    break;
-
-                count--;
-            }
-
-            sBattleFrontierStreakInfo.facilityId = i;
-            id = sMatchCallTrainers[matchCallId].battleFrontierRecordStreakTextIndex - 1;
-            return &sMatchCallGeneralTopics[topic][id];
-        }
-    }
-
     topic = (sMatchCallTrainers[matchCallId].generalTextId >> 8) - 1;
     id = (sMatchCallTrainers[matchCallId].generalTextId & 0xFF) - 1;
     return &sMatchCallGeneralTopics[topic][id];
@@ -1656,7 +1620,6 @@ static void (*const sPopulateMatchCallStringVarFuncs[])(int, u8 *) =
     [STR_MAP_NAME]         = PopulateMapName,
     [STR_SPECIES_IN_ROUTE] = PopulateSpeciesFromTrainerLocation,
     [STR_SPECIES_IN_PARTY] = PopulateSpeciesFromTrainerParty,
-    [STR_FACILITY_NAME]    = PopulateBattleFrontierFacilityName,
     [STR_FRONTIER_STREAK]  = PopulateBattleFrontierStreak,
 };
 
@@ -1817,22 +1780,6 @@ static void PopulateSpeciesFromTrainerParty(int matchCallId, u8 *destStr)
     StringCopy(destStr, speciesName);
 }
 
-static const u8 *const sBattleFrontierFacilityNames[NUM_FRONTIER_FACILITIES] =
-{
-    [FRONTIER_FACILITY_TOWER]   = gText_BattleTower2,
-    [FRONTIER_FACILITY_DOME]    = gText_BattleDome,
-    [FRONTIER_FACILITY_PALACE]  = gText_BattlePalace,
-    [FRONTIER_FACILITY_ARENA]   = gText_BattleArena,
-    [MATCH_CALL_PIKE]           = gText_BattlePike,
-    [MATCH_CALL_FACTORY]        = gText_BattleFactory,
-    [FRONTIER_FACILITY_PYRAMID] = gText_BattlePyramid,
-};
-
-static void PopulateBattleFrontierFacilityName(int matchCallId, u8 *destStr)
-{
-    StringCopy(destStr, sBattleFrontierFacilityNames[sBattleFrontierStreakInfo.facilityId]);
-}
-
 static void PopulateBattleFrontierStreak(int matchCallId, u8 *destStr)
 {
     int i = 0;
@@ -1898,87 +1845,6 @@ static bool32 ShouldTrainerRequestBattle(int matchCallId)
     }
 
     return FALSE;
-}
-
-static u16 GetFrontierStreakInfo(u16 facilityId, u32 *topicTextId)
-{
-    int i;
-    int j;
-    u16 streak = 0;
-
-    switch (facilityId)
-    {
-    case FRONTIER_FACILITY_DOME:
-        for (i = 0; i < (int)ARRAY_COUNT(gSaveBlock2Ptr->frontier.domeRecordWinStreaks); i++)
-        {
-            for (j = 0; j < FRONTIER_LVL_MODE_COUNT; j++)
-            {
-                if (streak < gSaveBlock2Ptr->frontier.domeRecordWinStreaks[i][j])
-                    streak = gSaveBlock2Ptr->frontier.domeRecordWinStreaks[i][j];
-            }
-        }
-        *topicTextId = GEN_TOPIC_B_DOME - 1;
-        break;
-    case MATCH_CALL_PIKE:
-        for (i = 0; i < FRONTIER_LVL_MODE_COUNT; i++)
-        {
-            if (streak < gSaveBlock2Ptr->frontier.pikeRecordStreaks[i])
-                streak = gSaveBlock2Ptr->frontier.pikeRecordStreaks[i];
-        }
-        *topicTextId = GEN_TOPIC_B_PIKE - 1;
-        break;
-    case FRONTIER_FACILITY_TOWER:
-        for (i = 0; i < (int)ARRAY_COUNT(gSaveBlock2Ptr->frontier.towerRecordWinStreaks); i++)
-        {
-            for (j = 0; j < FRONTIER_LVL_MODE_COUNT; j++)
-            {
-                if (streak < gSaveBlock2Ptr->frontier.towerRecordWinStreaks[i][j])
-                    streak = gSaveBlock2Ptr->frontier.towerRecordWinStreaks[i][j];
-            }
-        }
-        *topicTextId = GEN_TOPIC_STREAK_RECORD - 1;
-        break;
-    case FRONTIER_FACILITY_PALACE:
-        for (i = 0; i < (int)ARRAY_COUNT(gSaveBlock2Ptr->frontier.palaceRecordWinStreaks); i++)
-        {
-            for (j = 0; j < FRONTIER_LVL_MODE_COUNT; j++)
-            {
-                if (streak < gSaveBlock2Ptr->frontier.palaceRecordWinStreaks[i][j])
-                    streak = gSaveBlock2Ptr->frontier.palaceRecordWinStreaks[i][j];
-            }
-        }
-        *topicTextId = GEN_TOPIC_STREAK_RECORD - 1;
-        break;
-    case MATCH_CALL_FACTORY:
-        for (i = 0; i < (int)ARRAY_COUNT(gSaveBlock2Ptr->frontier.factoryRecordWinStreaks); i++)
-        {
-            for (j = 0; j < FRONTIER_LVL_MODE_COUNT; j++)
-            {
-                if (streak < gSaveBlock2Ptr->frontier.factoryRecordWinStreaks[i][j])
-                    streak = gSaveBlock2Ptr->frontier.factoryRecordWinStreaks[i][j];
-            }
-        }
-        *topicTextId = GEN_TOPIC_STREAK_RECORD - 1;
-        break;
-    case FRONTIER_FACILITY_ARENA:
-        for (i = 0; i < FRONTIER_LVL_MODE_COUNT; i++)
-        {
-            if (streak < gSaveBlock2Ptr->frontier.arenaRecordStreaks[i])
-                streak = gSaveBlock2Ptr->frontier.arenaRecordStreaks[i];
-        }
-        *topicTextId = GEN_TOPIC_STREAK_RECORD - 1;
-        break;
-    case FRONTIER_FACILITY_PYRAMID:
-        for (i = 0; i < FRONTIER_LVL_MODE_COUNT; i++)
-        {
-            if (streak < gSaveBlock2Ptr->frontier.pyramidRecordStreaks[i])
-                streak = gSaveBlock2Ptr->frontier.pyramidRecordStreaks[i];
-        }
-        *topicTextId = GEN_TOPIC_B_PYRAMID - 1;
-        break;
-    }
-
-    return streak;
 }
 
 static u8 GetPokedexRatingLevel(u16 numSeen)

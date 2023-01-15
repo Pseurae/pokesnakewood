@@ -15,4 +15,7 @@
 #define TRAINER_BATTLE_SET_TRAINER_B                    11
 #define TRAINER_BATTLE_HILL                             12
 
+#define SPECIAL_BATTLE_SECRET_BASE 0
+#define SPECIAL_BATTLE_STEVEN 1
+
 #endif // GUARD_CONSTANTS_BATTLE_SETUP_H

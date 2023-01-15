@@ -31,8 +31,6 @@
 #include "task.h"
 #include "text.h"
 #include "tilesets.h"
-#include "trader.h"
-#include "tv.h"
 #include "constants/decorations.h"
 #include "constants/event_objects.h"
 #include "constants/songs.h"
@@ -144,7 +142,6 @@ static void SelectDecorationCategory(u8 taskId);
 static void ReturnToDecorationCategoriesAfterInvalidSelection(u8 taskId);
 static void ExitDecorationCategoriesMenu(u8 taskId);
 static void ReturnToActionsMenuFromCategories(u8 taskId);
-static void ExitTraderDecorationMenu(u8 taskId);
 static void CopyDecorationMenuItemName(u8 *dest, u16 decoration);
 static void DecorationItemsMenu_OnCursorMove(s32 itemIndex, bool8 flag, struct ListMenu *menu);
 static void DecorationItemsMenu_PrintDecorationInUse(u8 windowId, u32 itemIndex, u8 y);
@@ -252,7 +249,6 @@ static const TaskFunc sSecretBasePC_SelectedDecorationActions[][2] =
 {
    { DecorationItemsMenuAction_AttemptPlace, DecorationItemsMenuAction_Cancel },
    { DecorationItemsMenuAction_AttemptToss,  DecorationItemsMenuAction_Cancel },
-   { DecorationItemsMenuAction_Trade,        DecorationItemsMenuAction_Cancel },
 };
 
 static const struct WindowTemplate sDecorationWindowTemplates[WINDOW_COUNT] =
@@ -817,10 +813,7 @@ static void ReturnToDecorationCategoriesAfterInvalidSelection(u8 taskId)
 
 static void ExitDecorationCategoriesMenu(u8 taskId)
 {
-    if (gTasks[taskId].tDecorationMenuCommand != DECOR_MENU_TRADE)
-        ReturnToActionsMenuFromCategories(taskId);
-    else
-        ExitTraderDecorationMenu(taskId);
+    ReturnToActionsMenuFromCategories(taskId);
 }
 
 static void ReturnToActionsMenuFromCategories(u8 taskId)
@@ -844,12 +837,6 @@ void ShowDecorationCategoriesWindow(u8 taskId)
 void CopyDecorationCategoryName(u8 *dest, u8 category)
 {
     StringCopy(dest, sDecorationCategoryNames[category]);
-}
-
-static void ExitTraderDecorationMenu(u8 taskId)
-{
-    RemoveDecorationWindow(WINDOW_DECORATION_CATEGORIES);
-    ExitTraderMenu(taskId);
 }
 
 static void InitDecorationItemsMenuLimits(void)
@@ -1655,9 +1642,6 @@ static void PlaceDecoration(u8 taskId)
     }
 
     gSprites[sDecor_CameraSpriteObjectIdx1].y += 2;
-    if (gMapHeader.regionMapSectionId == MAPSEC_SECRET_BASE)
-        TryPutSecretBaseVisitOnAir();
-
     CancelDecorating_(taskId);
 }
 
@@ -2263,8 +2247,6 @@ static void Task_PutAwayDecoration(u8 taskId)
         {
             StringExpandPlaceholders(gStringVar4, gText_DecorationReturnedToPC);
             DisplayItemMessageOnField(taskId, gStringVar4, ContinuePuttingAwayDecorationsPrompt);
-            if (gMapHeader.regionMapSectionId == MAPSEC_SECRET_BASE)
-                TryPutSecretBaseVisitOnAir();
         }
         break;
     }

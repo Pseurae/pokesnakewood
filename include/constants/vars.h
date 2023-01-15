@@ -295,15 +295,13 @@
 #define VAR_RESULT                    0x800D
 #define VAR_ITEM_ID                   0x800E
 #define VAR_LAST_TALKED               0x800F
-#define VAR_CONTEST_RANK              0x8010
-#define VAR_CONTEST_CATEGORY          0x8011
-#define VAR_MON_BOX_ID                0x8012
-#define VAR_MON_BOX_POS               0x8013
-#define VAR_PREV_TEXT_COLOR           0x8014
-#define VAR_TEXT_COLOR                0x8015
-#define VAR_TRAINER_BATTLE_OPPONENT_A 0x8016 // Alias of gTrainerBattleOpponent_A
+#define VAR_MON_BOX_ID                0x8010
+#define VAR_MON_BOX_POS               0x8011
+#define VAR_PREV_TEXT_COLOR           0x8012
+#define VAR_TEXT_COLOR                0x8013
+#define VAR_TRAINER_BATTLE_OPPONENT_A 0x8014 // Alias of gTrainerBattleOpponent_A
 
-#define SPECIAL_VARS_END              0x8016
+#define SPECIAL_VARS_END              0x8014
 
 // Text color ids for VAR_TEXT_COLOR / VAR_PREV_TEXT_COLOR
 #define NPC_TEXT_COLOR_MALE         0x08 // Blue, for male NPCs

@@ -21,7 +21,6 @@
 #include "item.h"
 #include "item_menu.h"
 #include "menu_helpers.h"
-#include "link.h"
 #include "money.h"
 #include "shop.h"
 #include "pokemon_storage_system.h"
@@ -897,7 +896,7 @@ static void Task_ContextMenu_FromFieldBag(u8 taskId)
     TMCase_SetWindowBorder2(2);
     AddTMContextMenu(&sTMCaseDynamicResources->contextMenuWindowId);
 
-    if (!MenuHelpers_IsLinkActive() && InUnionRoom() != TRUE)
+    if (!MenuHelpers_IsLinkActive() != TRUE)
     {
         sTMCaseDynamicResources->menuActionIndices = sMenuActionIndices_Field;
         sTMCaseDynamicResources->numMenuActions = NELEMS(sMenuActionIndices_Field);

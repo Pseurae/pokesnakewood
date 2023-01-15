@@ -1,20 +1,16 @@
 #include "global.h"
 #include "battle.h"
 #include "battle_anim.h"
-#include "battle_arena.h"
 #include "battle_controllers.h"
-#include "battle_dome.h"
 #include "battle_interface.h"
 #include "battle_message.h"
 #include "battle_setup.h"
-#include "battle_tv.h"
 #include "battle_z_move.h"
 #include "bg.h"
 #include "data.h"
 #include "day_night.h"
 #include "item.h"
 #include "item_menu.h"
-#include "link.h"
 #include "main.h"
 #include "m4a.h"
 #include "palette.h"
@@ -202,17 +198,7 @@ void SetControllerToPlayer(void)
 static void PlayerBufferExecCompleted(void)
 {
     gBattlerControllerFuncs[gActiveBattler] = PlayerBufferRunCommand;
-    if (gBattleTypeFlags & BATTLE_TYPE_LINK)
-    {
-        u8 playerId = GetMultiplayerId();
-
-        PrepareBufferDataTransferLink(2, 4, &playerId);
-        gBattleResources->bufferA[gActiveBattler][0] = CONTROLLER_TERMINATOR_NOP;
-    }
-    else
-    {
-        gBattleControllerExecFlags &= ~gBitTable[gActiveBattler];
-    }
+    gBattleControllerExecFlags &= ~gBitTable[gActiveBattler];
 }
 
 static void PlayerBufferRunCommand(void)
@@ -1002,60 +988,15 @@ static void HandleMoveSwitching(void)
     }
 }
 
-static void SetLinkBattleEndCallbacks(void)
-{
-    if (gWirelessCommType == 0)
-    {
-        if (gReceivedRemoteLinkPlayers == 0)
-        {
-            m4aSongNumStop(SE_LOW_HEALTH);
-            gMain.inBattle = FALSE;
-            gMain.callback1 = gPreBattleCallback1;
-            SetMainCallback2(CB2_InitEndLinkBattle);
-            if (gBattleOutcome == B_OUTCOME_WON)
-                TryPutLinkBattleTvShowOnAir();
-            FreeAllWindowBuffers();
-        }
-    }
-    else
-    {
-        if (IsLinkTaskFinished())
-        {
-            m4aSongNumStop(SE_LOW_HEALTH);
-            gMain.inBattle = FALSE;
-            gMain.callback1 = gPreBattleCallback1;
-            SetMainCallback2(CB2_InitEndLinkBattle);
-            if (gBattleOutcome == B_OUTCOME_WON)
-                TryPutLinkBattleTvShowOnAir();
-            FreeAllWindowBuffers();
-        }
-    }
-}
-
 // Despite handling link battles separately, this is only ever used by link battles
 void SetBattleEndCallbacks(void)
 {
     if (!gPaletteFade.active)
     {
-        if (gBattleTypeFlags & BATTLE_TYPE_LINK)
-        {
-            if (IsLinkTaskFinished())
-            {
-                if (gWirelessCommType == 0)
-                    SetCloseLinkCallback();
-                else
-                    SetLinkStandbyCallback();
-
-                gBattlerControllerFuncs[gActiveBattler] = SetLinkBattleEndCallbacks;
-            }
-        }
-        else
-        {
-            m4aSongNumStop(SE_LOW_HEALTH);
-            gMain.inBattle = FALSE;
-            gMain.callback1 = gPreBattleCallback1;
-            SetMainCallback2(gMain.savedCallback);
-        }
+        m4aSongNumStop(SE_LOW_HEALTH);
+        gMain.inBattle = FALSE;
+        gMain.callback1 = gPreBattleCallback1;
+        SetMainCallback2(gMain.savedCallback);
     }
 }
 
@@ -1177,10 +1118,7 @@ static void Intro_TryShinyAnimShowHealthbox(void)
     {
         if (!gBattleSpritesDataPtr->healthBoxesData[gActiveBattler].bgmRestored)
         {
-            if (gBattleTypeFlags & BATTLE_TYPE_MULTI && gBattleTypeFlags & BATTLE_TYPE_LINK)
-                m4aMPlayContinue(&gMPlayInfo_BGM);
-            else
-                m4aMPlayVolumeControl(&gMPlayInfo_BGM, TRACKS_ALL, 0x100);
+            m4aMPlayVolumeControl(&gMPlayInfo_BGM, TRACKS_ALL, 0x100);
         }
         gBattleSpritesDataPtr->healthBoxesData[gActiveBattler].bgmRestored = TRUE;
         bgmRestored = TRUE;
@@ -2439,27 +2377,7 @@ static void PlayerHandleDrawTrainerPic(void)
     s16 xPos, yPos;
     u32 trainerPicId;
 
-    if (gBattleTypeFlags & BATTLE_TYPE_LINK)
-    {
-        if ((gLinkPlayers[GetMultiplayerId()].version & 0xFF) == VERSION_FIRE_RED
-            || (gLinkPlayers[GetMultiplayerId()].version & 0xFF) == VERSION_LEAF_GREEN)
-        {
-            trainerPicId = gLinkPlayers[GetMultiplayerId()].gender + TRAINER_BACK_PIC_RED;
-        }
-        else if ((gLinkPlayers[GetMultiplayerId()].version & 0xFF) == VERSION_RUBY
-                 || (gLinkPlayers[GetMultiplayerId()].version & 0xFF) == VERSION_SAPPHIRE)
-        {
-            trainerPicId = gLinkPlayers[GetMultiplayerId()].gender + TRAINER_BACK_PIC_RUBY_SAPPHIRE_BRENDAN;
-        }
-        else
-        {
-            trainerPicId = gLinkPlayers[GetMultiplayerId()].gender + TRAINER_BACK_PIC_BRENDAN;
-        }
-    }
-    else
-    {
-        trainerPicId = gSaveBlock2Ptr->playerGender;
-    }
+    trainerPicId = gSaveBlock2Ptr->playerGender;
 
     if (gBattleTypeFlags & BATTLE_TYPE_MULTI)
     {
@@ -2521,27 +2439,7 @@ static void PlayerHandleTrainerSlide(void)
 {
     u32 trainerPicId;
 
-    if (gBattleTypeFlags & BATTLE_TYPE_LINK)
-    {
-        if ((gLinkPlayers[GetMultiplayerId()].version & 0xFF) == VERSION_FIRE_RED
-            || (gLinkPlayers[GetMultiplayerId()].version & 0xFF) == VERSION_LEAF_GREEN)
-        {
-            trainerPicId = gLinkPlayers[GetMultiplayerId()].gender + TRAINER_BACK_PIC_RED;
-        }
-        else if ((gLinkPlayers[GetMultiplayerId()].version & 0xFF) == VERSION_RUBY
-                 || (gLinkPlayers[GetMultiplayerId()].version & 0xFF) == VERSION_SAPPHIRE)
-        {
-            trainerPicId = gLinkPlayers[GetMultiplayerId()].gender + TRAINER_BACK_PIC_RUBY_SAPPHIRE_BRENDAN;
-        }
-        else
-        {
-            trainerPicId = gLinkPlayers[GetMultiplayerId()].gender + TRAINER_BACK_PIC_BRENDAN;
-        }
-    }
-    else
-    {
-        trainerPicId = gSaveBlock2Ptr->playerGender + TRAINER_BACK_PIC_BRENDAN;
-    }
+    trainerPicId = gSaveBlock2Ptr->playerGender + TRAINER_BACK_PIC_BRENDAN;
 
     DecompressTrainerBackPic(trainerPicId, gActiveBattler);
     SetMultiuseSpriteTemplateToTrainerBack(trainerPicId, GetBattlerPosition(gActiveBattler));
@@ -2655,7 +2553,6 @@ static void PlayerHandleMoveAnimation(void)
         gTransformedPersonalities[gActiveBattler] = gAnimDisableStructPtr->transformedMonPersonality;
         gBattleSpritesDataPtr->healthBoxesData[gActiveBattler].animationState = 0;
         gBattlerControllerFuncs[gActiveBattler] = PlayerDoMoveAnimation;
-        BattleTv_SetDataBasedOnMove(move, gWeatherMoveAnim, gAnimDisableStructPtr);
     }
 }
 
@@ -2718,8 +2615,6 @@ static void PlayerHandlePrintString(void)
     BufferStringBattle(*stringId);
     BattlePutTextOnWindow(gDisplayedStringBattle, B_WIN_MSG);
     gBattlerControllerFuncs[gActiveBattler] = CompleteOnInactiveTextPrinter2;
-    BattleTv_SetDataBasedOnString(*stringId);
-    BattleArena_DeductSkillPoints(gActiveBattler, *stringId);
 }
 
 static void PlayerHandlePrintSelectionString(void)
@@ -2745,7 +2640,6 @@ static void PlayerHandleChooseAction(void)
     s32 i;
 
     gBattlerControllerFuncs[gActiveBattler] = HandleChooseActionAfterDma3;
-    BattleTv_ClearExplosionFaintCause();
     BattlePutTextOnWindow(gText_BattleMenu, B_WIN_ACTION_MENU);
 
     for (i = 0; i < 4; i++)
@@ -2783,43 +2677,24 @@ static void HandleChooseMoveAfterDma3(void)
     }
 }
 
-// arenaMindPoints is used here as a placeholder for a timer.
-
-static void PlayerChooseMoveInBattlePalace(void)
-{
-    if (--*(gBattleStruct->arenaMindPoints + gActiveBattler) == 0)
-    {
-        // gBattlePalaceMoveSelectionRngValue = gRngValue;
-        BtlController_EmitTwoReturnValues(BUFFER_B, 10, ChooseMoveAndTargetInBattlePalace());
-        PlayerBufferExecCompleted();
-    }
-}
-
 static void PlayerHandleChooseMove(void)
 {
-    if (gBattleTypeFlags & BATTLE_TYPE_PALACE)
-    {
-        *(gBattleStruct->arenaMindPoints + gActiveBattler) = 8;
-        gBattlerControllerFuncs[gActiveBattler] = PlayerChooseMoveInBattlePalace;
-    }
-    else
-    {
-        struct ChooseMoveStruct *moveInfo = (struct ChooseMoveStruct *)(&gBattleResources->bufferA[gActiveBattler][4]);
 
-        InitMoveSelectionsVarsAndStrings();
-        gBattleStruct->mega.playerSelect = FALSE;
-        if (!IsMegaTriggerSpriteActive())
-            gBattleStruct->mega.triggerSpriteId = 0xFF;
-        if (CanMegaEvolve(gActiveBattler))
-            CreateMegaTriggerSprite(gActiveBattler, 0);
-        if (!IsZMoveTriggerSpriteActive())
-            gBattleStruct->zmove.triggerSpriteId = 0xFF;
+    struct ChooseMoveStruct *moveInfo = (struct ChooseMoveStruct *)(&gBattleResources->bufferA[gActiveBattler][4]);
 
-        GetUsableZMoves(gActiveBattler, moveInfo->moves);
-        gBattleStruct->zmove.viable = IsZMoveUsable(gActiveBattler, gMoveSelectionCursor[gActiveBattler]);
-        CreateZMoveTriggerSprite(gActiveBattler, gBattleStruct->zmove.viable);
-        gBattlerControllerFuncs[gActiveBattler] = HandleChooseMoveAfterDma3;
-    }
+    InitMoveSelectionsVarsAndStrings();
+    gBattleStruct->mega.playerSelect = FALSE;
+    if (!IsMegaTriggerSpriteActive())
+        gBattleStruct->mega.triggerSpriteId = 0xFF;
+    if (CanMegaEvolve(gActiveBattler))
+        CreateMegaTriggerSprite(gActiveBattler, 0);
+    if (!IsZMoveTriggerSpriteActive())
+        gBattleStruct->zmove.triggerSpriteId = 0xFF;
+
+    GetUsableZMoves(gActiveBattler, moveInfo->moves);
+    gBattleStruct->zmove.viable = IsZMoveUsable(gActiveBattler, gMoveSelectionCursor[gActiveBattler]);
+    CreateZMoveTriggerSprite(gActiveBattler, gBattleStruct->zmove.viable);
+    gBattlerControllerFuncs[gActiveBattler] = HandleChooseMoveAfterDma3;
 }
 
 void InitMoveSelectionsVarsAndStrings(void)
@@ -2882,10 +2757,6 @@ static void PlayerHandleHealthBarUpdate(void)
 
     LoadBattleBarGfx(0);
     hpVal = gBattleResources->bufferA[gActiveBattler][2] | (gBattleResources->bufferA[gActiveBattler][3] << 8);
-
-    // gPlayerPartyLostHP used by Battle Dome, but never read
-    if (hpVal > 0)
-        gPlayerPartyLostHP += hpVal;
 
     if (hpVal != INSTANT_HP_BAR_DROP)
     {
@@ -3271,8 +3142,6 @@ static void PlayerHandleBattleAnimation(void)
             PlayerBufferExecCompleted();
         else
             gBattlerControllerFuncs[gActiveBattler] = CompleteOnFinishedBattleAnimation;
-
-        BattleTv_SetDataBasedOnAnimation(animationId);
     }
 }
 

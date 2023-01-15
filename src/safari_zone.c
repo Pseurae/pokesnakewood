@@ -8,7 +8,6 @@
 #include "safari_zone.h"
 #include "script.h"
 #include "string_util.h"
-#include "tv.h"
 #include "constants/game_stat.h"
 #include "field_screen_effect.h"
 
@@ -65,7 +64,7 @@ void EnterSafariMode(void)
 
 void ExitSafariMode(void)
 {
-    TryPutSafariFanClubOnAir(sSafariZoneCaughtMons, sSafariZonePkblkUses);
+    // TryPutSafariFanClubOnAir(sSafariZoneCaughtMons, sSafariZonePkblkUses);
     ResetSafariZoneFlag();
     ClearAllPokeblockFeeders();
     gNumSafariBalls = 0;

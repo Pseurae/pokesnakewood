@@ -9,7 +9,6 @@
 #include "gpu_regs.h"
 #include "bg.h"
 #include "battle_controllers.h"
-#include "link.h"
 #include "sprite.h"
 #include "constants/trainers.h"
 #include "battle_interface.h"
@@ -148,12 +147,6 @@ static void CB2_ReshowBattleScreenAfterMenu(void)
             }
 
             ActionSelectionCreateCursorAt(gActionSelectionCursor[gBattlerInMenuId], 0);
-
-            if (gWirelessCommType != 0 && gReceivedRemoteLinkPlayers)
-            {
-                LoadWirelessStatusIndicatorSpriteGfx();
-                CreateWirelessStatusIndicatorSprite(0, 0);
-            }
         }
         break;
     default:

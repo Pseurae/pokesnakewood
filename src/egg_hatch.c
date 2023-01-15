@@ -62,7 +62,8 @@ struct EggHatchData
     u8 textColor[3];
 };
 
-extern const u32 gTradePlatform_Tilemap[];
+// extern const u32 gTradePlatform_Tilemap[];
+const u16 gTradePlatform_Tilemap[] = INCBIN_U16("graphics/trade/platform.bin");
 extern const u8 gText_HatchedFromEgg[];
 extern const u8 gText_NicknameHatchPrompt[];
 

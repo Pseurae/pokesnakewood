@@ -37,9 +37,6 @@
 #include "rtc.h"
 #include "party_menu.h"
 #include "constants/battle_config.h"
-#include "battle_arena.h"
-#include "battle_pike.h"
-#include "battle_pyramid.h"
 #include "field_specials.h"
 #include "pokemon_summary_screen.h"
 #include "pokenav.h"
@@ -4764,9 +4761,6 @@ static void Cmd_return(void)
 
 static void Cmd_end(void)
 {
-    if (gBattleTypeFlags & BATTLE_TYPE_ARENA)
-        BattleArena_AddSkillPoints(gBattlerAttacker);
-
     gMoveResultFlags = 0;
     gActiveBattler = 0;
     gCurrentActionFuncId = B_ACTION_TRY_FINISH;
@@ -6113,9 +6107,6 @@ static void Cmd_switchinanim(void)
     MarkBattlerForControllerExec(gActiveBattler);
 
     gBattlescriptCurrInstr += 3;
-
-    if (gBattleTypeFlags & BATTLE_TYPE_ARENA)
-        BattleArena_InitPoints();
 }
 
 bool32 CanBattlerSwitch(u32 battlerId)
@@ -6151,51 +6142,6 @@ bool32 CanBattlerSwitch(u32 battlerId)
         lastMonId = 0;
         if (battlerId & 2)
             lastMonId = MULTI_PARTY_SIZE;
-
-        for (i = lastMonId; i < lastMonId + MULTI_PARTY_SIZE; i++)
-        {
-            if (GetMonData(&party[i], MON_DATA_SPECIES) != SPECIES_NONE
-             && !GetMonData(&party[i], MON_DATA_IS_EGG)
-             && GetMonData(&party[i], MON_DATA_HP) != 0
-             && gBattlerPartyIndexes[battlerId] != i)
-                break;
-        }
-
-        ret = (i != lastMonId + MULTI_PARTY_SIZE);
-    }
-    else if (gBattleTypeFlags & BATTLE_TYPE_MULTI)
-    {
-        if (gBattleTypeFlags & BATTLE_TYPE_TOWER_LINK_MULTI)
-        {
-            if (GetBattlerSide(battlerId) == B_SIDE_PLAYER)
-            {
-                party = gPlayerParty;
-
-                lastMonId = 0;
-                if (GetLinkTrainerFlankId(GetBattlerMultiplayerId(battlerId)) == TRUE)
-                    lastMonId = MULTI_PARTY_SIZE;
-            }
-            else
-            {
-                party = gEnemyParty;
-
-                if (battlerId == 1)
-                    lastMonId = 0;
-                else
-                    lastMonId = MULTI_PARTY_SIZE;
-            }
-        }
-        else
-        {
-            if (GetBattlerSide(battlerId) == B_SIDE_OPPONENT)
-                party = gEnemyParty;
-            else
-                party = gPlayerParty;
-
-            lastMonId = 0;
-            if (GetLinkTrainerFlankId(GetBattlerMultiplayerId(battlerId)) == TRUE)
-                lastMonId = MULTI_PARTY_SIZE;
-        }
 
         for (i = lastMonId; i < lastMonId + MULTI_PARTY_SIZE; i++)
         {
@@ -6311,7 +6257,6 @@ static void Cmd_openpartyscreen(void)
 
     if (gBattlescriptCurrInstr[1] == BS_FAINTED_LINK_MULTIPLE_1)
     {
-        if ((gBattleTypeFlags & BATTLE_TYPE_MULTI) || !(gBattleTypeFlags & BATTLE_TYPE_DOUBLE))
         {
             for (gActiveBattler = 0; gActiveBattler < gBattlersCount; gActiveBattler++)
             {
@@ -6337,7 +6282,7 @@ static void Cmd_openpartyscreen(void)
                 }
             }
         }
-        else if (gBattleTypeFlags & BATTLE_TYPE_DOUBLE)
+        if (gBattleTypeFlags & BATTLE_TYPE_DOUBLE)
         {
             bool8 hasReplacement_0, hasReplacement_1, hasReplacement_2, hasReplacement_3;
 
@@ -8499,71 +8444,13 @@ static void Cmd_various(void)
             gHitMarker &= ~HITMARKER_PLAYER_FAINTED;
         }
         break;
-    case VARIOUS_PALACE_FLAVOR_TEXT:
-        // Try and print end-of-turn Battle Palace flavor text (e.g. "A glint appears in mon's eyes")
-        gBattleCommunication[0] = FALSE; // whether or not msg should be printed
-        gBattleScripting.battler = gActiveBattler = gBattleCommunication[1];
-        if (!(gBattleStruct->palaceFlags & gBitTable[gActiveBattler])
-            && gBattleMons[gActiveBattler].maxHP / 2 >= gBattleMons[gActiveBattler].hp
-            && gBattleMons[gActiveBattler].hp != 0
-            && !(gBattleMons[gActiveBattler].status1 & STATUS1_SLEEP))
-        {
-            gBattleStruct->palaceFlags |= gBitTable[gActiveBattler];
-            gBattleCommunication[0] = TRUE;
-            gBattleCommunication[MULTISTRING_CHOOSER] = sBattlePalaceNatureToFlavorTextId[GetNatureFromPersonality(gBattleMons[gActiveBattler].personality)];
-        }
-        break;
-    case VARIOUS_ARENA_JUDGMENT_WINDOW:
-        i = BattleArena_ShowJudgmentWindow(&gBattleCommunication[0]);
-
-        // BattleArena_ShowJudgmentWindow's last state was an intermediate step.
-        // Return without advancing the current instruction so that it will be called again.
-        if (i == ARENA_RESULT_RUNNING)
-            return;
-
-        gBattleCommunication[1] = i;
-        break;
-    case VARIOUS_ARENA_OPPONENT_MON_LOST:
-        gBattleMons[1].hp = 0;
-        gHitMarker |= HITMARKER_FAINTED(1);
-        gBattleStruct->arenaLostOpponentMons |= gBitTable[gBattlerPartyIndexes[1]];
-        gDisableStructs[1].truantSwitchInHack = 1;
-        break;
-    case VARIOUS_ARENA_PLAYER_MON_LOST:
-        gBattleMons[0].hp = 0;
-        gHitMarker |= HITMARKER_FAINTED(0);
-        gHitMarker |= HITMARKER_PLAYER_FAINTED;
-        gBattleStruct->arenaLostPlayerMons |= gBitTable[gBattlerPartyIndexes[0]];
-        gDisableStructs[0].truantSwitchInHack = 1;
-        break;
-    case VARIOUS_ARENA_BOTH_MONS_LOST:
-        gBattleMons[0].hp = 0;
-        gBattleMons[1].hp = 0;
-        gHitMarker |= HITMARKER_FAINTED(0);
-        gHitMarker |= HITMARKER_FAINTED(1);
-        gHitMarker |= HITMARKER_PLAYER_FAINTED;
-        gBattleStruct->arenaLostPlayerMons |= gBitTable[gBattlerPartyIndexes[0]];
-        gBattleStruct->arenaLostOpponentMons |= gBitTable[gBattlerPartyIndexes[1]];
-        gDisableStructs[0].truantSwitchInHack = 1;
-        gDisableStructs[1].truantSwitchInHack = 1;
-        break;
     case VARIOUS_EMIT_YESNOBOX:
         BtlController_EmitYesNoBox(BUFFER_A);
         MarkBattlerForControllerExec(gActiveBattler);
         break;
-    case VARIOUS_DRAW_ARENA_REF_TEXT_BOX:
-        DrawArenaRefereeTextBox();
-        break;
-    case VARIOUS_ERASE_ARENA_REF_TEXT_BOX:
-        EraseArenaRefereeTextBox();
-        break;
     case VARIOUS_ARENA_JUDGMENT_STRING:
         BattleStringExpandPlaceholdersToDisplayedString(gRefereeStringsTable[gBattlescriptCurrInstr[1]]);
         BattlePutTextOnWindow(gDisplayedStringBattle, ARENA_WIN_JUDGMENT_TEXT);
-        break;
-    case VARIOUS_ARENA_WAIT_STRING:
-        if (IsTextPrinterActive(ARENA_WIN_JUDGMENT_TEXT))
-            return;
         break;
     case VARIOUS_WAIT_CRY:
         if (!IsCryFinished())
@@ -11103,24 +10990,6 @@ static void Cmd_forcerandomswitch(void)
             || (gBattleTypeFlags & BATTLE_TYPE_INGAME_PARTNER))
         {
             if ((gBattlerTarget & BIT_FLANK) != B_FLANK_LEFT)
-            {
-                firstMonId = PARTY_SIZE / 2;
-                lastMonId = PARTY_SIZE;
-            }
-            else
-            {
-                firstMonId = 0;
-                lastMonId = PARTY_SIZE / 2;
-            }
-            monsCount = PARTY_SIZE / 2;
-            minNeeded = 1;
-            battler2PartyId = gBattlerPartyIndexes[gBattlerTarget];
-            battler1PartyId = gBattlerPartyIndexes[BATTLE_PARTNER(gBattlerTarget)];
-        }
-        else if ((gBattleTypeFlags & BATTLE_TYPE_MULTI && gBattleTypeFlags & BATTLE_TYPE_LINK)
-                 || (gBattleTypeFlags & BATTLE_TYPE_MULTI && gBattleTypeFlags & BATTLE_TYPE_RECORDED_LINK))
-        {
-            if (GetLinkTrainerFlankId(GetBattlerMultiplayerId(gBattlerTarget)) == B_FLANK_RIGHT)
             {
                 firstMonId = PARTY_SIZE / 2;
                 lastMonId = PARTY_SIZE;
@@ -13688,98 +13557,55 @@ static void Cmd_pickup(void)
     u16 ability;
     u8 lvlDivBy10;
 
-    if (InBattlePike())
+    for (i = 0; i < PARTY_SIZE; i++)
     {
+        species = GetMonData(&gPlayerParty[i], MON_DATA_SPECIES2);
+        heldItem = GetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM);
+        lvlDivBy10 = (GetMonData(&gPlayerParty[i], MON_DATA_LEVEL)-1) / 10; //Moving this here makes it easier to add in abilities like Honey Gather
+        if (lvlDivBy10 > 9)
+            lvlDivBy10 = 9;
 
-    }
-    else if (InBattlePyramid())
-    {
-        for (i = 0; i < PARTY_SIZE; i++)
+        if (GetMonData(&gPlayerParty[i], MON_DATA_ABILITY_NUM))
+            ability = gSpeciesInfo[species].abilities[1];
+        else
+            ability = gSpeciesInfo[species].abilities[0];
+
+        if (ability == ABILITY_PICKUP
+            && species != SPECIES_NONE
+            && species != SPECIES_EGG
+            && heldItem == ITEM_NONE
+            && (Random() % 10) == 0)
         {
-            species = GetMonData(&gPlayerParty[i], MON_DATA_SPECIES2);
-            heldItem = GetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM);
+            s32 j;
+            s32 rand = Random() % 100;
 
-            if (GetMonData(&gPlayerParty[i], MON_DATA_ABILITY_NUM))
-                ability = gSpeciesInfo[species].abilities[1];
-            else
-                ability = gSpeciesInfo[species].abilities[0];
-
-            if (ability == ABILITY_PICKUP
-                && species != SPECIES_NONE
-                && species != SPECIES_EGG
-                && heldItem == ITEM_NONE
-                && (Random() % 10) == 0)
+            for (j = 0; j < (int)ARRAY_COUNT(sPickupProbabilities); j++)
             {
-                heldItem = GetBattlePyramidPickupItemId();
+                if (sPickupProbabilities[j] > rand)
+                {
+                    SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &sPickupItems[lvlDivBy10 + j]);
+                    break;
+                }
+                else if (rand == 99 || rand == 98)
+                {
+                    SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &sRarePickupItems[lvlDivBy10 + (99 - rand)]);
+                    break;
+                }
+            }
+        }
+        #if (defined ITEM_HONEY)
+        else if (ability == ABILITY_HONEY_GATHER
+            && species != 0
+            && species != SPECIES_EGG
+            && heldItem == ITEM_NONE)
+        {
+            if ((lvlDivBy10 + 1 ) * 5 > Random() % 100)
+            {
+                heldItem = ITEM_HONEY;
                 SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &heldItem);
             }
-            #if (defined ITEM_HONEY)
-            else if (ability == ABILITY_HONEY_GATHER
-                && species != 0
-                && species != SPECIES_EGG
-                && heldItem == ITEM_NONE)
-            {
-                if ((lvlDivBy10 + 1 ) * 5 > Random() % 100)
-                {
-                    heldItem = ITEM_HONEY;
-                    SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &heldItem);
-                }
-            }
-            #endif
         }
-    }
-    else
-    {
-        for (i = 0; i < PARTY_SIZE; i++)
-        {
-            species = GetMonData(&gPlayerParty[i], MON_DATA_SPECIES2);
-            heldItem = GetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM);
-            lvlDivBy10 = (GetMonData(&gPlayerParty[i], MON_DATA_LEVEL)-1) / 10; //Moving this here makes it easier to add in abilities like Honey Gather
-            if (lvlDivBy10 > 9)
-                lvlDivBy10 = 9;
-
-            if (GetMonData(&gPlayerParty[i], MON_DATA_ABILITY_NUM))
-                ability = gSpeciesInfo[species].abilities[1];
-            else
-                ability = gSpeciesInfo[species].abilities[0];
-
-            if (ability == ABILITY_PICKUP
-                && species != SPECIES_NONE
-                && species != SPECIES_EGG
-                && heldItem == ITEM_NONE
-                && (Random() % 10) == 0)
-            {
-                s32 j;
-                s32 rand = Random() % 100;
-
-                for (j = 0; j < (int)ARRAY_COUNT(sPickupProbabilities); j++)
-                {
-                    if (sPickupProbabilities[j] > rand)
-                    {
-                        SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &sPickupItems[lvlDivBy10 + j]);
-                        break;
-                    }
-                    else if (rand == 99 || rand == 98)
-                    {
-                        SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &sRarePickupItems[lvlDivBy10 + (99 - rand)]);
-                        break;
-                    }
-                }
-            }
-            #if (defined ITEM_HONEY)
-            else if (ability == ABILITY_HONEY_GATHER
-                && species != 0
-                && species != SPECIES_EGG
-                && heldItem == ITEM_NONE)
-            {
-                if ((lvlDivBy10 + 1 ) * 5 > Random() % 100)
-                {
-                    heldItem = ITEM_HONEY;
-                    SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &heldItem);
-                }
-            }
-            #endif
-        }
+        #endif
     }
 
     gBattlescriptCurrInstr++;

@@ -17,7 +17,6 @@
 #include "fldeff_misc.h"
 #include "international_string_util.h"
 #include "item_menu.h"
-#include "link.h"
 #include "list_menu.h"
 #include "main.h"
 #include "map_name_popup.h"
@@ -32,7 +31,6 @@
 #include "string_util.h"
 #include "strings.h"
 #include "task.h"
-#include "tv.h"
 #include "window.h"
 #include "constants/event_bg.h"
 #include "constants/decorations.h"
@@ -1726,69 +1724,6 @@ static void SaveRecordMixBases(struct SecretBaseRecordMixer *mixers)
             mixers[2].version = gLinkPlayers[linkId3].version & 0xFF;   \
             mixers[2].language = gLinkPlayers[linkId3].language;
 
-void ReceiveSecretBasesData(void *secretBases, size_t recordSize, u8 linkIdx)
-{
-    struct SecretBaseRecordMixer mixers[3];
-    u16 i;
-
-    if (FlagGet(FLAG_RECEIVED_SECRET_POWER))
-    {
-        switch (GetLinkPlayerCount())
-        {
-        case 2:
-            memset(secretBases + 2 * recordSize, 0, recordSize);
-            memset(secretBases + 3 * recordSize, 0, recordSize);
-            break;
-        case 3:
-            memset(secretBases + 3 * recordSize, 0, recordSize);
-            break;
-        }
-
-        switch (linkIdx)
-        {
-        case 0:
-            INIT_SECRET_BASE_RECORD_MIXER(1, 2, 3)
-            break;
-        case 1:
-            INIT_SECRET_BASE_RECORD_MIXER(2, 3, 0)
-            break;
-        case 2:
-            INIT_SECRET_BASE_RECORD_MIXER(3, 0, 1)
-            break;
-        case 3:
-            INIT_SECRET_BASE_RECORD_MIXER(0, 1, 2)
-            break;
-        }
-
-        SaveRecordMixBases(mixers);
-
-        for (i = 1; i < SECRET_BASES_COUNT; i++)
-        {
-            // In the process of deleting duplicate bases, if a base the player has registered is deleted it is
-            // flagged with the temporary toRegister flag, so it can be re-registered after it has been newly saved
-            if (gSaveBlock1Ptr->secretBases[i].toRegister == TRUE)
-            {
-                gSaveBlock1Ptr->secretBases[i].registryStatus = REGISTERED;
-                gSaveBlock1Ptr->secretBases[i].toRegister = FALSE;
-            }
-        }
-
-        SortSecretBasesByRegistryStatus();
-        for (i = 1; i < SECRET_BASES_COUNT; i++)
-        {
-            // Unmark "new" bases, they've been saved now and are no longer important
-            if (gSaveBlock1Ptr->secretBases[i].registryStatus == NEW)
-                gSaveBlock1Ptr->secretBases[i].registryStatus = UNREGISTERED;
-        }
-
-        if (gSaveBlock1Ptr->secretBases[0].secretBaseId != 0
-         && gSaveBlock1Ptr->secretBases[0].numSecretBasesReceived != 0xFFFF)
-        {
-            gSaveBlock1Ptr->secretBases[0].numSecretBasesReceived++;
-        }
-    }
-}
-
 void ClearJapaneseSecretBases(struct SecretBase *bases)
 {
     u32 i;
@@ -1819,7 +1754,6 @@ void CheckLeftFriendsSecretBase(void)
     {
         VarSet(VAR_SECRET_BASE_IS_NOT_LOCAL, FALSE);
         sInFriendSecretBase = FALSE;
-        TryPutSecretBaseSecretsOnAir();
         VarSet(VAR_SECRET_BASE_STEP_COUNTER, 0);
         VarSet(VAR_SECRET_BASE_LAST_ITEM_USED, 0);
         VarSet(VAR_SECRET_BASE_LOW_TV_FLAGS, 0);

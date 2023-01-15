@@ -1,12 +1,8 @@
 #include "global.h"
-#include "frontier_util.h"
 #include "battle_setup.h"
 #include "berry.h"
 #include "clock.h"
 #include "coins.h"
-#include "contest.h"
-#include "contest_util.h"
-#include "contest_painting.h"
 #include "data.h"
 #include "decoration.h"
 #include "decoration_inventory.h"
@@ -28,7 +24,6 @@
 #include "main.h"
 #include "menu.h"
 #include "money.h"
-#include "mystery_event_script.h"
 #include "number_input.h"
 #include "palette.h"
 #include "party_menu.h"
@@ -49,7 +44,6 @@
 #include "text.h"
 #include "text_window.h"
 #include "trainer_see.h"
-#include "tv.h"
 #include "window.h"
 #include "constants/event_objects.h"
 
@@ -299,9 +293,6 @@ bool8 ScrCmd_endram(struct ScriptContext *ctx)
 
 bool8 ScrCmd_setmysteryeventstatus(struct ScriptContext *ctx)
 {
-    u8 status = ScriptReadByte(ctx);
-
-    SetMysteryEventScriptStatus(status);
     return FALSE;
 }
 
@@ -1472,13 +1463,6 @@ bool8 ScrCmd_hidemonpic(struct ScriptContext *ctx)
 bool8 ScrCmd_showcontestpainting(struct ScriptContext *ctx)
 {
     u8 contestWinnerId = ScriptReadByte(ctx);
-
-    // Artist's painting is temporary and already has its data loaded
-    if (contestWinnerId != CONTEST_WINNER_ARTIST)
-        SetContestWinnerForPainting(contestWinnerId);
-
-    ShowContestPainting();
-    ScriptContext_Stop();
     return TRUE;
 }
 
@@ -1957,38 +1941,27 @@ bool8 ScrCmd_setberrytree(struct ScriptContext *ctx)
 
 bool8 ScrCmd_getpokenewsactive(struct ScriptContext *ctx)
 {
-    u16 newsKind = VarGet(ScriptReadHalfword(ctx));
-
-    gSpecialVar_Result = IsPokeNewsActive(newsKind);
     return FALSE;
 }
 
 bool8 ScrCmd_choosecontestmon(struct ScriptContext *ctx)
 {
-    ChooseContestMon();
-    ScriptContext_Stop();
     return TRUE;
 }
 
 
 bool8 ScrCmd_startcontest(struct ScriptContext *ctx)
 {
-    StartContest();
-    ScriptContext_Stop();
     return TRUE;
 }
 
 bool8 ScrCmd_showcontestresults(struct ScriptContext *ctx)
 {
-    ShowContestResults();
-    ScriptContext_Stop();
     return TRUE;
 }
 
 bool8 ScrCmd_contestlinktransfer(struct ScriptContext *ctx)
 {
-    ContestLinkTransfer(gSpecialVar_ContestCategory);
-    ScriptContext_Stop();
     return TRUE;
 }
 

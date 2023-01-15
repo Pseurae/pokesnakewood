@@ -9,11 +9,6 @@
 		.align 2
 gSpecials::
 	def_special HealPlayerParty
-	def_special SetCableClubWarp
-	def_special DoCableClubWarp
-	def_special ReturnFromLinkRoom
-	def_special CleanupLinkRoomState
-	def_special ExitLinkRoom
 	def_special SetPlayerSecretBase
 	def_special CheckPlayerHasSecretBase
 	def_special EnterSecretBase
@@ -35,22 +30,8 @@ gSpecials::
 	def_special EnterNewlyCreatedSecretBase
 	def_special SetBattledOwnerFromResult
 	def_special DoSecretBasePCTurnOffEffect
-	def_special RecordMixingPlayerSpotTriggered
-	def_special TryBattleLinkup
-	def_special TryTradeLinkup
-	def_special TryRecordMixLinkup
-	def_special ValidateMixingGameLanguage
-	def_special CloseLink
-	def_special ColosseumPlayerSpotTriggered
-	def_special PlayerEnteredTradeSeat
-	def_special CableClubSaveGame
-	def_special TryBerryBlenderLinkup
-	def_special GetLinkPartnerNames
-	def_special SpawnLinkPartnerObjectEvent
 	def_special SavePlayerParty
 	def_special LoadPlayerParty
-	def_special ChooseHalfPartyForBattle
-	def_special Script_ShowLinkTrainerCard
 	def_special ObjectEventInteractionGetBerryTreeData
 	def_special ObjectEventInteractionGetBerryName
 	def_special ObjectEventInteractionGetBerryCountString
@@ -72,68 +53,14 @@ gSpecials::
 	def_special BattleSetup_StartRematchBattle
 	def_special ShowPokemonStorageSystemPC
 	def_special HasEnoughMonsForDoubleBattle
-	def_special TurnOffTVScreen
-	def_special DoTVShow
-	def_special DoPokeNews
-	def_special GetRandomActiveShowIdx
-	def_special GetSelectedTVShow
-	def_special InterviewBefore
-	def_special InterviewAfter
-	def_special IsLeadMonNicknamedOrNotEnglish
-	def_special SetContestCategoryStringVarForInterview
-	def_special GetNextActiveShowIfMassOutbreak
-	def_special IsTVShowAlreadyInQueue
-	def_special CheckForPlayersHouseNews
-	def_special GetMomOrDadStringForTVMessage
-	def_special ResetTVShowState
-	def_special GetContestWinnerId
-	def_special GetContestPlayerId
-	def_special GetNpcContestantLocalId
-	def_special BufferContestWinnerTrainerName
-	def_special BufferContestWinnerMonName
-	def_special BufferContestTrainerAndMonNames
-	def_special GetContestMonConditionRanking
-	def_special SetContestTrainerGfxIds
-	def_special TryEnterContestMon
-	def_special GetContestantNamesAtRank
-	def_special SetLinkContestPlayerGfx
-	def_special GetContestMonCondition
-	def_special HasMonWonThisContestBefore
-	def_special GiveMonContestRibbon
-	def_special IsContestDebugActive
-	def_special GiveMonArtistRibbon
-	def_special TryContestGModeLinkup
 	def_special SaveGame
 	def_special DoWateringBerryTreeAnim
 	def_special ShowEasyChatScreen
 	def_special ShowEasyChatProfile
-	def_special Script_GetCurrentMauvilleMan
-	def_special HasBardSongBeenChanged
-	def_special SaveBardSongLyrics
-	def_special GetHipsterSpokenFlag
-	def_special SetHipsterSpokenFlag
-	def_special HipsterTryTeachWord
-	def_special PlayBardSong
-	def_special SetMauvilleOldManObjEventGfx
-	def_special GenerateGiddyLine
-	def_special GiddyShouldTellAnotherTale
-	def_special StorytellerGetFreeStorySlot
-	def_special Script_StorytellerDisplayStory
-	def_special StorytellerStoryListMenu
-	def_special StorytellerUpdateStat
-	def_special Script_StorytellerInitializeRandomStat
-	def_special HasStorytellerAlreadyRecorded
-	def_special TraderMenuGetDecoration
-	def_special GetTraderTradedFlag
-	def_special DoesPlayerHaveNoDecorations
-	def_special IsDecorationCategoryFull
-	def_special TraderShowDecorationMenu
-	def_special TraderDoDecorationTrade
 	def_special GetSeedotSizeRecordInfo
 	def_special CompareSeedotSize
 	def_special GetLotadSizeRecordInfo
 	def_special CompareLotadSize
-	def_special TryPutNameRaterShowOnTheAir
 	def_special BufferMonNickname
 	def_special IsMonOTIDNotPlayers
 	def_special BufferTrendyPhraseString
@@ -144,11 +71,6 @@ gSpecials::
 	def_special CalculatePlayerPartyCount
 	def_special CountPartyNonEggMons
 	def_special CountPartyAliveNonEggMons_IgnoreVar0x8004Slot
-	def_special ShouldReadyContestArtist
-	def_special SaveMuseumContestPainting
-	def_special DoesContestCategoryHaveMuseumPainting
-	def_special CountPlayerMuseumPaintings
-	def_special ShowContestPainting  @ Unused, redundant with showcontestpainting command
 	def_special MauvilleGymSetDefaultBarriers
 	def_special MauvilleGymPressSwitch
 	def_special ShowFieldMessageStringVar4
@@ -171,7 +93,6 @@ gSpecials::
 	def_special ChangePokemonNickname
 	def_special ChoosePartyMon
 	def_special GetFirstFreePokeblockSlot
-	def_special DoBerryBlending
 	def_special PlayRoulette
 	def_special IsFanClubMemberFanOfPlayer
 	def_special GetNumFansOfPlayerInTrainerFanClub
@@ -182,14 +103,6 @@ gSpecials::
 	def_special UpdateTrainerFanClubGameClear
 	def_special Script_TryGainNewFanFromCounter
 	def_special RockSmashWildEncounter
-	def_special GabbyAndTyGetBattleNum
-	def_special GabbyAndTyAfterInterview
-	def_special GabbyAndTyBeforeInterview
-	def_special DoTVShowInSearchOfTrainers
-	def_special IsGabbyAndTyShowOnTheAir
-	def_special GabbyAndTyGetLastQuote
-	def_special GabbyAndTyGetLastBattleTrivia
-	def_special GetGabbyAndTyLocalIds
 	def_special GetBattleOutcome
 	def_special GetDaycareMonNicknames
 	def_special GetDaycareState
@@ -206,7 +119,6 @@ gSpecials::
 	def_special ScriptHatchMon
 	def_special EggHatch
 	def_special CheckDaycareMonReceivedMail
-	def_special ShowLinkBattleRecords
 	def_special IsEnoughForCostInVar0x8005
 	def_special SubtractMoneyFromVar0x8005
 	def_special TryFieldPoisonWhiteOut
@@ -241,35 +153,14 @@ gSpecials::
 	def_special FinishCyclingRoadChallenge
 	def_special UpdateCyclingRoadState
 	def_special GetLeadMonFriendshipScore
-	def_special CallFrontierUtilFunc
-	def_special CallBattleTowerFunc
-	def_special CallBattleDomeFunction
-	def_special CallBattlePalaceFunction
-	def_special CopyEReaderTrainerGreeting
 	def_special DoSpecialTrainerBattle
-	def_special CallBattleArenaFunction
-	def_special CallBattleFactoryFunction
-	def_special CallBattlePikeFunction
-	def_special CallBattlePyramidFunction
 	def_special StopMapMusic
-	def_special CallVerdanturfTentFunction
-	def_special CallFallarborTentFunction
-	def_special CallSlateportTentFunction
-	def_special ChoosePartyForBattleFrontier
-	def_special ValidateEReaderTrainer
-	def_special GetBestBattleTowerStreak
-	def_special ReducePlayerPartyToSelectedMons
 	def_special BedroomPC
 	def_special PlayerPC
 	def_special FieldShowRegionMap
-	def_special GetInGameTradeSpeciesInfo
-	def_special CreateInGameTradePokemon
-	def_special DoInGameTradeScene
-	def_special GetTradeSpecies
 	def_special GetWeekCount
 	def_special RetrieveLotteryNumber
 	def_special PickLotteryCornerTicket
-	def_special ShowBerryBlenderRecordWindow
 	def_special ResetTrickHouseNuggetFlag
 	def_special SetTrickHouseNuggetFlag
 	def_special ScriptMenu_CreatePCMultichoice
@@ -296,7 +187,6 @@ gSpecials::
 	def_special DoOrbEffect
 	def_special FadeOutOrbEffect
 	def_special WaitWeather
-	def_special BufferEReaderTrainerName
 	def_special GetSlotMachineId
 	def_special GetPlayerFacingDirection
 	def_special FoundAbandonedShipRoom1Key
@@ -331,13 +221,9 @@ gSpecials::
 	def_special StartDroughtWeatherBlend
 	def_special DoDiveWarp
 	def_special DoFallWarp
-	def_special ShowContestEntryMonPic
-	def_special HideContestEntryMonPic
-	def_special SetEReaderTrainerGfxId
 	def_special BattleSetup_StartLatiBattle
 	def_special SetRoute119Weather
 	def_special SetRoute123Weather
-	def_special GetContestMultiplayerId
 	def_special ScriptGetPartyMonSpecies
 	def_special IsSelectedMonEgg
 	def_special TryInitBattleTowerAwardManObjectEvent
@@ -348,19 +234,9 @@ gSpecials::
 	def_special GetDaysUntilPacifidlogTMAvailable
 	def_special HasAllHoennMons
 	def_special MonOTNameNotPlayer
-	def_special BufferLottoTicketNumber
-	def_special TryHideBattleTowerReporter
 	def_special DoesPartyHaveEnigmaBerry
-	def_special GenerateContestRand
 	def_special SetChampionSaveWarp
-	def_special TryPutTreasureInvestigatorsOnAir
-	def_special TryPutLotteryWinnerReportOnAir
-	def_special TryPutTrainerFanClubOnAir
-	def_special ShouldHideFanClubInterviewer
 	def_special ShowGlassWorkshopMenu
-	def_special PutFanClubSpecialOnTheAir
-	def_special IncrementDailyPlantedBerries
-	def_special IncrementDailyPickedBerries
 	def_special InitSecretBaseVars
 	def_special CheckInteractedWithFriendsSandOrnament
 	def_special DeclinedSecretBaseBattle
@@ -401,7 +277,6 @@ gSpecials::
 	def_special ClearQuizLadyQuestionAndAnswer
 	def_special QuizLadySetCustomQuestion
 	def_special QuizLadyTakePrizeForCustomQuiz
-	def_special GetMysteryGiftCardStat
 	def_special QuizLadyRecordCustomQuizData
 	def_special QuizLadySetWaitingForChallenger
 	def_special BufferQuizCorrectAnswer
@@ -414,9 +289,7 @@ gSpecials::
 	def_special SetContestLadyGivenPokeblock
 	def_special GetContestLadyMonSpecies
 	def_special GetContestLadyCategory
-	def_special PutLilycoveContestLadyShowOnTheAir
 	def_special CloseBattlePikeCurtain
-	def_special CallApprenticeFunction
 	def_special ShouldTryGetTrainerScript
 	def_special ShowMapNamePopup
 	def_special ShowMapNamePopup
@@ -424,51 +297,18 @@ gSpecials::
 	def_special SetMirageTowerVisibility
 	def_special StartPlayerDescendMirageTower
 	def_special BufferTMHMMoveName
-	def_special IsWirelessAdapterConnected
-	def_special TryBecomeLinkLeader
-	def_special TryJoinLinkGroup
-	def_special RunUnionRoom
-	def_special ShowWirelessCommunicationScreen
-	def_special InitUnionRoom
-	def_special BufferUnionRoomPlayerName
 	def_special ChooseMonForWirelessMinigame
-	def_special Script_ResetUnionRoomTrade
 	def_special IsBadEggInParty
-	def_special ValidateSavedWonderCard
 	def_special HasAtLeastOneBerry
-	def_special IsPokemonJumpSpeciesInParty
-	def_special ShowPokemonJumpRecords
-	def_special IsDodrioInParty
-	def_special ShowDodrioBerryPickingRecords
 	def_special OffsetCameraForBattle
 	def_special GetDeptStoreDefaultFloorChoice
 	def_special BufferVarsForIVRater
-	def_special LinkContestWaitForConnection
-	def_special GetWirelessCommType
-	def_special LinkContestTryShowWirelessIndicator
-	def_special LinkContestTryHideWirelessIndicator
-	def_special IsWirelessContest
-	def_special ShowRankingHallRecordsWindow
-	def_special ScrollRankingHallRecordsWindow
-	def_special ShowFrontierManiacMessage
-	def_special IsContestWithRSPlayer
-	def_special ClearLinkContestFlags
-	def_special TryContestEModeLinkup
 	def_special ShowScrollableMultichoice
 	def_special ScrollableMultichoice_TryReturnToList
-	def_special BufferBattleTowerElevatorFloors
-	def_special TryStoreHeldItemsInPyramidBag
-	def_special ChooseItemsToTossFromPyramidBag
 	def_special DoBattlePyramidMonsHaveHeldItem
 	def_special BattlePyramidChooseMonHeldItems
-	def_special SetBattleTowerLinkPlayerGfx
-	def_special ShowNatureGirlMessage
-	def_special ShowBattlePointsWindow
 	def_special UpdateBattlePointsWindow
 	def_special CloseBattlePointsWindow
-	def_special GiveFrontierBattlePoints
-	def_special TakeFrontierBattlePoints
-	def_special GetFrontierBattlePoints
 	def_special ShowFrontierExchangeCornerItemIconWindow
 	def_special CloseFrontierExchangeCornerItemIconWindow
 	def_special DisplayBerryPowderVendorMenu
@@ -476,8 +316,6 @@ gSpecials::
 	def_special HasEnoughBerryPowder
 	def_special TakeBerryPowder
 	def_special PrintPlayerBerryPowderAmount
-	def_special ShowFrontierGamblerLookingMessage
-	def_special ShowFrontierGamblerGoMessage
 	def_special Script_DoRayquazaScene
 	def_special OpenPokenavForTutorial
 	def_special ScriptMenu_CreateStartMenuForPokenavTutorial
@@ -501,7 +339,6 @@ gSpecials::
 	def_special CreateAbnormalWeatherEvent
 	def_special GetAbnormalWeatherMapNameAndType
 	def_special GetMartEmployeeObjectEventId
-	def_special SaveForBattleTowerLink
 	def_special Unused_SetWeatherSunny
 	def_special SetUnlockedPokedexFlags
 	def_special IsTrainerRegistered
@@ -509,31 +346,22 @@ gSpecials::
 	def_special EnableNationalPokedex
 	def_special ScriptMenu_CreateLilycoveSSTidalMultichoice
 	def_special GetLilycoveSSTidalSelection
-	def_special TurnOnTVScreen
 	def_special SetMewAboveGrass
 	def_special ShouldDistributeEonTicket
-	def_special LinkRetireStatusWithBattleTowerPartner
-	def_special BattleTowerReconnectLink
-	def_special CallTrainerHillFunction
 	def_special Script_DoRayquazaScene @ Listed twice
 	def_special LoopWingFlapSE
 	def_special DestroyMewEmergingGrassSprite
-	def_special ShowBerryCrushRankings
 	def_special TryBufferWaldaPhrase
 	def_special DoWaldaNamingScreen
 	def_special TryGetWallpaperWithWaldaPhrase
 	def_special PlayerNotAtTrainerHillEntrance
 	def_special GetBattlePyramidHint
-	def_special LoadLinkContestPlayerPalettes
-	def_special ShowTrainerHillRecords
 	def_special PlayerFaceTrainerAfterBattle
 	def_special ResetHealLocationFromDewford
 	def_special IsLastMonThatKnowsSurf
 	def_special CountPartyAliveNonEggMons
 	def_special TryPrepareSecondApproachingTrainer
-	def_special RemoveRecordsWindow
 	def_special CloseDeptStoreElevatorWindow
-	def_special TrySetBattleTowerLinkType
 	def_special AddObtainedItemIconSprite
 	def_special RemoveObtainedItemIconSprite
 	def_special EnableWildEncounters

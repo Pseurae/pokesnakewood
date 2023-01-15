@@ -2,9 +2,6 @@
 #include "item_menu.h"
 #include "battle.h"
 #include "battle_controllers.h"
-#include "battle_pyramid.h"
-#include "frontier_util.h"
-#include "battle_pyramid_bag.h"
 #include "berry_pouch.h"
 #include "berry_tag_screen.h"
 #include "bg.h"
@@ -23,7 +20,6 @@
 #include "item_use.h"
 #include "lilycove_lady.h"
 #include "list_menu.h"
-#include "link.h"
 #include "mail.h"
 #include "main.h"
 #include "malloc.h"
@@ -49,8 +45,6 @@
 #include "tm_case.h"
 #include "menu_helpers.h"
 #include "window.h"
-#include "apprentice.h"
-#include "battle_pike.h"
 #include "constants/items.h"
 #include "constants/rgb.h"
 #include "constants/songs.h"
@@ -175,7 +169,6 @@ static void WaitAfterItemSell(u8);
 static void TryDepositItem(u8);
 static void Task_ChooseHowManyToDeposit(u8 taskId);
 static void WaitDepositErrorMessage(u8);
-static void CB2_ApprenticeExitBagMenu(void);
 static void CB2_FavorLadyExitBagMenu(void);
 static void CB2_QuizLadyExitBagMenu(void);
 static void UpdatePocketItemLists(void);
@@ -524,10 +517,7 @@ static void CB2_BagMenuFromPokeStorage(void)
 
 void CB2_BagMenuFromBattle(void)
 {
-    if (!InBattlePyramid())
-        GoToBagMenu(ITEMMENULOCATION_BATTLE, POCKETS_COUNT, CB2_SetUpReshowBattleScreenAfterMenu2);
-    else
-        GoToBattlePyramidBagMenu(PYRAMIDBAG_LOC_BATTLE, CB2_SetUpReshowBattleScreenAfterMenu2);
+    GoToBagMenu(ITEMMENULOCATION_BATTLE, POCKETS_COUNT, CB2_SetUpReshowBattleScreenAfterMenu2);
 }
 
 // Choosing berry to plant
@@ -550,13 +540,6 @@ void CB2_GoToSellMenu(void)
 void CB2_GoToItemDepositMenu(void)
 {
     GoToBagMenu(ITEMMENULOCATION_ITEMPC, ITEMS_POCKET, CB2_PlayerPCExitBagMenu);
-}
-
-void ApprenticeOpenBagMenu(void)
-{
-    GoToBagMenu(ITEMMENULOCATION_APPRENTICE, POCKETS_COUNT, CB2_ApprenticeExitBagMenu);
-    gSpecialVar_0x8005 = ITEM_NONE;
-    gSpecialVar_Result = FALSE;
 }
 
 void FavorLadyOpenBagMenu(void)
@@ -1560,7 +1543,7 @@ static void OpenContextMenu(u8 taskId)
     case ITEMMENULOCATION_BERRY_TREE:
     case ITEMMENULOCATION_ITEMPC:
     default:
-        if (MenuHelpers_IsLinkActive() == TRUE || InUnionRoom() == TRUE)
+        if (MenuHelpers_IsLinkActive() == TRUE)
         {
             if (gBagPosition.pocket == KEYITEMS_POCKET || !IsHoldingItemAllowed(gSpecialVar_ItemId))
             {
@@ -1955,8 +1938,6 @@ bool8 UseRegisteredKeyItemOnField(void)
 {
     u8 taskId;
 
-    if (InUnionRoom() == TRUE || InBattlePyramid() || InBattlePike() || InMultiPartnerRoom() == TRUE)
-        return FALSE;
     HideMapNamePopUpWindow();
     ChangeBgY_ScreenOff(0, 0, BG_COORD_SET);
     if (gSaveBlock1Ptr->registeredItem != ITEM_NONE)
@@ -2301,12 +2282,6 @@ static void ItemMenu_Show(u8 taskId)
     gSpecialVar_Result = TRUE;
     RemoveContextWindow();
     Task_FadeAndCloseBagMenu(taskId);
-}
-
-static void CB2_ApprenticeExitBagMenu(void)
-{
-    gFieldCallback = Apprentice_ScriptContext_Enable;
-    SetMainCallback2(CB2_ReturnToField);
 }
 
 static void ItemMenu_GiveFavorLady(u8 taskId)

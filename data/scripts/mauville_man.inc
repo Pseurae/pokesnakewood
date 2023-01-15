@@ -1,5 +1,4 @@
 MauvilleCity_PokemonCenter_1F_EventScript_MauvilleOldMan::
-	special Script_GetCurrentMauvilleMan
 	switch VAR_RESULT
 	case MAUVILLE_MAN_BARD, MauvilleCity_PokemonCenter_1F_EventScript_Bard
 	case MAUVILLE_MAN_HIPSTER, MauvilleCity_PokemonCenter_1F_EventScript_Hipster
@@ -150,7 +149,6 @@ MauvilleCity_PokemonCenter_1F_EventScript_Trader::
 	faceplayer
 	msgbox MauvilleCity_PokemonCenter_1F_Text_WantToTradeDecor, MSGBOX_YESNO
 	goto_if_eq VAR_RESULT, NO, MauvilleCity_PokemonCenter_1F_EventScript_DeclineTrade
-	special GetTraderTradedFlag
 	goto_if_eq VAR_RESULT, TRUE, MauvilleCity_PokemonCenter_1F_EventScript_AlreadyTraded
 	message MauvilleCity_PokemonCenter_1F_Text_PickADecorItem
 	waitmessage
@@ -168,13 +166,11 @@ MauvilleCity_PokemonCenter_1F_EventScript_AlreadyTraded::
 	end
 
 MauvilleCity_PokemonCenter_1F_EventScript_PickDecorToReceive::
-	special TraderMenuGetDecoration
 	waitstate
 	goto_if_eq VAR_0x8004, 0, MauvilleCity_PokemonCenter_1F_EventScript_CancelPickDecor
 	goto_if_eq VAR_0x8004, 0xFFFF, MauvilleCity_PokemonCenter_1F_EventScript_InvalidDecor
 	msgbox MauvilleCity_PokemonCenter_1F_Text_OnceBelongedToPlayerDoYouWantIt, MSGBOX_YESNO
 	goto_if_eq VAR_RESULT, NO, MauvilleCity_PokemonCenter_1F_EventScript_PickDifferentDecor
-	special DoesPlayerHaveNoDecorations
 	goto_if_eq VAR_RESULT, TRUE, MauvilleCity_PokemonCenter_1F_EventScript_DontHaveAnyDecor
 	goto MauvilleCity_PokemonCenter_1F_EventScript_PickDecorToGive
 	end
@@ -207,11 +203,9 @@ MauvilleCity_PokemonCenter_1F_EventScript_PickDecorToGive::
 	waitstate
 	goto_if_eq VAR_0x8006, 0, MauvilleCity_PokemonCenter_1F_EventScript_CancelGiveDecor
 	goto_if_eq VAR_0x8006, 0xFFFF, MauvilleCity_PokemonCenter_1F_EventScript_DecorInUse
-	special IsDecorationCategoryFull
 	goto_if_eq VAR_RESULT, TRUE, MauvilleCity_PokemonCenter_1F_EventScript_NoRoomForDecor
 	msgbox MauvilleCity_PokemonCenter_1F_Text_SoWellTradeTheseDecor, MSGBOX_YESNO
 	goto_if_eq VAR_RESULT, NO, MauvilleCity_PokemonCenter_1F_EventScript_PickDecorToGive
-	special TraderDoDecorationTrade
 	msgbox MauvilleCity_PokemonCenter_1F_Text_SendDecorToYourPC, MSGBOX_DEFAULT
 	release
 	end

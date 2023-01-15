@@ -44,7 +44,6 @@ static void InitKeys_(void);
 static void FreePokenavResources(void);
 static void VBlankCB_Pokenav(void);
 static void CB2_Pokenav(void);
-static void Task_RunLoopedTask_LinkMode(u8);
 static void Task_RunLoopedTask(u8);
 static void Task_Pokenav(u8);
 static void CB2_InitPokenavForTutorial(void);
@@ -209,12 +208,7 @@ EWRAM_DATA struct PokenavResources *gPokenavResources = NULL;
 // code
 u32 CreateLoopedTask(LoopedTask loopedTask, u32 priority)
 {
-    u16 taskId;
-
-    if (!IsOverworldLinkActive())
-        taskId = CreateTask(Task_RunLoopedTask, priority);
-    else
-        taskId = CreateTask(Task_RunLoopedTask_LinkMode, priority);
+    u16 taskId = CreateTask(Task_RunLoopedTask, priority);
 
     SetWordTaskArg(taskId, 1, (u32)loopedTask);
 
@@ -228,7 +222,7 @@ bool32 IsLoopedTaskActive(u32 taskId)
     u32 secondaryId = LOOPED_TASK_SECONDARY_ID(taskId);
 
     if (gTasks[primaryId].isActive
-        && (gTasks[primaryId].func == Task_RunLoopedTask || gTasks[primaryId].func == Task_RunLoopedTask_LinkMode)
+        && (gTasks[primaryId].func == Task_RunLoopedTask)
         && gTasks[primaryId].data[3] == secondaryId)
         return TRUE;
     else
@@ -241,7 +235,7 @@ bool32 FuncIsActiveLoopedTask(LoopedTask func)
     for (i = 0; i < NUM_TASKS; i++)
     {
         if (gTasks[i].isActive
-            && (gTasks[i].func == Task_RunLoopedTask || gTasks[i].func == Task_RunLoopedTask_LinkMode)
+            && (gTasks[i].func == Task_RunLoopedTask)
             && (LoopedTask)GetWordTaskArg(i, 1) == func)
             return TRUE;
     }
@@ -277,38 +271,6 @@ static void Task_RunLoopedTask(u8 taskId)
         case LT_PAUSE:
             return;
         }
-    }
-}
-
-// Every "Continue" action pauses instead.
-static void Task_RunLoopedTask_LinkMode(u8 taskId)
-{
-    LoopedTask task;
-    s16 *state;
-    u32 action;
-
-    if (Overworld_IsRecvQueueAtMax())
-        return;
-
-    task = (LoopedTask)GetWordTaskArg(taskId, 1);
-    state = &gTasks[taskId].data[0];
-    action = task(*state);
-    switch (action)
-    {
-    case LT_INC_AND_PAUSE:
-    case LT_INC_AND_CONTINUE:
-        (*state)++;
-        break;
-    case LT_FINISH:
-        DestroyTask(taskId);
-        break;
-    // case: LT_SET_STATE:
-    default:
-        *state = LOOPED_TASK_DECODE_STATE(action);
-        break;
-    case LT_PAUSE:
-    case LT_CONTINUE:
-        break;
     }
 }
 

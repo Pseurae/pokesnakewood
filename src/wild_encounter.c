@@ -11,12 +11,8 @@
 #include "pokeblock.h"
 #include "battle_setup.h"
 #include "roamer.h"
-#include "tv.h"
-#include "link.h"
 #include "script.h"
 #include "battle_debug.h"
-#include "battle_pike.h"
-#include "battle_pyramid.h"
 #include "constants/abilities.h"
 #include "constants/battle_config.h"
 #include "constants/game_stat.h"
@@ -644,35 +640,7 @@ bool8 StandardWildEncounter(u16 curMetatileBehavior, u16 prevMetatileBehavior)
     headerId = GetCurrentMapWildMonHeaderId();
     if (headerId == HEADER_NONE)
     {
-        if (gMapHeader.mapLayoutId == LAYOUT_BATTLE_FRONTIER_BATTLE_PIKE_ROOM_WILD_MONS)
-        {
-            headerId = GetBattlePikeWildMonHeaderId();
-            if (prevMetatileBehavior != curMetatileBehavior && !AllowWildCheckOnNewMetatile())
-                return FALSE;
-            else if (WildEncounterCheck(gBattlePikeWildMonHeaders[headerId].landMonsInfo->encounterRate, FALSE) != TRUE)
-                return FALSE;
-            else if (TryGenerateWildMon(gBattlePikeWildMonHeaders[headerId].landMonsInfo, WILD_AREA_LAND, WILD_CHECK_KEEN_EYE) != TRUE)
-                return FALSE;
-            else if (!TryGenerateBattlePikeWildMon(TRUE))
-                return FALSE;
-
-            BattleSetup_StartBattlePikeWildBattle();
-            return TRUE;
-        }
-        if (gMapHeader.mapLayoutId == LAYOUT_BATTLE_FRONTIER_BATTLE_PYRAMID_FLOOR)
-        {
-            headerId = gSaveBlock2Ptr->frontier.curChallengeBattleNum;
-            if (prevMetatileBehavior != curMetatileBehavior && !AllowWildCheckOnNewMetatile())
-                return FALSE;
-            else if (WildEncounterCheck(gBattlePyramidWildMonHeaders[headerId].landMonsInfo->encounterRate, FALSE) != TRUE)
-                return FALSE;
-            else if (TryGenerateWildMon(gBattlePyramidWildMonHeaders[headerId].landMonsInfo, WILD_AREA_LAND, WILD_CHECK_KEEN_EYE) != TRUE)
-                return FALSE;
-
-            GenerateBattlePyramidWildMon();
-            BattleSetup_StartWildBattle();
-            return TRUE;
-        }
+        return FALSE;
     }
     else
     {
@@ -808,26 +776,7 @@ bool8 SweetScentWildEncounter(void)
     headerId = GetCurrentMapWildMonHeaderId();
     if (headerId == HEADER_NONE)
     {
-        if (gMapHeader.mapLayoutId == LAYOUT_BATTLE_FRONTIER_BATTLE_PIKE_ROOM_WILD_MONS)
-        {
-            headerId = GetBattlePikeWildMonHeaderId();
-            if (TryGenerateWildMon(gBattlePikeWildMonHeaders[headerId].landMonsInfo, WILD_AREA_LAND, 0) != TRUE)
-                return FALSE;
-
-            TryGenerateBattlePikeWildMon(FALSE);
-            BattleSetup_StartBattlePikeWildBattle();
-            return TRUE;
-        }
-        if (gMapHeader.mapLayoutId == LAYOUT_BATTLE_FRONTIER_BATTLE_PYRAMID_FLOOR)
-        {
-            headerId = gSaveBlock2Ptr->frontier.curChallengeBattleNum;
-            if (TryGenerateWildMon(gBattlePyramidWildMonHeaders[headerId].landMonsInfo, WILD_AREA_LAND, 0) != TRUE)
-                return FALSE;
-
-            GenerateBattlePyramidWildMon();
-            BattleSetup_StartWildBattle();
-            return TRUE;
-        }
+        return FALSE;
     }
     else
     {
@@ -898,7 +847,6 @@ void FishingWildEncounter(u8 rod)
         species = GenerateFishingWildMon(gWildMonHeaders[GetCurrentMapWildMonHeaderId()].fishingMonsInfo, rod);
     }
     IncrementGameStat(GAME_STAT_FISHING_CAPTURES);
-    SetPokemonAnglerSpecies(species);
     gIsFishingEncounter = TRUE;
     BattleSetup_StartWildBattle();
 }
@@ -958,11 +906,6 @@ bool8 UpdateRepelCounter(void)
     u16 repelLureVar = VarGet(VAR_REPEL_STEP_COUNT);
     u16 steps = REPEL_LURE_STEPS(repelLureVar);
     bool32 isLure = IS_LAST_USED_LURE(repelLureVar);
-
-    if (InBattlePike() || InBattlePyramid())
-        return FALSE;
-    if (InUnionRoom() == TRUE)
-        return FALSE;
 
     if (steps != 0)
     {

@@ -593,8 +593,6 @@ static bool8 MailReadBuildGraphics(void)
             }
             break;
         case 15:
-            if (Overworld_IsRecvQueueAtMax() == TRUE)
-                return FALSE;
             break;
         case 16:
             SetVBlankCallback(VBlankCB_MailRead);

@@ -1,6 +1,5 @@
 #include "global.h"
 #include "malloc.h"
-#include "battle_pyramid.h"
 #include "berry.h"
 #include "characters.h"
 #include "day_night.h"
@@ -16,7 +15,6 @@
 #include "field_player_avatar.h"
 #include "field_weather.h"
 #include "fieldmap.h"
-#include "mauville_old_man.h"
 #include "metatile_behavior.h"
 #include "overworld.h"
 #include "palette.h"
@@ -24,7 +22,6 @@
 #include "sprite.h"
 #include "task.h"
 #include "trainer_see.h"
-#include "trainer_hill.h"
 #include "util.h"
 #include "constants/event_object_movement.h"
 #include "constants/event_objects.h"
@@ -993,7 +990,6 @@ static void ClearAllObjectEvents(void)
 
 void ResetObjectEvents(void)
 {
-    ClearLinkPlayerObjectEvents();
     ClearAllObjectEvents();
     ClearPlayerAvatarInfo();
     CreateReflectionEffectSprites();
@@ -1123,31 +1119,6 @@ static u8 InitObjectEventStateFromTemplate(struct ObjectEventTemplate *template,
             objectEvent->rangeY++;
     }
     return objectEventId;
-}
-
-u8 Unref_TryInitLocalObjectEvent(u8 localId)
-{
-    u8 i;
-    u8 objectEventCount;
-    struct ObjectEventTemplate *template;
-
-    if (gMapHeader.events != NULL)
-    {
-        if (InBattlePyramid())
-            objectEventCount = GetNumBattlePyramidObjectEvents();
-        else if (InTrainerHill())
-            objectEventCount = 2;
-        else
-            objectEventCount = gMapHeader.events->objectEventCount;
-
-        for (i = 0; i < objectEventCount; i++)
-        {
-            template = &gSaveBlock1Ptr->objectEventTemplates[i];
-            if (template->localId == localId && !FlagGet(template->flagId))
-                return InitObjectEventStateFromTemplate(template, gSaveBlock1Ptr->location.mapNum, gSaveBlock1Ptr->location.mapGroup);
-        }
-    }
-    return OBJECT_EVENTS_COUNT;
 }
 
 static bool8 GetAvailableObjectEventId(u16 localId, u8 mapNum, u8 mapGroup, u8 *objectEventId)
@@ -1441,12 +1412,7 @@ void TrySpawnObjectEvents(s16 cameraX, s16 cameraY)
         s16 top = gSaveBlock1Ptr->pos.y + 1;
         s16 bottom = gSaveBlock1Ptr->pos.y + MAP_OFFSET_H - 1;
 
-        if (InBattlePyramid())
-            objectCount = GetNumBattlePyramidObjectEvents();
-        else if (InTrainerHill())
-            objectCount = 2;
-        else
-            objectCount = gMapHeader.events->objectEventCount;
+        objectCount = gMapHeader.events->objectEventCount;
 
         for (i = 0; i < objectCount; i++)
         {
@@ -1687,12 +1653,6 @@ const struct ObjectEventGraphicsInfo *GetObjectEventGraphicsInfo(u16 graphicsId)
 
     if (graphicsId >= OBJ_EVENT_GFX_VARS)
         graphicsId = VarGetObjectEventGraphicsId(graphicsId - OBJ_EVENT_GFX_VARS);
-
-    if (graphicsId == OBJ_EVENT_GFX_BARD)
-    {
-        bard = GetCurrentMauvilleOldMan();
-        return gMauvilleOldManGraphicsInfoPointers[bard];
-    }
 
     if (graphicsId >= NUM_OBJ_EVENT_GFX)
         graphicsId = OBJ_EVENT_GFX_NINJA_BOY;

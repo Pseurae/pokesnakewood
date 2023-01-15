@@ -1,11 +1,9 @@
 #include "global.h"
-#include "battle_pyramid.h"
 #include "bg.h"
 #include "day_night.h"
 #include "fieldmap.h"
 #include "fldeff.h"
 #include "fldeff_misc.h"
-#include "frontier_util.h"
 #include "menu.h"
 #include "mirage_tower.h"
 #include "overworld.h"
@@ -13,8 +11,6 @@
 #include "pokenav.h"
 #include "script.h"
 #include "secret_base.h"
-#include "trainer_hill.h"
-#include "tv.h"
 #include "constants/field_tint.h"
 #include "constants/rgb.h"
 #include "constants/metatile_behaviors.h"
@@ -82,19 +78,6 @@ void InitMapFromSavedGame(void)
     InitSecretBaseAppearance(FALSE);
     SetOccupiedSecretBaseEntranceMetatiles(gMapHeader.events);
     RunOnLoadMapScript();
-    UpdateTVScreensOnMap(gBackupMapLayout.width, gBackupMapLayout.height);
-}
-
-void InitBattlePyramidMap(bool8 setPlayerPosition)
-{
-    CpuFastFill16(MAPGRID_UNDEFINED, sBackupMapData, sizeof(sBackupMapData));
-    GenerateBattlePyramidFloorLayout(sBackupMapData, setPlayerPosition);
-}
-
-void InitTrainerHillMap(void)
-{
-    CpuFastFill16(MAPGRID_UNDEFINED, sBackupMapData, sizeof(sBackupMapData));
-    GenerateTrainerHillFloorLayout(sBackupMapData);
 }
 
 static void InitMapLayoutData(struct MapHeader *mapHeader)

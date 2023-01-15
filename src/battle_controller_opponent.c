@@ -4,19 +4,14 @@
 #include "battle_ai_util.h"
 #include "constants/battle_ai.h"
 #include "battle_anim.h"
-#include "battle_arena.h"
 #include "battle_controllers.h"
 #include "battle_message.h"
 #include "battle_interface.h"
 #include "battle_setup.h"
-#include "battle_tower.h"
-#include "battle_tv.h"
 #include "battle_z_move.h"
 #include "bg.h"
 #include "data.h"
-#include "frontier_util.h"
 #include "item.h"
-#include "link.h"
 #include "main.h"
 #include "m4a.h"
 #include "palette.h"
@@ -35,7 +30,6 @@
 #include "constants/moves.h"
 #include "constants/songs.h"
 #include "constants/trainers.h"
-#include "trainer_hill.h"
 
 static void OpponentHandleGetMonData(void);
 static void OpponentHandleGetRawMonData(void);
@@ -166,7 +160,6 @@ static void (*const sOpponentBufferCommands[CONTROLLER_CMDS_COUNT])(void) =
     [CONTROLLER_BATTLEANIMATION]          = OpponentHandleBattleAnimation,
     [CONTROLLER_LINKSTANDBYMSG]           = OpponentHandleLinkStandbyMsg,
     [CONTROLLER_RESETACTIONMOVESELECTION] = OpponentHandleResetActionMoveSelection,
-    [CONTROLLER_ENDLINKBATTLE]            = OpponentHandleEndLinkBattle,
     [CONTROLLER_DEBUGMENU]                = OpponentHandleDebugMenu,
     [CONTROLLER_TERMINATOR_NOP]           = OpponentCmdEnd
 };
@@ -339,13 +332,7 @@ static void Intro_TryShinyAnimShowHealthbox(void)
     {
         if (!gBattleSpritesDataPtr->healthBoxesData[gActiveBattler].bgmRestored)
         {
-            if (gBattleTypeFlags & BATTLE_TYPE_MULTI && gBattleTypeFlags & BATTLE_TYPE_LINK)
-            {
-                if (GetBattlerPosition(gActiveBattler) == 1)
-                    m4aMPlayContinue(&gMPlayInfo_BGM);
-            }
-            else
-                m4aMPlayVolumeControl(&gMPlayInfo_BGM, TRACKS_ALL, 0x100);
+            m4aMPlayVolumeControl(&gMPlayInfo_BGM, TRACKS_ALL, 0x100);
         }
         gBattleSpritesDataPtr->healthBoxesData[gActiveBattler].bgmRestored = TRUE;
         bgmRestored = TRUE;
@@ -533,17 +520,7 @@ static void CompleteOnFinishedBattleAnimation(void)
 static void OpponentBufferExecCompleted(void)
 {
     gBattlerControllerFuncs[gActiveBattler] = OpponentBufferRunCommand;
-    if (gBattleTypeFlags & BATTLE_TYPE_LINK)
-    {
-        u8 playerId = GetMultiplayerId();
-
-        PrepareBufferDataTransferLink(2, 4, &playerId);
-        gBattleResources->bufferA[gActiveBattler][0] = CONTROLLER_TERMINATOR_NOP;
-    }
-    else
-    {
-        gBattleControllerExecFlags &= ~gBitTable[gActiveBattler];
-    }
+    gBattleControllerExecFlags &= ~gBitTable[gActiveBattler];
 }
 
 static void OpponentHandleGetMonData(void)
@@ -1251,42 +1228,6 @@ static void OpponentHandleDrawTrainerPic(void)
     {
         trainerPicId = GetSecretBaseTrainerPicIndex();
     }
-    else if (gTrainerBattleOpponent_A == TRAINER_FRONTIER_BRAIN)
-    {
-        trainerPicId = GetFrontierBrainTrainerPicIndex();
-    }
-    else if (gBattleTypeFlags & BATTLE_TYPE_TRAINER_HILL)
-    {
-        if (gBattleTypeFlags & BATTLE_TYPE_TWO_OPPONENTS)
-        {
-            if (gActiveBattler == 1)
-                trainerPicId = GetTrainerHillTrainerFrontSpriteId(gTrainerBattleOpponent_A);
-            else
-                trainerPicId = GetTrainerHillTrainerFrontSpriteId(gTrainerBattleOpponent_B);
-        }
-        else
-        {
-            trainerPicId = GetTrainerHillTrainerFrontSpriteId(gTrainerBattleOpponent_A);
-        }
-    }
-    else if (gBattleTypeFlags & BATTLE_TYPE_FRONTIER)
-    {
-        if (gBattleTypeFlags & (BATTLE_TYPE_TWO_OPPONENTS | BATTLE_TYPE_TOWER_LINK_MULTI))
-        {
-            if (gActiveBattler == 1)
-                trainerPicId = GetFrontierTrainerFrontSpriteId(gTrainerBattleOpponent_A);
-            else
-                trainerPicId = GetFrontierTrainerFrontSpriteId(gTrainerBattleOpponent_B);
-        }
-        else
-        {
-            trainerPicId = GetFrontierTrainerFrontSpriteId(gTrainerBattleOpponent_A);
-        }
-    }
-    else if (gBattleTypeFlags & BATTLE_TYPE_EREADER_TRAINER)
-    {
-        trainerPicId = GetEreaderTrainerFrontSpriteId();
-    }
     else if (gBattleTypeFlags & BATTLE_TYPE_TWO_OPPONENTS)
     {
         if (gActiveBattler != 1)
@@ -1334,42 +1275,6 @@ static void OpponentHandleTrainerSlide(void)
     if (gBattleTypeFlags & BATTLE_TYPE_SECRET_BASE)
     {
         trainerPicId = GetSecretBaseTrainerPicIndex();
-    }
-    else if (gTrainerBattleOpponent_A == TRAINER_FRONTIER_BRAIN)
-    {
-        trainerPicId = GetFrontierBrainTrainerPicIndex();
-    }
-    else if (gBattleTypeFlags & BATTLE_TYPE_TRAINER_HILL)
-    {
-        if (gBattleTypeFlags & BATTLE_TYPE_TWO_OPPONENTS)
-        {
-            if (gActiveBattler == 1)
-                trainerPicId = GetTrainerHillTrainerFrontSpriteId(gTrainerBattleOpponent_A);
-            else
-                trainerPicId = GetTrainerHillTrainerFrontSpriteId(gTrainerBattleOpponent_B);
-        }
-        else
-        {
-            trainerPicId = GetTrainerHillTrainerFrontSpriteId(gTrainerBattleOpponent_A);
-        }
-    }
-    else if (gBattleTypeFlags & BATTLE_TYPE_FRONTIER)
-    {
-        if (gBattleTypeFlags & (BATTLE_TYPE_TWO_OPPONENTS | BATTLE_TYPE_TOWER_LINK_MULTI))
-        {
-            if (gActiveBattler == 1)
-                trainerPicId = GetFrontierTrainerFrontSpriteId(gTrainerBattleOpponent_A);
-            else
-                trainerPicId = GetFrontierTrainerFrontSpriteId(gTrainerBattleOpponent_B);
-        }
-        else
-        {
-            trainerPicId = GetFrontierTrainerFrontSpriteId(gTrainerBattleOpponent_A);
-        }
-    }
-    else if (gBattleTypeFlags & BATTLE_TYPE_EREADER_TRAINER)
-    {
-        trainerPicId = GetEreaderTrainerFrontSpriteId();
     }
     else if (gBattleTypeFlags & BATTLE_TYPE_TWO_OPPONENTS)
     {
@@ -1527,7 +1432,6 @@ static void OpponentHandlePrintString(void)
     BufferStringBattle(*stringId);
     BattlePutTextOnWindow(gDisplayedStringBattle, B_WIN_MSG);
     gBattlerControllerFuncs[gActiveBattler] = CompleteOnInactiveTextPrinter;
-    BattleArena_DeductSkillPoints(gActiveBattler, *stringId);
 }
 
 static void OpponentHandlePrintSelectionString(void)
@@ -1554,49 +1458,42 @@ static void OpponentHandleChooseMove(void)
     if (gBattleTypeFlags & (BATTLE_TYPE_TRAINER | BATTLE_TYPE_FIRST_BATTLE | BATTLE_TYPE_SAFARI | BATTLE_TYPE_ROAMER)
      || IsWildMonSmart())
     {
-        if (gBattleTypeFlags & BATTLE_TYPE_PALACE)
+        chosenMoveId = gBattleStruct->aiMoveOrAction[gActiveBattler];
+        gBattlerTarget = gBattleStruct->aiChosenTarget[gActiveBattler];
+        switch (chosenMoveId)
         {
-            BtlController_EmitTwoReturnValues(BUFFER_B, 10, ChooseMoveAndTargetInBattlePalace());
-        }
-        else
-        {
-            chosenMoveId = gBattleStruct->aiMoveOrAction[gActiveBattler];
-            gBattlerTarget = gBattleStruct->aiChosenTarget[gActiveBattler];
-            switch (chosenMoveId)
+        case AI_CHOICE_WATCH:
+            BtlController_EmitTwoReturnValues(BUFFER_B, B_ACTION_SAFARI_WATCH_CAREFULLY, 0);
+            break;
+        case AI_CHOICE_FLEE:
+            BtlController_EmitTwoReturnValues(BUFFER_B, B_ACTION_RUN, 0);
+            break;
+        case AI_CHOICE_SWITCH:
+            BtlController_EmitTwoReturnValues(BUFFER_B, 10, 0xFFFF);
+            break;
+        case 6:
+            BtlController_EmitTwoReturnValues(BUFFER_B, 15, gBattlerTarget);
+            break;
+        default:
             {
-            case AI_CHOICE_WATCH:
-                BtlController_EmitTwoReturnValues(BUFFER_B, B_ACTION_SAFARI_WATCH_CAREFULLY, 0);
-                break;
-            case AI_CHOICE_FLEE:
-                BtlController_EmitTwoReturnValues(BUFFER_B, B_ACTION_RUN, 0);
-                break;
-            case AI_CHOICE_SWITCH:
-                BtlController_EmitTwoReturnValues(BUFFER_B, 10, 0xFFFF);
-                break;
-            case 6:
-                BtlController_EmitTwoReturnValues(BUFFER_B, 15, gBattlerTarget);
-                break;
-            default:
-                {
-                    u16 chosenMove = moveInfo->moves[chosenMoveId];
+                u16 chosenMove = moveInfo->moves[chosenMoveId];
 
-                    if (GetBattlerMoveTargetType(gActiveBattler, chosenMove) & (MOVE_TARGET_USER_OR_SELECTED | MOVE_TARGET_USER))
-                        gBattlerTarget = gActiveBattler;
-                    if (GetBattlerMoveTargetType(gActiveBattler, chosenMove) & MOVE_TARGET_BOTH)
-                    {
-                        gBattlerTarget = GetBattlerAtPosition(B_POSITION_PLAYER_LEFT);
-                        if (gAbsentBattlerFlags & gBitTable[gBattlerTarget])
-                            gBattlerTarget = GetBattlerAtPosition(B_POSITION_PLAYER_RIGHT);
-                    }
-                    if (ShouldUseZMove(gActiveBattler, gBattlerTarget, chosenMove))
-                        QueueZMove(gActiveBattler, chosenMove);
-                    if (CanMegaEvolve(gActiveBattler)) // If opponent can mega evolve, do it.
-                        BtlController_EmitTwoReturnValues(BUFFER_B, 10, (chosenMoveId) | (RET_MEGA_EVOLUTION) | (gBattlerTarget << 8));
-                    else
-                        BtlController_EmitTwoReturnValues(BUFFER_B, 10, (chosenMoveId) | (gBattlerTarget << 8));
+                if (GetBattlerMoveTargetType(gActiveBattler, chosenMove) & (MOVE_TARGET_USER_OR_SELECTED | MOVE_TARGET_USER))
+                    gBattlerTarget = gActiveBattler;
+                if (GetBattlerMoveTargetType(gActiveBattler, chosenMove) & MOVE_TARGET_BOTH)
+                {
+                    gBattlerTarget = GetBattlerAtPosition(B_POSITION_PLAYER_LEFT);
+                    if (gAbsentBattlerFlags & gBitTable[gBattlerTarget])
+                        gBattlerTarget = GetBattlerAtPosition(B_POSITION_PLAYER_RIGHT);
                 }
-                break;
+                if (ShouldUseZMove(gActiveBattler, gBattlerTarget, chosenMove))
+                    QueueZMove(gActiveBattler, chosenMove);
+                if (CanMegaEvolve(gActiveBattler)) // If opponent can mega evolve, do it.
+                    BtlController_EmitTwoReturnValues(BUFFER_B, 10, (chosenMoveId) | (RET_MEGA_EVOLUTION) | (gBattlerTarget << 8));
+                else
+                    BtlController_EmitTwoReturnValues(BUFFER_B, 10, (chosenMoveId) | (gBattlerTarget << 8));
             }
+            break;
         }
         OpponentBufferExecCompleted();
     }
@@ -2075,7 +1972,7 @@ static void OpponentHandleResetActionMoveSelection(void)
 
 static void OpponentHandleEndLinkBattle(void)
 {
-    if (gBattleTypeFlags & BATTLE_TYPE_LINK && !(gBattleTypeFlags & BATTLE_TYPE_IS_MASTER))
+    if (!(gBattleTypeFlags & BATTLE_TYPE_IS_MASTER))
     {
         gMain.inBattle = 0;
         gMain.callback1 = gPreBattleCallback1;

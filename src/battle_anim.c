@@ -4,7 +4,6 @@
 #include "battle_controllers.h"
 #include "battle_interface.h"
 #include "bg.h"
-#include "contest.h"
 #include "day_night.h"
 #include "decompress.h"
 #include "dma3.h"
@@ -82,7 +81,6 @@ static void Cmd_stopsound(void);
 
 static void RunAnimScriptCommand(void);
 static void Task_UpdateMonBg(u8 taskId);
-static void FlipBattlerBgTiles(void);
 static void Task_ClearMonBg(u8 taskId);
 static void Task_ClearMonBgStatic(u8 taskId);
 static void Task_FadeToBg(u8 taskId);
@@ -242,22 +240,14 @@ void LaunchBattleAnimation(const u8 *const animsTable[], u16 tableId, bool8 isMo
         }
     }
 
-    if (!IsContest())
+    InitPrioritiesForVisibleBattlers();
+    UpdateOamPriorityInAllHealthboxes(0, hideHpBoxes);
+    for (i = 0; i < MAX_BATTLERS_COUNT; i++)
     {
-        InitPrioritiesForVisibleBattlers();
-        UpdateOamPriorityInAllHealthboxes(0, hideHpBoxes);
-        for (i = 0; i < MAX_BATTLERS_COUNT; i++)
-        {
-            if (GetBattlerSide(i) != B_SIDE_PLAYER)
-                gAnimBattlerSpecies[i] = GetMonData(&gEnemyParty[gBattlerPartyIndexes[i]], MON_DATA_SPECIES);
-            else
-                gAnimBattlerSpecies[i] = GetMonData(&gPlayerParty[gBattlerPartyIndexes[i]], MON_DATA_SPECIES);
-        }
-    }
-    else
-    {
-        for (i = 0; i < CONTESTANT_COUNT; i++)
-            gAnimBattlerSpecies[i] = gContestResources->moveAnim->species;
+        if (GetBattlerSide(i) != B_SIDE_PLAYER)
+            gAnimBattlerSpecies[i] = GetMonData(&gEnemyParty[gBattlerPartyIndexes[i]], MON_DATA_SPECIES);
+        else
+            gAnimBattlerSpecies[i] = GetMonData(&gPlayerParty[gBattlerPartyIndexes[i]], MON_DATA_SPECIES);
     }
 
     if (!isMoveAnim)
@@ -741,10 +731,8 @@ void MoveBattlerSpriteToBG(u8 battlerId, bool8 toBG_2, bool8 setSpriteInvisible)
         battlerSpriteId = gBattlerSpriteIds[battlerId];
 
         gBattle_BG1_X =  -(gSprites[battlerSpriteId].x + gSprites[battlerSpriteId].x2) + 0x20;
-        if (IsContest() && IsSpeciesNotUnown(gContestResources->moveAnim->species))
-            gBattle_BG1_X--;
-
         gBattle_BG1_Y =  -(gSprites[battlerSpriteId].y + gSprites[battlerSpriteId].y2) + 0x20;
+
         if (setSpriteInvisible)
             gSprites[gBattlerSpriteIds[battlerId]].invisible = TRUE;
 
@@ -760,9 +748,6 @@ void MoveBattlerSpriteToBG(u8 battlerId, bool8 toBG_2, bool8 setSpriteInvisible)
             battlerPosition = GetBattlerPosition(battlerId);
 
         DrawBattlerOnBg(1, 0, 0, battlerPosition, animBg.paletteId, animBg.bgTiles, animBg.bgTilemap, animBg.tilesOffset);
-
-        if (IsContest())
-            FlipBattlerBgTiles();
     }
     else
     {
@@ -790,32 +775,6 @@ void MoveBattlerSpriteToBG(u8 battlerId, bool8 toBG_2, bool8 setSpriteInvisible)
         CpuCopy32(&gPlttBufferUnfaded[0x100 + battlerId * 16], (void *)(BG_PLTT + 0x120), 0x20);
 
         DrawBattlerOnBg(2, 0, 0, GetBattlerPosition(battlerId), animBg.paletteId, animBg.bgTiles + 0x1000, animBg.bgTilemap + 0x400, animBg.tilesOffset);
-    }
-}
-
-static void FlipBattlerBgTiles(void)
-{
-    s32 i, j;
-    struct BattleAnimBgData animBg;
-    u16 *ptr;
-
-    if (IsSpeciesNotUnown(gContestResources->moveAnim->species))
-    {
-        GetBattleAnimBg1Data(&animBg);
-        ptr = animBg.bgTilemap;
-        for (i = 0; i < 8; i++)
-        {
-            for (j = 0; j < 4; j++)
-            {
-                u16 temp;
-                SWAP(ptr[j + i * 32], ptr[7 - j + i * 32], temp);
-            }
-        }
-        for (i = 0; i < 8; i++)
-        {
-            for (j = 0; j < 8; j++)
-                ptr[j + i * 32] ^= 0x400;
-        }
     }
 }
 
@@ -1265,8 +1224,8 @@ void LoadMoveBg(u16 bgId)
 
 static void LoadDefaultBg(void)
 {
-    if (IsContest())
-        LoadContestBgAfterMoveAnim();
+    if (FALSE)
+        ;
 #if B_TERRAIN_BG_CHANGE == TRUE
     else if (gFieldStatuses & STATUS_FIELD_TERRAIN_ANY)
         DrawTerrainTypeBattleBackground();

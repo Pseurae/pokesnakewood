@@ -7,8 +7,6 @@
 #include "decompress.h"
 #include "event_data.h"
 #include "international_string_util.h"
-#include "link.h"
-#include "link_rfu.h"
 #include "main.h"
 #include "menu.h"
 #include "overworld.h"
@@ -20,9 +18,7 @@
 #include "script.h"
 #include "sprite.h"
 #include "string_util.h"
-#include "tv.h"
 #include "constants/items.h"
-#include "constants/battle_frontier.h"
 
 static void CB2_ReturnFromChooseHalfParty(void);
 static void CB2_ReturnFromChooseBattleFrontierParty(void);
@@ -194,15 +190,6 @@ void ScriptSetMonMoveSlot(u8 monIndex, u16 move, u8 slot)
     SetMonMoveSlot(&gPlayerParty[monIndex], move, slot);
 }
 
-// Note: When control returns to the event script, gSpecialVar_Result will be
-// TRUE if the party selection was successful.
-void ChooseHalfPartyForBattle(void)
-{
-    gMain.savedCallback = CB2_ReturnFromChooseHalfParty;
-    VarSet(VAR_FRONTIER_FACILITY, FACILITY_MULTI_OR_EREADER);
-    InitChooseHalfPartyForBattle(0);
-}
-
 static void CB2_ReturnFromChooseHalfParty(void)
 {
     switch (gSelectedOrderFromParty[0])
@@ -218,12 +205,6 @@ static void CB2_ReturnFromChooseHalfParty(void)
     SetMainCallback2(CB2_ReturnToFieldContinueScriptPlayMapMusic);
 }
 
-void ChoosePartyForBattleFrontier(void)
-{
-    gMain.savedCallback = CB2_ReturnFromChooseBattleFrontierParty;
-    InitChooseHalfPartyForBattle(gSpecialVar_0x8004 + 1);
-}
-
 static void CB2_ReturnFromChooseBattleFrontierParty(void)
 {
     switch (gSelectedOrderFromParty[0])
@@ -237,25 +218,4 @@ static void CB2_ReturnFromChooseBattleFrontierParty(void)
     }
 
     SetMainCallback2(CB2_ReturnToFieldContinueScriptPlayMapMusic);
-}
-
-void ReducePlayerPartyToSelectedMons(void)
-{
-    struct Pokemon party[MAX_FRONTIER_PARTY_SIZE];
-    int i;
-
-    CpuFill32(0, party, sizeof party);
-
-    // copy the selected pokemon according to the order.
-    for (i = 0; i < MAX_FRONTIER_PARTY_SIZE; i++)
-        if (gSelectedOrderFromParty[i]) // as long as the order keeps going (did the player select 1 mon? 2? 3?), do not stop
-            party[i] = gPlayerParty[gSelectedOrderFromParty[i] - 1]; // index is 0 based, not literal
-
-    CpuFill32(0, gPlayerParty, sizeof gPlayerParty);
-
-    // overwrite the first 4 with the order copied to.
-    for (i = 0; i < MAX_FRONTIER_PARTY_SIZE; i++)
-        gPlayerParty[i] = party[i];
-
-    CalculatePlayerPartyCount();
 }

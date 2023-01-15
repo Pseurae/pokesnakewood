@@ -50,7 +50,6 @@
 #include "task.h"
 #include "pokemon_summary_screen.h"
 #include "constants/abilities.h"
-#include "constants/battle_frontier.h"
 #include "constants/flags.h"
 #include "constants/items.h"
 #include "constants/map_groups.h"
@@ -122,7 +121,6 @@ enum { // Give
     DEBUG_GIVE_MENU_ITEM_POKEMON_COMPLEX,
     DEBUG_GIVE_MENU_ITEM_MAX_MONEY,
     DEBUG_GIVE_MENU_ITEM_MAX_COINS,
-    DEBUG_GIVE_MENU_ITEM_MAX_BATTLE_POINTS,
     DEBUG_GIVE_MENU_ITEM_DAYCARE_EGG,
     DEBUG_GIVE_MENU_ITEM_FILL_PC,
     DEBUG_GIVE_MENU_ITEM_CHEAT,
@@ -262,7 +260,6 @@ static void DebugAction_Give_Pokemon_ComplexCreateMon(u8 taskId);
 static void DebugAction_Give_Pokemon_Move(u8 taskId);
 static void DebugAction_Give_MaxMoney(u8 taskId);
 static void DebugAction_Give_MaxCoins(u8 taskId);
-static void DebugAction_Give_MaxBattlePoints(u8 taskId);
 static void DebugAction_Give_DayCareEgg(u8 taskId);
 static void DebugAction_Give_FillPC(u8 taskId);
 static void DebugAction_Give_CHEAT(u8 taskId);
@@ -488,7 +485,6 @@ static const struct ListMenuItem sDebugMenu_Items_Give[] =
     [DEBUG_GIVE_MENU_ITEM_POKEMON_COMPLEX]   = {sDebugText_Give_GivePokemonComplex, DEBUG_GIVE_MENU_ITEM_POKEMON_COMPLEX},
     [DEBUG_GIVE_MENU_ITEM_MAX_MONEY]         = {sDebugText_Give_MaxMoney,           DEBUG_GIVE_MENU_ITEM_MAX_MONEY},
     [DEBUG_GIVE_MENU_ITEM_MAX_COINS]         = {sDebugText_Give_MaxCoins,           DEBUG_GIVE_MENU_ITEM_MAX_COINS},
-    [DEBUG_GIVE_MENU_ITEM_MAX_BATTLE_POINTS] = {sDebugText_Give_BattlePoints,       DEBUG_GIVE_MENU_ITEM_MAX_BATTLE_POINTS},
     [DEBUG_GIVE_MENU_ITEM_DAYCARE_EGG]       = {sDebugText_Give_DaycareEgg,         DEBUG_GIVE_MENU_ITEM_DAYCARE_EGG},
     [DEBUG_GIVE_MENU_ITEM_FILL_PC]           = {sDebugText_Give_FillPc,             DEBUG_GIVE_MENU_ITEM_FILL_PC},
     [DEBUG_GIVE_MENU_ITEM_CHEAT]             = {sDebugText_Give_GiveCHEAT,          DEBUG_GIVE_MENU_ITEM_CHEAT},
@@ -567,7 +563,6 @@ static void (*const sDebugMenu_Actions_Give[])(u8) =
     [DEBUG_GIVE_MENU_ITEM_POKEMON_COMPLEX]   = DebugAction_Give_PokemonComplex,
     [DEBUG_GIVE_MENU_ITEM_MAX_MONEY]         = DebugAction_Give_MaxMoney,
     [DEBUG_GIVE_MENU_ITEM_MAX_COINS]         = DebugAction_Give_MaxCoins,
-    [DEBUG_GIVE_MENU_ITEM_MAX_BATTLE_POINTS] = DebugAction_Give_MaxBattlePoints,
     [DEBUG_GIVE_MENU_ITEM_DAYCARE_EGG]       = DebugAction_Give_DayCareEgg,
     [DEBUG_GIVE_MENU_ITEM_FILL_PC]           = DebugAction_Give_FillPC,
     [DEBUG_GIVE_MENU_ITEM_CHEAT]             = DebugAction_Give_CHEAT,
@@ -2742,11 +2737,6 @@ static void DebugAction_Give_MaxMoney(u8 taskId)
 static void DebugAction_Give_MaxCoins(u8 taskId)
 {
     SetCoins(9999);
-}
-
-static void DebugAction_Give_MaxBattlePoints(u8 taskId)
-{
-    gSaveBlock2Ptr->frontier.battlePoints = MAX_BATTLE_FRONTIER_POINTS;
 }
 
 static void DebugAction_Give_DayCareEgg(u8 taskId)

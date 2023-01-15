@@ -18,7 +18,6 @@
 #include "gpu_regs.h"
 #include "coins.h"
 #include "strings.h"
-#include "tv.h"
 #include "text_window.h"
 #include "main_menu.h"
 #include "bg.h"
@@ -1214,7 +1213,6 @@ static void InitSlotMachine(void)
         sSlotMachine->reelPixelOffsets[i] = REEL_HEIGHT - sSlotMachine->reelPositions[i] * REEL_SYMBOL_HEIGHT;
         sSlotMachine->reelPixelOffsets[i] %= REEL_HEIGHT;
     }
-    AlertTVThatPlayerPlayedSlotMachine(GetCoins());
 }
 
 static void SlotMachineSetup_InitPalsSpritesTasks(void)
@@ -1425,8 +1423,6 @@ static bool8 SlotTask_StartSpin(struct Task *task)
     SpinSlotReel(LEFT_REEL);
     SpinSlotReel(MIDDLE_REEL);
     SpinSlotReel(RIGHT_REEL);
-
-    IncrementDailySlotsUses();
 
     task->tTimer = 0;
     if (sSlotMachine->machineBias & BIAS_REELTIME)
@@ -1730,7 +1726,6 @@ static bool8 SlotTask_WaitMsg_NoMoreCoins(struct Task *task)
 static bool8 SlotTask_EndGame(struct Task *task)
 {
     SetCoins(sSlotMachine->coins);
-    TryPutFindThatGamerOnAir(GetCoins());
     BeginNormalPaletteFade(PALETTES_ALL, 0, 0, 16, RGB(0, 0, 0));
     sSlotMachine->state++; // SLOTTASK_FREE
     return FALSE;

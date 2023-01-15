@@ -9,8 +9,6 @@
 #include "overworld.h"
 #include "pokemon_storage_system.h"
 #include "main.h"
-#include "trainer_hill.h"
-#include "link.h"
 #include "constants/game_stat.h"
 
 static u16 CalculateChecksum(void *, u16);
@@ -708,10 +706,8 @@ static void UpdateSaveAddresses(void)
 u8 HandleSavingData(u8 saveType)
 {
     u8 i;
-    u32 *backupVar = gTrainerHillVBlankCounter;
     u8 *tempAddr;
 
-    gTrainerHillVBlankCounter = NULL;
     UpdateSaveAddresses();
     switch (saveType)
     {
@@ -759,7 +755,6 @@ u8 HandleSavingData(u8 saveType)
         WriteSaveSectorOrSlot(FULL_SAVE_SLOT, gRamSaveSectorLocations);
         break;
     }
-    gTrainerHillVBlankCounter = backupVar;
     return 0;
 }
 
@@ -973,81 +968,3 @@ u32 TryWriteSpecialSaveSector(u8 sector, u8 *src)
 #define tState         data[0]
 #define tTimer         data[1]
 #define tInBattleTower data[2]
-
-// Note that this is very different from TrySavingData(SAVE_LINK).
-// Most notably it does save the PC data.
-void Task_LinkFullSave(u8 taskId)
-{
-    s16 *data = gTasks[taskId].data;
-
-    switch (tState)
-    {
-    case 0:
-        gSoftResetDisabled = TRUE;
-        tState = 1;
-        break;
-    case 1:
-        SetLinkStandbyCallback();
-        tState = 2;
-        break;
-    case 2:
-        if (IsLinkTaskFinished())
-        {
-            // if (!tInBattleTower)
-            //     SaveMapView();
-            tState = 3;
-        }
-        break;
-    case 3:
-        if (!tInBattleTower)
-            SetContinueGameWarpStatusToDynamicWarp();
-        LinkFullSave_Init();
-        tState = 4;
-        break;
-    case 4:
-        if (++tTimer == 5)
-        {
-            tTimer = 0;
-            tState = 5;
-        }
-        break;
-    case 5:
-        if (LinkFullSave_WriteSector())
-            tState = 6;
-        else
-            tState = 4; // Not finished, delay again
-        break;
-    case 6:
-        LinkFullSave_ReplaceLastSector();
-        tState = 7;
-        break;
-    case 7:
-        if (!tInBattleTower)
-            ClearContinueGameWarpStatus2();
-        SetLinkStandbyCallback();
-        tState = 8;
-        break;
-    case 8:
-        if (IsLinkTaskFinished())
-        {
-            LinkFullSave_SetLastSectorSignature();
-            tState = 9;
-        }
-        break;
-    case 9:
-        SetLinkStandbyCallback();
-        tState = 10;
-        break;
-    case 10:
-        if (IsLinkTaskFinished())
-            tState++;
-        break;
-    case 11:
-        if (++tTimer > 5)
-        {
-            gSoftResetDisabled = FALSE;
-            DestroyTask(taskId);
-        }
-        break;
-    }
-}

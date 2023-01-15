@@ -31,7 +31,6 @@ void DoLavaridgeGym1FWarp(void);
 void DoTeleportTileWarp(void);
 void DoMossdeepGymWarp(void);
 void DoPortholeWarp(void);
-void DoCableClubWarp(void);
 void DoContestHallWarp(void);
 void AnimateFlash(u8 newFlashLevel);
 void WriteBattlePyramidViewScanlineEffectBuffer(void);

@@ -5,10 +5,8 @@
 #include "main.h"
 #include "window.h"
 #include "malloc.h"
-#include "link.h"
 #include "bg.h"
 #include "sound.h"
-#include "frontier_pass.h"
 #include "overworld.h"
 #include "menu.h"
 #include "text.h"
@@ -25,10 +23,8 @@
 #include "graphics.h"
 #include "pokemon_icon.h"
 #include "trainer_pokemon_sprites.h"
-#include "contest_util.h"
 #include "constants/songs.h"
 #include "constants/game_stat.h"
-#include "constants/battle_frontier.h"
 #include "constants/rgb.h"
 #include "constants/trainers.h"
 #include "constants/union_room.h"
@@ -107,7 +103,6 @@ static bool8 IsCardFlipTaskActive(void);
 static bool8 LoadCardGfx(void);
 static void CB2_InitTrainerCard(void);
 static u32 GetCappedGameStat(u8 statId, u32 maxValue);
-static bool8 HasAllFrontierSymbols(void);
 static u8 GetRubyTrainerStars(struct TrainerCard *);
 static u16 GetCaughtMonsCount(void);
 static void SetPlayerCardData(struct TrainerCard *, u8);
@@ -408,11 +403,6 @@ static void Task_TrainerCard(u8 taskId)
         break;
     // Fade in
     case 7:
-        if (gWirelessCommType == 1 && gReceivedRemoteLinkPlayers == TRUE)
-        {
-            LoadWirelessStatusIndicatorSpriteGfx();
-            CreateWirelessStatusIndicatorSprite(230, 150);
-        }
         BlendPalettes(PALETTES_ALL, 16, sData->blendColor);
         BeginNormalPaletteFade(PALETTES_ALL, 0, 16, 0, sData->blendColor);
         SetVBlankCallback(VblankCb_TrainerCard);
@@ -431,7 +421,7 @@ static void Task_TrainerCard(u8 taskId)
         break;
     case STATE_HANDLE_INPUT_FRONT:
         // Blink the : in play time
-        if (!gReceivedRemoteLinkPlayers && sData->timeColonNeedDraw)
+        if (sData->timeColonNeedDraw)
         {
             PrintTimeOnCard();
             DrawTrainerCardWindow(1);
@@ -445,19 +435,12 @@ static void Task_TrainerCard(u8 taskId)
         }
         else if (JOY_NEW(B_BUTTON))
         {
-            if (gReceivedRemoteLinkPlayers && sData->isLink && InUnionRoom() == TRUE)
-            {
-                sData->mainState = STATE_WAIT_LINK_PARTNER;
-            }
-            else
-            {
-                BeginNormalPaletteFade(PALETTES_ALL, 0, 0, 16, sData->blendColor);
-                sData->mainState = STATE_CLOSE_CARD;
-            }
+            BeginNormalPaletteFade(PALETTES_ALL, 0, 0, 16, sData->blendColor);
+            sData->mainState = STATE_CLOSE_CARD;
         }
         break;
     case STATE_WAIT_FLIP_TO_BACK:
-        if (IsCardFlipTaskActive() && Overworld_IsRecvQueueAtMax() != TRUE)
+        if (IsCardFlipTaskActive())
         {
             PlaySE(SE_RG_CARD_OPEN);
             sData->mainState = STATE_HANDLE_INPUT_BACK;
@@ -466,55 +449,32 @@ static void Task_TrainerCard(u8 taskId)
     case STATE_HANDLE_INPUT_BACK:
         if (JOY_NEW(B_BUTTON))
         {
-            if (gReceivedRemoteLinkPlayers && sData->isLink && InUnionRoom() == TRUE)
-            {
-                sData->mainState = STATE_WAIT_LINK_PARTNER;
-            }
-            else if (gReceivedRemoteLinkPlayers)
-            {
-                BeginNormalPaletteFade(PALETTES_ALL, 0, 0, 16, sData->blendColor);
-                sData->mainState = STATE_CLOSE_CARD;
-            }
-            else
-            {
-                FlipTrainerCard();
-                sData->mainState = STATE_WAIT_FLIP_TO_FRONT;
-                PlaySE(SE_RG_CARD_FLIP);
-            }
+            FlipTrainerCard();
+            sData->mainState = STATE_WAIT_FLIP_TO_FRONT;
+            PlaySE(SE_RG_CARD_FLIP);
         }
         else if (JOY_NEW(A_BUTTON))
         {
-           if (gReceivedRemoteLinkPlayers && sData->isLink && InUnionRoom() == TRUE)
-           {
-               sData->mainState = STATE_WAIT_LINK_PARTNER;
-           }
-           else
-           {
-               BeginNormalPaletteFade(PALETTES_ALL, 0, 0, 16, sData->blendColor);
-               sData->mainState = STATE_CLOSE_CARD;
-           }
+            BeginNormalPaletteFade(PALETTES_ALL, 0, 0, 16, sData->blendColor);
+            sData->mainState = STATE_CLOSE_CARD;
         }
         break;
     case STATE_WAIT_LINK_PARTNER:
-        SetCloseLinkCallback();
         DrawDialogueFrame(0, TRUE);
         AddTextPrinterParameterized(0, FONT_NORMAL, gText_WaitingTrainerFinishReading, 0, 1, 255, 0);
         CopyWindowToVram(0, COPYWIN_FULL);
         sData->mainState = STATE_CLOSE_CARD_LINK;
         break;
     case STATE_CLOSE_CARD_LINK:
-        if (!gReceivedRemoteLinkPlayers)
-        {
-            BeginNormalPaletteFade(PALETTES_ALL, 0, 0, 16, sData->blendColor);
-            sData->mainState = STATE_CLOSE_CARD;
-        }
+        BeginNormalPaletteFade(PALETTES_ALL, 0, 0, 16, sData->blendColor);
+        sData->mainState = STATE_CLOSE_CARD;
         break;
     case STATE_CLOSE_CARD:
         if (!UpdatePaletteFade())
             CloseTrainerCard(taskId);
         break;
     case STATE_WAIT_FLIP_TO_FRONT:
-        if (IsCardFlipTaskActive() && Overworld_IsRecvQueueAtMax() != TRUE)
+        if (IsCardFlipTaskActive())
         {
             sData->mainState = STATE_HANDLE_INPUT_FRONT;
             PlaySE(SE_RG_CARD_OPEN);
@@ -643,17 +603,6 @@ static u32 GetCappedGameStat(u8 statId, u32 maxValue)
     return min(maxValue, statValue);
 }
 
-static bool8 HasAllFrontierSymbols(void)
-{
-    u8 i;
-    for (i = 0; i < NUM_FRONTIER_FACILITIES; i++)
-    {
-        if (!FlagGet(FLAG_SYS_TOWER_SILVER + 2 * i) || !FlagGet(FLAG_SYS_TOWER_GOLD + 2 * i))
-            return FALSE;
-    }
-    return TRUE;
-}
-
 u32 CountPlayerTrainerStars(void)
 {
     u8 stars = 0;
@@ -661,10 +610,6 @@ u32 CountPlayerTrainerStars(void)
     if (GetGameStat(GAME_STAT_ENTERED_HOF))
         stars++;
     if (HasAllHoennMons())
-        stars++;
-    if (CountPlayerMuseumPaintings() >= CONTEST_CATEGORIES_COUNT)
-        stars++;
-    if (HasAllFrontierSymbols())
         stars++;
 
     return stars;
@@ -736,8 +681,6 @@ static void SetPlayerCardData(struct TrainerCard *trainerCard, u8 cardType)
     case CARD_TYPE_FRLG:
         trainerCard->contestsWithFriends = GetCappedGameStat(GAME_STAT_WON_LINK_CONTEST, 999);
         trainerCard->pokeblocksWithFriends = GetCappedGameStat(GAME_STAT_POKEBLOCKS_WITH_FRIENDS, 0xFFFF);
-        if (CountPlayerMuseumPaintings() >= CONTEST_CATEGORIES_COUNT)
-            trainerCard->hasAllPaintings = TRUE;
         trainerCard->stars = GetRubyTrainerStars(trainerCard);
         break;
     case CARD_TYPE_RS:
@@ -756,10 +699,6 @@ static void TrainerCard_GenerateCardForPlayer(struct TrainerCard *trainerCard)
     memset(trainerCard, 0, sizeof(struct TrainerCard));
     trainerCard->version = GAME_VERSION;
     SetPlayerCardData(trainerCard, CARD_TYPE_EMERALD);
-    trainerCard->hasAllFrontierSymbols = HasAllFrontierSymbols();
-    trainerCard->frontierBP = gSaveBlock2Ptr->frontier.cardBattlePoints;
-    if (trainerCard->hasAllFrontierSymbols)
-        trainerCard->stars++;
 
     if (trainerCard->gender == FEMALE)
         trainerCard->unionRoomClass = gUnionRoomFacilityClasses[(trainerCard->trainerId % NUM_UNION_ROOM_CLASSES) + NUM_UNION_ROOM_CLASSES];
@@ -772,10 +711,7 @@ void TrainerCard_GenerateCardForLinkPlayer(struct TrainerCard *trainerCard)
     memset(trainerCard, 0, 0x60);
     trainerCard->version = GAME_VERSION;
     SetPlayerCardData(trainerCard, CARD_TYPE_EMERALD);
-    trainerCard->linkHasAllFrontierSymbols = HasAllFrontierSymbols();
     *((u16 *)&trainerCard->linkPoints.frontier) = gSaveBlock2Ptr->frontier.cardBattlePoints;
-    if (trainerCard->linkHasAllFrontierSymbols)
-        trainerCard->stars++;
 
     if (trainerCard->gender == FEMALE)
         trainerCard->unionRoomClass = gUnionRoomFacilityClasses[(trainerCard->trainerId % NUM_UNION_ROOM_CLASSES) + NUM_UNION_ROOM_CLASSES];
@@ -799,7 +735,6 @@ void CopyTrainerCardData(struct TrainerCard *dst, struct TrainerCard *src, u8 ga
     case CARD_TYPE_EMERALD:
         memcpy(dst, src, 0x60);
         dst->linkPoints.frontier = 0;
-        dst->hasAllFrontierSymbols = src->linkHasAllFrontierSymbols;
         dst->frontierBP = *((u16 *)&src->linkPoints.frontier);
         break;
     }
@@ -853,10 +788,7 @@ static void InitGpuRegs(void)
     SetGpuReg(REG_OFFSET_WINOUT, WINOUT_WIN01_BG1 | WINOUT_WIN01_BG2 | WINOUT_WIN01_BG3 | WINOUT_WIN01_OBJ);
     SetGpuReg(REG_OFFSET_WIN0V, DISPLAY_HEIGHT);
     SetGpuReg(REG_OFFSET_WIN0H, DISPLAY_WIDTH);
-    if (gReceivedRemoteLinkPlayers)
-        EnableInterrupts(INTR_FLAG_VBLANK | INTR_FLAG_HBLANK | INTR_FLAG_VCOUNT | INTR_FLAG_TIMER3 | INTR_FLAG_SERIAL);
-    else
-        EnableInterrupts(INTR_FLAG_VBLANK | INTR_FLAG_HBLANK);
+    EnableInterrupts(INTR_FLAG_VBLANK | INTR_FLAG_HBLANK);
 }
 
 static void UpdateCardFlipRegs(u16 cardTop)
@@ -1664,9 +1596,6 @@ static bool8 Task_AnimateCardFlipDown(struct Task *task)
 static bool8 Task_DrawFlippedCardSide(struct Task *task)
 {
     sData->allowDMACopy = FALSE;
-    if (Overworld_IsRecvQueueAtMax() == TRUE)
-        return FALSE;
-
     do
     {
         switch (sData->flipDrawState)
@@ -1710,7 +1639,7 @@ static bool8 Task_DrawFlippedCardSide(struct Task *task)
             return FALSE;
         }
         sData->flipDrawState++;
-    } while (gReceivedRemoteLinkPlayers == 0);
+    } while (1);
 
     return FALSE;
 }
@@ -1793,28 +1722,12 @@ void ShowPlayerTrainerCard(void (*callback)(void))
 {
     sData = AllocZeroed(sizeof(*sData));
     sData->callback2 = callback;
-    if (callback == CB2_ReshowFrontierPass)
-        sData->blendColor = RGB_WHITE;
-    else
-        sData->blendColor = RGB_BLACK;
+    sData->blendColor = RGB_BLACK;
 
-    if (InUnionRoom() == TRUE)
-        sData->isLink = TRUE;
-    else
-        sData->isLink = FALSE;
+    sData->isLink = FALSE;
 
     sData->language = GAME_LANGUAGE;
     TrainerCard_GenerateCardForPlayer(&sData->trainerCard);
-    SetMainCallback2(CB2_InitTrainerCard);
-}
-
-void ShowTrainerCardInLink(u8 cardId, void (*callback)(void))
-{
-    sData = AllocZeroed(sizeof(*sData));
-    sData->callback2 = callback;
-    sData->isLink = TRUE;
-    sData->trainerCard = gTrainerCards[cardId];
-    sData->language = gLinkPlayers[cardId].language;
     SetMainCallback2(CB2_InitTrainerCard);
 }
 
@@ -1875,22 +1788,10 @@ static u8 VersionToCardType(u8 version)
 
 static void CreateTrainerCardTrainerPic(void)
 {
-    if (InUnionRoom() == TRUE && gReceivedRemoteLinkPlayers == 1)
-    {
-        CreateTrainerCardTrainerPicSprite(FacilityClassToPicIndex(sData->trainerCard.unionRoomClass),
-                    TRUE,
-                    sTrainerPicOffset[sData->isHoenn][sData->trainerCard.gender][0],
-                    sTrainerPicOffset[sData->isHoenn][sData->trainerCard.gender][1],
-                    8,
-                    2);
-    }
-    else
-    {
-        CreateTrainerCardTrainerPicSprite(FacilityClassToPicIndex(sTrainerPicFacilityClass[sData->cardType][sData->trainerCard.gender]),
-                    TRUE,
-                    sTrainerPicOffset[sData->isHoenn][sData->trainerCard.gender][0],
-                    sTrainerPicOffset[sData->isHoenn][sData->trainerCard.gender][1],
-                    8,
-                    2);
-    }
+    CreateTrainerCardTrainerPicSprite(FacilityClassToPicIndex(sTrainerPicFacilityClass[sData->cardType][sData->trainerCard.gender]),
+                TRUE,
+                sTrainerPicOffset[sData->isHoenn][sData->trainerCard.gender][0],
+                sTrainerPicOffset[sData->isHoenn][sData->trainerCard.gender][1],
+                8,
+                2);
 }

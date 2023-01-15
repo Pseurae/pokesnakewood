@@ -2,7 +2,6 @@
 #include "constants/global.h"
 #include "constants/battle.h"
 #include "constants/pokemon.h"
-#include "constants/battle_arena.h"
 #include "constants/battle_script_commands.h"
 #include "constants/battle_anim.h"
 #include "constants/battle_string_ids.h"
@@ -6278,25 +6277,6 @@ BattleScript_LocalBattleLostDoTrainer2WinText::
 BattleScript_LocalBattleLostEnd_::
 	end2
 
-BattleScript_FrontierLinkBattleLost::
-	returnopponentmon1toball BS_ATTACKER
-	waitstate
-	returnopponentmon2toball BS_ATTACKER
-	waitstate
-	trainerslidein BS_ATTACKER
-	waitstate
-	printstring STRINGID_TRAINER1WINTEXT
-	trainerslideout B_POSITION_OPPONENT_LEFT
-	waitstate
-	trainerslidein BS_FAINTED
-	waitstate
-	printstring STRINGID_TRAINER2WINTEXT
-	jumpifbattletype BATTLE_TYPE_RECORDED, BattleScript_FrontierLinkBattleLostEnd
-	endlinkbattle
-BattleScript_FrontierLinkBattleLostEnd::
-	waitmessage B_WAIT_TIME_LONG
-	end2
-
 BattleScript_LinkBattleWonOrLost::
 	jumpifbattletype BATTLE_TYPE_BATTLE_TOWER, BattleScript_TowerLinkBattleWon
 	printstring STRINGID_BATTLEEND
@@ -9344,49 +9324,6 @@ BattleScript_ArenaNothingDecided::
 	arenawaitmessage B_MSG_REF_NOTHING_IS_DECIDED
 	pause B_WAIT_TIME_LONG
 	arenaerasereftextbox
-	end2
-
-BattleScript_ArenaDoJudgment::
-	makevisible BS_PLAYER1
-	waitstate
-	makevisible BS_OPPONENT1
-	waitstate
-	volumedown
-	playse SE_ARENA_TIMEUP1
-	pause 8
-	playse SE_ARENA_TIMEUP1
-	pause B_WAIT_TIME_LONG
-	arenadrawreftextbox
-	arenajudgmentstring B_MSG_REF_THATS_IT
-	arenawaitmessage B_MSG_REF_THATS_IT
-	pause B_WAIT_TIME_LONG
-	setbyte gBattleCommunication, 0  @ Reset state for arenajudgmentwindow
-	arenajudgmentwindow
-	pause B_WAIT_TIME_LONG
-	arenajudgmentwindow
-	arenajudgmentstring B_MSG_REF_JUDGE_MIND
-	arenawaitmessage B_MSG_REF_JUDGE_MIND
-	arenajudgmentwindow
-	arenajudgmentstring B_MSG_REF_JUDGE_SKILL
-	arenawaitmessage B_MSG_REF_JUDGE_SKILL
-	arenajudgmentwindow
-	arenajudgmentstring B_MSG_REF_JUDGE_BODY
-	arenawaitmessage B_MSG_REF_JUDGE_BODY
-	arenajudgmentwindow
-	jumpifbyte CMP_EQUAL, gBattleCommunication + 1, ARENA_RESULT_PLAYER_LOST, BattleScript_ArenaJudgmentPlayerLoses
-	jumpifbyte CMP_EQUAL, gBattleCommunication + 1, ARENA_RESULT_TIE, BattleScript_ArenaJudgmentDraw
-@ ARENA_RESULT_PLAYER_WON
-	arenajudgmentstring B_MSG_REF_PLAYER_WON
-	arenawaitmessage B_MSG_REF_PLAYER_WON
-	arenajudgmentwindow
-	arenaerasereftextbox
-	printstring STRINGID_DEFEATEDOPPONENTBYREFEREE
-	waitmessage B_WAIT_TIME_LONG
-	playfaintcry BS_OPPONENT1
-	waitcry BS_ATTACKER
-	dofaintanimation BS_OPPONENT1
-	cleareffectsonfaint BS_OPPONENT1
-	arenaopponentmonlost
 	end2
 
 BattleScript_ArenaJudgmentPlayerLoses:

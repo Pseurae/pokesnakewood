@@ -1,17 +1,7 @@
 #include "constants/global.h"
-#include "constants/apprentice.h"
 #include "constants/battle.h"
-#include "constants/battle_arena.h"
 #include "constants/battle_config.h"
-#include "constants/battle_dome.h"
-#include "constants/battle_factory.h"
-#include "constants/battle_frontier.h"
-#include "constants/battle_palace.h"
-#include "constants/battle_pike.h"
-#include "constants/battle_pyramid.h"
 #include "constants/battle_setup.h"
-#include "constants/battle_tent.h"
-#include "constants/battle_tower.h"
 #include "constants/berry.h"
 #include "constants/cable_club.h"
 #include "constants/character_names.h"
@@ -29,7 +19,6 @@
 #include "constants/field_tint.h"
 #include "constants/field_weather.h"
 #include "constants/flags.h"
-#include "constants/frontier_util.h"
 #include "constants/game_stat.h"
 #include "constants/item.h"
 #include "constants/item_config.h"
@@ -82,8 +71,6 @@ gSpecialVars::
 	.4byte gSpecialVar_Result
 	.4byte gSpecialVar_ItemId
 	.4byte gSpecialVar_LastTalked
-	.4byte gSpecialVar_ContestRank
-	.4byte gSpecialVar_ContestCategory
 	.4byte gSpecialVar_MonBoxId
 	.4byte gSpecialVar_MonBoxPos
 	.4byte gSpecialVar_PrevTextColor
@@ -656,7 +643,7 @@ EventScript_SetBrineyLocation_Route109::
 
 	.include "data/scripts/pkmn_center_nurse.inc"
 	.include "data/scripts/obtain_item.inc"
-	.include "data/scripts/record_mix.inc"
+	@ .include "data/scripts/record_mix.inc"
 	.include "data/scripts/pc.inc"
 
 @ scripts/notices.inc? signs.inc? See comment about text/notices.inc
@@ -958,7 +945,6 @@ gText_LegendaryFlewAway::
 	.string "The {STR_VAR_1} flew away!$"
 
 	.include "data/text/pc_transfer.inc"
-	.include "data/text/questionnaire.inc"
 	.include "data/text/abnormal_weather.inc"
 
 EventScript_SelectWithoutRegisteredItem::
@@ -980,15 +966,15 @@ EventScript_CableClub_SetVarResult0::
 	return
 
 Common_EventScript_UnionRoomAttendant::
-	call CableClub_EventScript_UnionRoomAttendant
+	@ call CableClub_EventScript_UnionRoomAttendant
 	end
 
 Common_EventScript_WirelessClubAttendant::
-	call CableClub_EventScript_WirelessClubAttendant
+	@ call CableClub_EventScript_WirelessClubAttendant
 	end
 
 Common_EventScript_DirectCornerAttendant::
-	call CableClub_EventScript_DirectCornerAttendant
+	@ call CableClub_EventScript_DirectCornerAttendant
 	end
 
 Common_EventScript_RemoveStaticPokemon::
@@ -1008,32 +994,18 @@ Common_EventScript_LegendaryFlewAway::
 	end
 
 	.include "data/scripts/pc_transfer.inc"
-	.include "data/scripts/questionnaire.inc"
 	.include "data/scripts/abnormal_weather.inc"
 	.include "data/scripts/trainer_script.inc"
 	.include "data/scripts/berry_tree.inc"
 	.include "data/scripts/secret_base.inc"
-	.include "data/scripts/cable_club.inc"
 	.include "data/text/cable_club.inc"
-	.include "data/scripts/contest_hall.inc"
-	.include "data/text/contest_strings.inc"
-	.include "data/text/contest_link.inc"
-	.include "data/text/contest_painting.inc"
 	.include "data/text/trick_house_mechadolls.inc"
-	.include "data/scripts/tv.inc"
-	.include "data/text/tv.inc"
-	.include "data/scripts/interview.inc"
-	.include "data/scripts/gabby_and_ty.inc"
-	.include "data/text/pokemon_news.inc"
-	.include "data/scripts/mauville_man.inc"
 	.include "data/scripts/field_move_scripts.inc"
 	.include "data/scripts/item_ball_scripts.inc"
 	.include "data/scripts/profile_man.inc"
 	.include "data/scripts/day_care.inc"
 	.include "data/scripts/flash.inc"
 	.include "data/scripts/players_house.inc"
-	.include "data/scripts/berry_blender.inc"
-	.include "data/text/mauville_man.inc"
 	.include "data/text/trainers.inc"
 	.include "data/scripts/repel.inc"
 	.include "data/scripts/safari_zone.inc"
@@ -1048,17 +1020,10 @@ Common_EventScript_LegendaryFlewAway::
 	.include "data/scripts/cave_hole.inc"
 	.include "data/scripts/lilycove_lady.inc"
 	.include "data/text/match_call.inc"
-	.include "data/scripts/apprentice.inc"
-	.include "data/text/apprentice.inc"
-	.include "data/text/battle_dome.inc"
-	.include "data/scripts/battle_pike.inc"
 	.include "data/text/blend_master.inc"
-	.include "data/text/battle_tent.inc"
 	.include "data/text/event_ticket_2.inc"
 	.include "data/text/move_tutors.inc"
 	.include "data/scripts/move_tutors.inc"
-	.include "data/scripts/trainer_hill.inc"
 	.include "data/scripts/test_signpost.inc"
-	.include "data/text/frontier_brain.inc"
 	.include "data/text/save.inc"
 	.include "data/text/birch_speech.inc"

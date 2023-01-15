@@ -1,8 +1,6 @@
 #include "global.h"
 #include "battle.h"
 #include "battle_anim.h"
-#include "battle_arena.h"
-#include "battle_pyramid.h"
 #include "battle_util.h"
 #include "battle_controllers.h"
 #include "battle_interface.h"
@@ -26,7 +24,6 @@
 #include "battle_ai_main.h"
 #include "battle_ai_util.h"
 #include "event_data.h"
-#include "link.h"
 #include "malloc.h"
 #include "berry.h"
 #include "pokedex.h"
@@ -511,9 +508,6 @@ void HandleAction_UseMove(void)
         gBattlescriptCurrInstr = gBattleScriptsForMoveEffects[gBattleMoves[gCurrentMove].effect];
     }
 
-    if (gBattleTypeFlags & BATTLE_TYPE_ARENA)
-        BattleArena_AddMindPoints(gBattlerAttacker);
-
     // Record HP of each battler
     for (i = 0; i < MAX_BATTLERS_COUNT; i++)
         gBattleStruct->hpBefore[i] = gBattleMons[i].hp;
@@ -661,27 +655,8 @@ bool8 TryRunFromBattle(u8 battler)
     #endif
     else if (GetBattlerAbility(battler) == ABILITY_RUN_AWAY)
     {
-        if (InBattlePyramid())
-        {
-            gBattleStruct->runTries++;
-            pyramidMultiplier = GetPyramidRunMultiplier();
-            speedVar = (gBattleMons[battler].speed * pyramidMultiplier) / (gBattleMons[BATTLE_OPPOSITE(battler)].speed) + (gBattleStruct->runTries * 30);
-            if (speedVar > (Random() & 0xFF))
-            {
-                gLastUsedAbility = ABILITY_RUN_AWAY;
-                gProtectStructs[battler].fleeType = FLEE_ABILITY;
-                effect++;
-            }
-        }
-        else
-        {
-            gLastUsedAbility = ABILITY_RUN_AWAY;
-            gProtectStructs[battler].fleeType = FLEE_ABILITY;
-            effect++;
-        }
-    }
-    else if (gBattleTypeFlags & (BATTLE_TYPE_FRONTIER | BATTLE_TYPE_TRAINER_HILL) && gBattleTypeFlags & BATTLE_TYPE_TRAINER)
-    {
+        gLastUsedAbility = ABILITY_RUN_AWAY;
+        gProtectStructs[battler].fleeType = FLEE_ABILITY;
         effect++;
     }
     else
@@ -690,14 +665,7 @@ bool8 TryRunFromBattle(u8 battler)
         if (!IsBattlerAlive(runningFromBattler))
             runningFromBattler |= BIT_FLANK;
 
-        if (InBattlePyramid())
-        {
-            pyramidMultiplier = GetPyramidRunMultiplier();
-            speedVar = (gBattleMons[battler].speed * pyramidMultiplier) / (gBattleMons[runningFromBattler].speed) + (gBattleStruct->runTries * 30);
-            if (speedVar > (Random() & 0xFF))
-                effect++;
-        }
-        else if (gBattleMons[battler].speed < gBattleMons[runningFromBattler].speed)
+        if (gBattleMons[battler].speed < gBattleMons[runningFromBattler].speed)
         {
             speedVar = (gBattleMons[battler].speed * 128) / (gBattleMons[runningFromBattler].speed) + (gBattleStruct->runTries * 30);
             if (speedVar > (Random() & 0xFF))
@@ -1445,16 +1413,6 @@ void MarkBattlerForControllerExec(u8 battlerId)
         gBattleControllerExecFlags |= gBitTable[battlerId] << (32 - MAX_BATTLERS_COUNT);
     else
         gBattleControllerExecFlags |= gBitTable[battlerId];
-}
-
-void MarkBattlerReceivedLinkData(u8 battlerId)
-{
-    s32 i;
-
-    for (i = 0; i < GetLinkPlayerCount(); i++)
-        gBattleControllerExecFlags |= gBitTable[battlerId] << (i << 2);
-
-    gBattleControllerExecFlags &= ~((1 << 28) << battlerId);
 }
 
 void CancelMultiTurnMoves(u8 battler)
@@ -3307,20 +3265,6 @@ bool8 HandleWishPerishSongOnTurnEnd(void)
         }
         // fall through
     case 2:
-        if ((gBattleTypeFlags & BATTLE_TYPE_ARENA)
-         && gBattleStruct->arenaTurnCounter == 2
-         && gBattleMons[0].hp != 0 && gBattleMons[1].hp != 0)
-        {
-            s32 i;
-
-            for (i = 0; i < 2; i++)
-                CancelMultiTurnMoves(i);
-
-            gBattlescriptCurrInstr = BattleScript_ArenaDoJudgment;
-            BattleScriptExecute(BattleScript_ArenaDoJudgment);
-            gBattleStruct->wishPerishSongState++;
-            return TRUE;
-        }
         break;
     }
 
@@ -3984,46 +3928,6 @@ bool8 HasNoMonsToSwitch(u8 battler, u8 partyIdBattlerOn1, u8 partyIdBattlerOn2)
             party = gEnemyParty;
 
         playerId = ((battler & BIT_FLANK) / 2);
-        for (i = playerId * MULTI_PARTY_SIZE; i < playerId * MULTI_PARTY_SIZE + MULTI_PARTY_SIZE; i++)
-        {
-            if (GetMonData(&party[i], MON_DATA_HP) != 0
-             && GetMonData(&party[i], MON_DATA_SPECIES2) != SPECIES_NONE
-             && GetMonData(&party[i], MON_DATA_SPECIES2) != SPECIES_EGG)
-                break;
-        }
-        return (i == playerId * MULTI_PARTY_SIZE + MULTI_PARTY_SIZE);
-    }
-    else if (gBattleTypeFlags & BATTLE_TYPE_MULTI)
-    {
-        if (gBattleTypeFlags & BATTLE_TYPE_TOWER_LINK_MULTI)
-        {
-            if (GetBattlerSide(battler) == B_SIDE_PLAYER)
-            {
-                party = gPlayerParty;
-                flankId = GetBattlerMultiplayerId(battler);
-                playerId = GetLinkTrainerFlankId(flankId);
-            }
-            else
-            {
-                party = gEnemyParty;
-                if (battler == 1)
-                    playerId = 0;
-                else
-                    playerId = 1;
-            }
-        }
-        else
-        {
-            flankId = GetBattlerMultiplayerId(battler);
-
-            if (GetBattlerSide(battler) == B_SIDE_PLAYER)
-                party = gPlayerParty;
-            else
-                party = gEnemyParty;
-
-            playerId = GetLinkTrainerFlankId(flankId);
-        }
-
         for (i = playerId * MULTI_PARTY_SIZE; i < playerId * MULTI_PARTY_SIZE + MULTI_PARTY_SIZE; i++)
         {
             if (GetMonData(&party[i], MON_DATA_HP) != 0

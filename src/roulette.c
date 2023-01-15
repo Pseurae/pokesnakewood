@@ -25,7 +25,6 @@
 #include "strings.h"
 #include "task.h"
 #include "trig.h"
-#include "tv.h"
 #include "window.h"
 #include "constants/coins.h"
 #include "constants/rgb.h"
@@ -1245,7 +1244,6 @@ static void CB2_LoadRoulette(void)
         taskId = sRoulette->playTaskId = CreateTask(Task_StartPlaying, 0);
         gTasks[taskId].tBallNum = BALLS_PER_ROUND;
         gTasks[taskId].tCoins = GetCoins();
-        AlertTVThatPlayerPlayedRoulette(GetCoins());
         sRoulette->spinTaskId = CreateTask(Task_SpinWheel, 1);
         SetMainCallback2(CB2_Roulette);
         return;
@@ -1469,7 +1467,6 @@ static void ProcessBetGridInput(u8 taskId)
 
 static void Task_StartSpin(u8 taskId)
 {
-    IncrementDailyRouletteUses();
     sRoulette->selectionRectDrawState = SELECT_STATE_ERASE;
     if (sRoulette->minBet == 1)
         sRoulette->wheelDelay = 1;
@@ -1968,7 +1965,6 @@ static void ExitRoulette(u8 taskId)
         gSpecialVar_0x8004 = TRUE;
     else
         gSpecialVar_0x8004 = FALSE;
-    TryPutFindThatGamerOnAir(GetCoins());
     BeginHardwarePaletteFade(0xFF, 0, 0, 16, 0);
     gTasks[taskId].func = Task_ExitRoulette;
 }

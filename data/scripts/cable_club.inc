@@ -361,9 +361,7 @@ CableClub_EventScript_EnterColosseum::
 	waitdooranim
 	release
 	goto_if_eq VAR_0x8004, USING_MULTI_BATTLE, CableClub_EventScript_WarpTo4PColosseum
-	special SetCableClubWarp
 	warp MAP_BATTLE_COLOSSEUM_2P, 6, 8
-	special DoCableClubWarp
 	waitstate
 	end
 
@@ -374,9 +372,7 @@ CableClub_EventScript_PlayerApproachLinkRoomRight::
 	return
 
 CableClub_EventScript_WarpTo4PColosseum::
-	special SetCableClubWarp
 	warp MAP_BATTLE_COLOSSEUM_4P, 5, 8
-	special DoCableClubWarp
 	waitstate
 	end
 
@@ -454,9 +450,7 @@ CableClub_EventScript_EnterTradeCenter::
 	closedoor 9, 1
 	waitdooranim
 	release
-	special SetCableClubWarp
 	setwarp MAP_TRADE_CENTER, 5, 8
-	special DoCableClubWarp
 	waitstate
 	end
 
@@ -519,9 +513,7 @@ CableClub_EventScript_EnterRecordCorner::
 	closedoor 9, 1
 	waitdooranim
 	release
-	special SetCableClubWarp
 	setwarp MAP_RECORD_CORNER, 8, 9
-	special DoCableClubWarp
 	waitstate
 	end
 
@@ -569,8 +561,6 @@ MossdeepCity_GameCorner_1F_EventScript_AbortMinigame::
 
 @ Unused
 CableClub_EventScript_CableClubWarp::
-	special SetCableClubWarp
-	special DoCableClubWarp
 	waitstate
 	end
 
@@ -658,7 +648,7 @@ EventScript_CableBoxResults::
 	setvar VAR_0x8004, 0
 	special ShowLinkBattleRecords
 	waitbuttonpress
-	special RemoveRecordsWindow
+	
 	releaseall
 	end
 
@@ -676,7 +666,6 @@ EventScript_BattleColosseum_2P_PlayerSpot1::
 
 EventScript_BattleColosseum_4P_PlayerSpot0::
 	fadescreen FADE_TO_BLACK
-	special ChooseHalfPartyForBattle
 	waitstate
 	goto_if_eq VAR_RESULT, 0, EventScript_BattleColosseum_4P_CancelSpotTrigger
 	setvar VAR_0x8005, 0
@@ -686,7 +675,6 @@ EventScript_BattleColosseum_4P_PlayerSpot0::
 
 EventScript_BattleColosseum_4P_PlayerSpot1::
 	fadescreen FADE_TO_BLACK
-	special ChooseHalfPartyForBattle
 	waitstate
 	goto_if_eq VAR_RESULT, 0, EventScript_BattleColosseum_4P_CancelSpotTrigger
 	setvar VAR_0x8005, 1
@@ -696,7 +684,6 @@ EventScript_BattleColosseum_4P_PlayerSpot1::
 
 EventScript_BattleColosseum_4P_PlayerSpot2::
 	fadescreen FADE_TO_BLACK
-	special ChooseHalfPartyForBattle
 	waitstate
 	goto_if_eq VAR_RESULT, 0, EventScript_BattleColosseum_4P_CancelSpotTrigger
 	setvar VAR_0x8005, 2
@@ -706,7 +693,6 @@ EventScript_BattleColosseum_4P_PlayerSpot2::
 
 EventScript_BattleColosseum_4P_PlayerSpot3::
 	fadescreen FADE_TO_BLACK
-	special ChooseHalfPartyForBattle
 	waitstate
 	goto_if_eq VAR_RESULT, 0, EventScript_BattleColosseum_4P_CancelSpotTrigger
 	setvar VAR_0x8005, 3
@@ -846,8 +832,6 @@ EventScript_TerminateLink::
 	end
 
 EventScript_DoLinkRoomExit::
-	special CleanupLinkRoomState
-	special ReturnFromLinkRoom
 	waitstate
 	end
 
@@ -859,7 +843,6 @@ CableClub_EventScript_UnionRoomAttendant::
 	specialvar VAR_RESULT, IsBadEggInParty
 	goto_if_eq VAR_RESULT, TRUE, CableClub_EventScript_AbortLinkPlayerHasBadEgg
 	copyvar VAR_0x8007, VAR_LAST_TALKED
-	specialvar VAR_RESULT, IsWirelessAdapterConnected
 	goto_if_eq VAR_RESULT, FALSE, CableClub_EventScript_UnionRoomAdapterNotConnected
 	message CableClub_Text_WelcomeUnionRoomEnter
 	waitmessage
@@ -906,11 +889,8 @@ CableClub_EventScript_EnterUnionRoom::
 	hideobjectat OBJ_EVENT_ID_PLAYER, 0
 	closedoor 5, 1
 	waitdooranim
-	special Script_ResetUnionRoomTrade
-	special SetCableClubWarp
 	warpspinenter MAP_UNION_ROOM, 7, 11
 	waitstate
-	special RunUnionRoom
 	waitstate
 	end
 
@@ -959,7 +939,6 @@ CableClub_EventScript_DirectCornerAttendant::
 	goto_if_unset FLAG_SYS_POKEDEX_GET, CableClub_EventScript_WirelessClubAdjustements
 	specialvar VAR_RESULT, IsBadEggInParty
 	goto_if_eq VAR_RESULT, TRUE, CableClub_EventScript_AbortLinkPlayerHasBadEgg
-	specialvar VAR_RESULT, IsWirelessAdapterConnected
 	goto_if_eq VAR_RESULT, FALSE, CableClub_EventScript_WelcomeToCableClub
 	message CableClub_Text_WelcomeWhichDirectCornerRoom
 	waitmessage
@@ -1175,12 +1154,10 @@ CableClub_EventScript_TryJoinGroupXPlayers::
 	return
 
 CableClub_EventScript_TryBecomeLinkLeader::
-	special TryBecomeLinkLeader
 	waitstate
 	return
 
 CableClub_EventScript_TryJoinLinkGroup::
-	special TryJoinLinkGroup
 	waitstate
 	return
 
@@ -1213,10 +1190,8 @@ CableClub_EventScript_EnterWirelessLinkRoom::
 EventScript_WirelessBoxResults::
 	lockall
 	goto_if_unset FLAG_SYS_POKEDEX_GET, CableClub_EventScript_NotReadyYet
-	specialvar VAR_RESULT, IsWirelessAdapterConnected
 	goto_if_eq VAR_RESULT, FALSE, CableClub_EventScript_AdapterNotConnected
 	fadescreen FADE_TO_BLACK
-	special ShowWirelessCommunicationScreen
 	waitstate
 	msgbox CableClub_Text_ParticipantsStepUpToCounter, MSGBOX_DEFAULT
 	releaseall
@@ -1258,7 +1233,6 @@ EventScript_CloseMossdeepGameCornerBarrier::
 	return
 
 CableClub_OnResume:
-	special InitUnionRoom
 	end
 
 MossdeepCity_GameCorner_1F_EventScript_InfoMan2::
@@ -1294,7 +1268,6 @@ MossdeepCity_GameCorner_1F_EventScript_OldMan2::
 	faceplayer
 	message MossdeepCity_GameCorner_1F_Text_WelcomeCanYouWait
 	waitmessage
-	specialvar VAR_RESULT, IsWirelessAdapterConnected
 	goto_if_eq VAR_RESULT, FALSE, MossdeepCity_GameCorner_1F_EventScript_AdapterNotConnected
 	delay 60
 	message MossdeepCity_GameCorner_1F_Text_PlayWhichGame
@@ -1309,7 +1282,6 @@ MossdeepCity_GameCorner_1F_EventScript_OldMan2::
 
 MossdeepCity_GameCorner_1F_EventScript_PlayPokemonJump::
 	setvar VAR_0x8005, 0
-	special IsPokemonJumpSpeciesInParty
 	goto_if_eq VAR_RESULT, FALSE, MossdeepCity_GameCorner_1F_EventScript_DontHaveRequiredMon
 	msgbox MossdeepCity_GameCorner_1F_Text_EnterWhichPokemon, MSGBOX_DEFAULT
 	fadescreen FADE_TO_BLACK
@@ -1325,7 +1297,6 @@ MossdeepCity_GameCorner_1F_EventScript_PlayPokemonJump::
 
 MossdeepCity_GameCorner_1F_EventScript_PlayDodrioBerryPicking::
 	setvar VAR_0x8005, 1
-	special IsDodrioInParty
 	goto_if_eq VAR_RESULT, FALSE, MossdeepCity_GameCorner_1F_EventScript_DontHaveRequiredMon
 	msgbox MossdeepCity_GameCorner_1F_Text_EnterWhichPokemon, MSGBOX_DEFAULT
 	fadescreen FADE_TO_BLACK
@@ -1410,14 +1381,12 @@ MossdeepCity_GameCorner_1F_EventScript_ExplainDodrioBerryPickingRequirements::
 
 MossdeepCity_GameCorner_1F_EventScript_PokemonJumpRecords::
 	lockall
-	special ShowPokemonJumpRecords
 	waitstate
 	releaseall
 	end
 
 MossdeepCity_GameCorner_1F_EventScript_DodrioBerryPickingRecords::
 	lockall
-	special ShowDodrioBerryPickingRecords
 	waitstate
 	releaseall
 	end

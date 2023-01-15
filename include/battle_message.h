@@ -248,7 +248,6 @@ extern const u8 *const gBattleStringsTable[];
 extern const u8 *const gStatNamesTable[];
 extern const u8 *const gPokeblockWasTooXStringTable[];
 extern const u8 *const gRefereeStringsTable[];
-extern const u8 *const gRoundsStringTable[];
 
 extern const u8 gText_PkmnIsEvolving[];
 extern const u8 gText_CongratsPkmnEvolved[];

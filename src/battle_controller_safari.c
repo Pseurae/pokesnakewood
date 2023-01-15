@@ -7,7 +7,6 @@
 #include "bg.h"
 #include "data.h"
 #include "item_menu.h"
-#include "link.h"
 #include "main.h"
 #include "m4a.h"
 #include "palette.h"
@@ -292,17 +291,7 @@ static void CompleteOnFinishedBattleAnimation(void)
 static void SafariBufferExecCompleted(void)
 {
     gBattlerControllerFuncs[gActiveBattler] = SafariBufferRunCommand;
-    if (gBattleTypeFlags & BATTLE_TYPE_LINK)
-    {
-        u8 playerId = GetMultiplayerId();
-
-        PrepareBufferDataTransferLink(2, 4, &playerId);
-        gBattleResources->bufferA[gActiveBattler][0] = CONTROLLER_TERMINATOR_NOP;
-    }
-    else
-    {
-        gBattleControllerExecFlags &= ~gBitTable[gActiveBattler];
-    }
+    gBattleControllerExecFlags &= ~gBitTable[gActiveBattler];
 }
 
 static void SafariHandleGetMonData(void)

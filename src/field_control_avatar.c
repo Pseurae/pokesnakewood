@@ -16,7 +16,6 @@
 #include "field_specials.h"
 #include "fldeff_misc.h"
 #include "item_menu.h"
-#include "link.h"
 #include "match_call.h"
 #include "metatile_behavior.h"
 #include "overworld.h"
@@ -28,7 +27,6 @@
 #include "sound.h"
 #include "start_menu.h"
 #include "trainer_see.h"
-#include "trainer_hill.h"
 #include "wild_encounter.h"
 #include "constants/event_bg.h"
 #include "constants/event_objects.h"
@@ -325,11 +323,7 @@ static const u8 *GetInteractedObjectEventScript(struct MapPosition *position, u8
     gSpecialVar_LastTalked = gObjectEvents[objectEventId].localId;
     gSpecialVar_Facing = direction;
 
-    if (InTrainerHill() == TRUE)
-        script = GetTrainerHillTrainerScript();
-    else
-        script = GetObjectEventScriptPointerByObjectEventId(objectEventId);
-
+    script = GetObjectEventScriptPointerByObjectEventId(objectEventId);
     script = GetRamScript(gSpecialVar_LastTalked, script);
     return script;
 }
@@ -389,16 +383,12 @@ static const u8 *GetInteractedMetatileScript(struct MapPosition *position, u8 me
 {
     s8 elevation;
 
-    if (MetatileBehavior_IsPlayerFacingTVScreen(metatileBehavior, direction) == TRUE)
-        return EventScript_TV;
     if (MetatileBehavior_IsPC(metatileBehavior) == TRUE)
         return EventScript_PC;
     if (MetatileBehavior_IsClosedSootopolisDoor(metatileBehavior) == TRUE)
         return EventScript_ClosedSootopolisDoor;
     if (MetatileBehavior_IsSkyPillarClosedDoor(metatileBehavior) == TRUE)
         return SkyPillar_Outside_EventScript_ClosedDoor;
-    if (MetatileBehavior_IsCableBoxResults1(metatileBehavior) == TRUE)
-        return EventScript_CableBoxResults;
     if (MetatileBehavior_IsPokeblockFeeder(metatileBehavior) == TRUE)
         return EventScript_PokeBlockFeeder;
     if (MetatileBehavior_IsTrickHousePuzzleDoor(metatileBehavior) == TRUE)
@@ -421,14 +411,6 @@ static const u8 *GetInteractedMetatileScript(struct MapPosition *position, u8 me
         return EventScript_ShopShelf;
     if (MetatileBehavior_IsBlueprint(metatileBehavior) == TRUE)
         return EventScript_Blueprint;
-    if (MetatileBehavior_IsPlayerFacingWirelessBoxResults(metatileBehavior, direction) == TRUE)
-        return EventScript_WirelessBoxResults;
-    if (MetatileBehavior_IsCableBoxResults2(metatileBehavior, direction) == TRUE)
-        return EventScript_CableBoxResults;
-    if (MetatileBehavior_IsQuestionnaire(metatileBehavior) == TRUE)
-        return EventScript_Questionnaire;
-    if (MetatileBehavior_IsTrainerHillTimer(metatileBehavior) == TRUE)
-        return EventScript_TrainerHillTimer;
 
     elevation = position->elevation;
     if (elevation == MapGridGetElevationAt(position->x, position->y))
@@ -535,11 +517,6 @@ static bool8 TryStartMiscWalkingScripts(u16 metatileBehavior)
         ScriptContext_SetupScript(EventScript_FallDownHole);
         return TRUE;
     }
-    else if (MetatileBehavior_IsBattlePyramidWarp(metatileBehavior))
-    {
-        ScriptContext_SetupScript(BattlePyramid_WarpToNextFloor);
-        return TRUE;
-    }
     else if (MetatileBehavior_IsSecretBaseGlitterMat(metatileBehavior) == TRUE)
     {
         DoSecretBaseGlitterMatSparkle();
@@ -556,11 +533,6 @@ static bool8 TryStartMiscWalkingScripts(u16 metatileBehavior)
 
 static bool8 TryStartStepCountScript(u16 metatileBehavior)
 {
-    if (InUnionRoom() == TRUE)
-    {
-        return FALSE;
-    }
-
     IncrementRematchStepCounter();
     UpdateFriendshipStepCounter();
     UpdateFarawayIslandStepCounter();
@@ -814,30 +786,7 @@ static void SetupWarp(struct MapHeader *unused, s8 warpEventId, struct MapPositi
 {
     const struct WarpEvent *warpEvent;
 
-    u8 trainerHillMapId = GetCurrentTrainerHillMapId();
-
-    if (trainerHillMapId)
-    {
-        if (trainerHillMapId == GetNumFloorsInTrainerHillChallenge())
-        {
-            if (warpEventId == 0)
-                warpEvent = &gMapHeader.events->warps[0];
-            else
-                warpEvent = SetWarpDestinationTrainerHill4F();
-        }
-        else if (trainerHillMapId == TRAINER_HILL_ROOF)
-        {
-            warpEvent = SetWarpDestinationTrainerHillFinalFloor(warpEventId);
-        }
-        else
-        {
-            warpEvent = &gMapHeader.events->warps[warpEventId];
-        }
-    }
-    else
-    {
-        warpEvent = &gMapHeader.events->warps[warpEventId];
-    }
+    warpEvent = &gMapHeader.events->warps[warpEventId];
 
     if (warpEvent->mapNum == MAP_NUM(DYNAMIC))
     {
@@ -1015,15 +964,4 @@ const u8 *GetObjectEventScriptPointerPlayerFacing(void)
     direction = GetPlayerMovementDirection();
     GetInFrontOfPlayerPosition(&position);
     return GetInteractedObjectEventScript(&position, MapGridGetMetatileBehaviorAt(position.x, position.y), direction);
-}
-
-int SetCableClubWarp(void)
-{
-    struct MapPosition position;
-
-    GetPlayerMovementDirection();  //unnecessary
-    GetPlayerPosition(&position);
-    MapGridGetMetatileBehaviorAt(position.x, position.y);  //unnecessary
-    SetupWarp(&gMapHeader, GetWarpEventAtMapPosition(&gMapHeader, &position), &position);
-    return 0;
 }

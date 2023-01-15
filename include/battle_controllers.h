@@ -199,12 +199,9 @@ enum
 extern struct UnusedControllerStruct gUnusedControllerStruct;
 
 // general functions
-void HandleLinkBattleSetup(void);
 void SetUpBattleVarsAndBirchZigzagoon(void);
 void InitBattleControllers(void);
 bool32 IsValidForBattle(struct Pokemon *mon);
-void TryReceiveLinkBattleData(void);
-void PrepareBufferDataTransferLink(u8 bufferId, u16 size, u8 *data);
 
 // emitters
 void BtlController_EmitGetMonData(u8 bufferId, u8 requestId, u8 monToCheck);

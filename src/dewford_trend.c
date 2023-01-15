@@ -2,11 +2,9 @@
 #include "dewford_trend.h"
 #include "easy_chat.h"
 #include "event_data.h"
-#include "link.h"
 #include "malloc.h"
 #include "random.h"
 #include "text.h"
-#include "tv.h"
 #include "string_util.h"
 
 /*
@@ -189,10 +187,6 @@ bool8 TrySetTrendyPhrase(u16 *phrase)
                     j--;
                 }
                 gSaveBlock1Ptr->dewfordTrends[i] = trend;
-
-                if (i == SAVED_TRENDS_COUNT - 1)
-                    TryPutTrendWatcherOnAir(phrase);
-
                 // If i is 0, the given phrase is the new current phrase
                 return (i == 0);
             }
@@ -200,7 +194,6 @@ bool8 TrySetTrendyPhrase(u16 *phrase)
 
         // New trend is less "trendy" than all other saved trends, put it in last
         gSaveBlock1Ptr->dewfordTrends[SAVED_TRENDS_COUNT - 1] = trend;
-        TryPutTrendWatcherOnAir(phrase);
     }
     return FALSE;
 }
@@ -225,67 +218,6 @@ static void SortTrends(struct DewfordTrend *trends, u16 numTrends, u8 mode)
 
 #define SAVED_TRENDS_SIZE (sizeof(struct DewfordTrend) * SAVED_TRENDS_COUNT)
 #define BUFFER_SIZE (SAVED_TRENDS_SIZE * MAX_LINK_PLAYERS > 0x100 ? SAVED_TRENDS_SIZE * MAX_LINK_PLAYERS : 0x100) // More space was allocated than needed
-
-void ReceiveDewfordTrendData(struct DewfordTrend *linkedTrends, size_t size, u8 unused)
-{
-    u16 i, j, numTrends, players;
-    struct DewfordTrend *linkedTrendsBuffer, *savedTrendsBuffer, *src, *dst, *temp;
-
-    // Exit if alloc fails
-    if (!(linkedTrendsBuffer = Alloc(BUFFER_SIZE)))
-        return;
-
-    // Exit if alloc fails
-    if (!(savedTrendsBuffer = Alloc(BUFFER_SIZE)))
-    {
-        Free(linkedTrendsBuffer);
-        return;
-    }
-
-    // Buffer the new trends being received via Record Mixing
-    players = GetLinkPlayerCount();
-    for (i = 0; i < players; i++)
-        memcpy(&linkedTrendsBuffer[i * SAVED_TRENDS_COUNT], (u8 *)linkedTrends + i * size, SAVED_TRENDS_SIZE);
-
-    // Determine which of the received trends should be saved.
-    // savedTrendsBuffer starts empty, and when finished will contain
-    // which of the linked trends to save in the saveblock.
-    src = linkedTrendsBuffer;
-    dst = savedTrendsBuffer;
-    numTrends = 0;
-    for (i = 0; i < players; i++)
-    {
-        for (j = 0; j < SAVED_TRENDS_COUNT; j++)
-        {
-            s16 idx = GetSavedTrendIndex(savedTrendsBuffer, src, numTrends);
-            if (idx < 0)
-            {
-                // This phrase is not a currently saved trend, save it
-                *(dst++) = *src;
-                numTrends++;
-            }
-            else
-            {
-                // This phrase already exists as a saved phrase
-                // Only overwrrite it if it's "trendier"
-                temp = &savedTrendsBuffer[idx];
-                if (temp->trendiness < src->trendiness)
-                    *temp = *src;
-            }
-            src++;
-        }
-    }
-    SortTrends(savedTrendsBuffer, numTrends, SORT_MODE_FULL);
-
-    // Overwrite current saved trends with new saved trends
-    src = savedTrendsBuffer;
-    dst = gSaveBlock1Ptr->dewfordTrends;
-    for (i = 0; i < SAVED_TRENDS_COUNT; i++)
-        *(dst++) = *(src++);
-
-    Free(linkedTrendsBuffer);
-    Free(savedTrendsBuffer);
-}
 
 void BufferTrendyPhraseString(void)
 {
