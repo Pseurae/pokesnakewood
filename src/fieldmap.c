@@ -45,7 +45,6 @@ static void FillNorthConnection(struct MapHeader const *mapHeader, struct MapHea
 static void FillWestConnection(struct MapHeader const *mapHeader, struct MapHeader const *connectedMapHeader, s32 offset);
 static void FillEastConnection(struct MapHeader const *mapHeader, struct MapHeader const *connectedMapHeader, s32 offset);
 static void InitBackupMapLayoutConnections(struct MapHeader *mapHeader);
-static bool8 SkipCopyingMetatileFromSavedMap(u16 *mapBlock, u16 mapWidth, u8 yMode);
 static struct MapConnection *GetIncomingConnection(u8 direction, int x, int y);
 static bool8 IsPosInIncomingConnectingMap(u8 direction, int x, int y, struct MapConnection *connection);
 static bool8 IsCoordInIncomingConnectingMap(int coord, int srcMax, int destMax, int offset);
@@ -760,13 +759,6 @@ void GetCameraFocusCoords(u16 *x, u16 *y)
     *y = gSaveBlock1Ptr->pos.y + MAP_OFFSET;
 }
 
-// Unused
-static void SetCameraCoords(u16 x, u16 y)
-{
-    gSaveBlock1Ptr->pos.x = x;
-    gSaveBlock1Ptr->pos.y = y;
-}
-
 void GetCameraCoords(u16 *x, u16 *y)
 {
     *x = gSaveBlock1Ptr->pos.x;
@@ -782,21 +774,6 @@ void MapGridSetMetatileImpassabilityAt(int x, int y, bool32 impassable)
         else
             gBackupMapLayout.map[x + gBackupMapLayout.width * y] &= ~MAPGRID_COLLISION_MASK;
     }
-}
-
-static bool8 SkipCopyingMetatileFromSavedMap(u16 *mapBlock, u16 mapWidth, u8 yMode)
-{
-    if (yMode == 0xFF)
-        return FALSE;
-
-    if (yMode == 0)
-        mapBlock -= mapWidth;
-    else
-        mapBlock += mapWidth;
-
-    if (IsLargeBreakableDecoration(*mapBlock & MAPGRID_METATILE_ID_MASK, yMode) == TRUE)
-        return TRUE;
-    return FALSE;
 }
 
 static void CopyTilesetToVram(struct Tileset const *tileset, u16 numTiles, u16 offset)

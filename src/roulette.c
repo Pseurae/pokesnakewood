@@ -3556,16 +3556,6 @@ static void CreateGridSprites(void)
     }
 }
 
-// Unused
-static void DestroyGridSprites(void)
-{
-    u8 i;
-    for (i = 0; i < NUM_ROULETTE_SLOTS; i++)
-    {
-        DestroySprite(&gSprites[sRoulette->spriteIds[i + SPR_GRID_ICONS]]);
-    }
-}
-
 static void ShowHideGridIcons(bool8 hideAll, u8 hideSquare)
 {
     u8 i;

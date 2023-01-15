@@ -1104,12 +1104,6 @@ static u16 GetNPCRoomGraphicsId(void)
     return sNPCTable[sNpcId].graphicsId;
 }
 
-// Unused
-static u8 GetInWildMonRoom(void)
-{
-    return sInWildMonRoom;
-}
-
 bool32 TryGenerateBattlePikeWildMon(bool8 checkKeenEyeIntimidate)
 {
     s32 i;

@@ -273,9 +273,6 @@ static void DebugAction_Sound_SE_SelectId(u8 taskId);
 static void DebugAction_Sound_MUS(u8 taskId);
 static void DebugAction_Sound_MUS_SelectId(u8 taskId);
 
-static void DebugTask_HandleMenuInput(u8 taskId, void (*HandleInput)(u8));
-static void DebugAction_OpenSubMenu(u8 taskId, struct ListMenuTemplate LMtemplate);
-
 extern u8 Debug_FlagsNotSetMessage[];
 extern u8 Debug_Script_1[];
 extern u8 Debug_Script_2[];

@@ -266,8 +266,7 @@ void InitMoveSelectionsVarsAndStrings(void);
 void MoveSelectionCreateCursorAt(u8 cursorPos, u8 arg1);
 void MoveSelectionDestroyCursorAt(u8 cursorPosition);
 
-// recorded player controller
-void SetControllerToRecordedPlayer(void);
+
 
 // opponent controller
 void SetControllerToOpponent(void);
@@ -280,9 +279,6 @@ void SetControllerToSafari(void);
 
 // wally controller
 void SetControllerToWally(void);
-
-// recorded opponent controller
-void SetControllerToRecordedOpponent(void);
 
 // link opponent
 void SetControllerToLinkOpponent(void);

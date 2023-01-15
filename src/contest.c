@@ -3250,15 +3250,6 @@ static void DrawMoveEffectSymbol(u16 move, u8 contestant)
     }
 }
 
-// Unused
-static void DrawMoveEffectSymbols(void)
-{
-    s32 i;
-
-    for (i = 0; i < CONTESTANT_COUNT; i++)
-        DrawMoveEffectSymbol(eContestantStatus[i].currMove, i);
-}
-
 static u16 GetStarTileOffset(void)
 {
     return 0x2034;
@@ -4220,25 +4211,6 @@ static void SpriteCB_EndBlinkContestantBox(struct Sprite *sprite)
     ResetBlendForContestantBoxBlink();
 }
 
-// Unused.
-static void ContestDebugTogglePointTotal(void)
-{
-    if(eContestDebugMode == CONTEST_DEBUG_MODE_PRINT_POINT_TOTAL)
-        eContestDebugMode = CONTEST_DEBUG_MODE_OFF;
-    else
-        eContestDebugMode = CONTEST_DEBUG_MODE_PRINT_POINT_TOTAL;
-
-    if(eContestDebugMode == CONTEST_DEBUG_MODE_OFF)
-    {
-        DrawContestantWindowText();
-        SwapMoveDescAndContestTilemaps();
-    }
-    else
-    {
-        ContestDebugDoPrint();
-    }
-}
-
 static void ContestDebugDoPrint(void)
 {
     u8 i;
@@ -4873,19 +4845,6 @@ static void Task_ShowAndUpdateApplauseMeter(u8 taskId)
         }
         break;
     }
-}
-
-// Unused.
-static void HideApplauseMeterNoAnim(void)
-{
-    gSprites[eContest.applauseMeterSpriteId].x2 = 0;
-    gSprites[eContest.applauseMeterSpriteId].invisible = FALSE;
-}
-
-// Unused.
-static void ShowApplauseMeterNoAnim(void)
-{
-    gSprites[eContest.applauseMeterSpriteId].invisible = TRUE;
 }
 
 #define tDelay  data[10]

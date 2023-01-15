@@ -163,10 +163,6 @@ static void (*const sWallyBufferCommands[CONTROLLER_CMDS_COUNT])(void) =
     [CONTROLLER_TERMINATOR_NOP]           = WallyCmdEnd
 };
 
-static void SpriteCB_Null7(void)
-{
-}
-
 void SetControllerToWally(void)
 {
     gBattlerControllerFuncs[gActiveBattler] = WallyBufferRunCommand;
@@ -417,12 +413,6 @@ static void WallyBufferExecCompleted(void)
     {
         gBattleControllerExecFlags &= ~gBitTable[gActiveBattler];
     }
-}
-
-static void CompleteOnFinishedStatusAnimation(void)
-{
-    if (!gBattleSpritesDataPtr->healthBoxesData[gActiveBattler].statusAnimActive)
-        WallyBufferExecCompleted();
 }
 
 static void WallyHandleGetMonData(void)

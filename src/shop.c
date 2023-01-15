@@ -910,14 +910,6 @@ static void BuyMenuDrawObjectEvents(void)
     }
 }
 
-static bool8 BuyMenuCheckIfObjectEventOverlapsMenuBg(s16 *object)
-{
-    if (!BuyMenuCheckForOverlapWithMenuBg(object[X_COORD], object[Y_COORD] + 2) && object[LAYER_TYPE] != METATILE_LAYER_TYPE_COVERED)
-        return TRUE;
-    else
-        return FALSE;
-}
-
 static void BuyMenuCopyMenuBgToBg1TilemapBuffer(void)
 {
     s16 i;

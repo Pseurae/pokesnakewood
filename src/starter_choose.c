@@ -37,7 +37,6 @@ static void CB2_StarterChoose(void);
 static void ClearStarterLabel(void);
 static void Task_StarterChoose(u8 taskId);
 static void Task_HandleStarterChooseInput(u8 taskId);
-static void Task_WaitForStarterSprite(u8 taskId);
 static void Task_AskConfirmStarter(u8 taskId);
 static void Task_HandleConfirmStarterInput(u8 taskId);
 static void Task_DeclineStarter(u8 taskId);
@@ -529,16 +528,6 @@ static void Task_HandleStarterChooseInput(u8 taskId)
     }
 }
 
-static void Task_WaitForStarterSprite(u8 taskId)
-{
-    if (gSprites[gTasks[taskId].tCircleSpriteId].affineAnimEnded &&
-        gSprites[gTasks[taskId].tCircleSpriteId].x == STARTER_PKMN_POS_X &&
-        gSprites[gTasks[taskId].tCircleSpriteId].y == STARTER_PKMN_POS_Y)
-    {
-        gTasks[taskId].func = Task_AskConfirmStarter;
-    }
-}
-
 static void Task_AskConfirmStarter(u8 taskId)
 {
     PlayCry_Normal(GetStarterPokemon(gTasks[taskId].tStarterSelection), 0);
@@ -596,41 +585,41 @@ static void Task_DeclineStarter(u8 taskId)
     gTasks[taskId].func = Task_StarterChoose;
 }
 
-static void CreateStarterPokemonLabel(u8 selection)
-{
-    u8 categoryText[32];
-    struct WindowTemplate winTemplate;
-    const u8 *speciesName;
-    s32 width;
-    u8 labelLeft, labelRight, labelTop, labelBottom;
+// static void CreateStarterPokemonLabel(u8 selection)
+// {
+//     u8 categoryText[32];
+//     struct WindowTemplate winTemplate;
+//     const u8 *speciesName;
+//     s32 width;
+//     u8 labelLeft, labelRight, labelTop, labelBottom;
 
-    u16 species = GetStarterPokemon(selection);
-    CopyMonCategoryText(SpeciesToNationalPokedexNum(species), categoryText);
-    speciesName = gSpeciesNames[species];
+//     u16 species = GetStarterPokemon(selection);
+//     CopyMonCategoryText(SpeciesToNationalPokedexNum(species), categoryText);
+//     speciesName = gSpeciesNames[species];
 
-    winTemplate = sWindowTemplate_StarterLabel;
-    winTemplate.tilemapLeft = sStarterLabelCoords[selection][0];
-    winTemplate.tilemapTop = sStarterLabelCoords[selection][1];
+//     winTemplate = sWindowTemplate_StarterLabel;
+//     winTemplate.tilemapLeft = sStarterLabelCoords[selection][0];
+//     winTemplate.tilemapTop = sStarterLabelCoords[selection][1];
 
-    sStarterLabelWindowId = AddWindow(&winTemplate);
-    FillWindowPixelBuffer(sStarterLabelWindowId, PIXEL_FILL(0));
+//     sStarterLabelWindowId = AddWindow(&winTemplate);
+//     FillWindowPixelBuffer(sStarterLabelWindowId, PIXEL_FILL(0));
 
-    width = GetStringCenterAlignXOffset(FONT_NARROW, categoryText, 0x68);
-    AddTextPrinterParameterized3(sStarterLabelWindowId, FONT_NARROW, width, 1, sTextColors, 0, categoryText);
+//     width = GetStringCenterAlignXOffset(FONT_NARROW, categoryText, 0x68);
+//     AddTextPrinterParameterized3(sStarterLabelWindowId, FONT_NARROW, width, 1, sTextColors, 0, categoryText);
 
-    width = GetStringCenterAlignXOffset(FONT_NORMAL, speciesName, 0x68);
-    AddTextPrinterParameterized3(sStarterLabelWindowId, FONT_NORMAL, width, 17, sTextColors, 0, speciesName);
+//     width = GetStringCenterAlignXOffset(FONT_NORMAL, speciesName, 0x68);
+//     AddTextPrinterParameterized3(sStarterLabelWindowId, FONT_NORMAL, width, 17, sTextColors, 0, speciesName);
 
-    PutWindowTilemap(sStarterLabelWindowId);
-    ScheduleBgCopyTilemapToVram(0);
+//     PutWindowTilemap(sStarterLabelWindowId);
+//     ScheduleBgCopyTilemapToVram(0);
 
-    labelLeft = sStarterLabelCoords[selection][0] * 8 - 4;
-    labelRight = (sStarterLabelCoords[selection][0] + 13) * 8 + 4;
-    labelTop = sStarterLabelCoords[selection][1] * 8;
-    labelBottom = (sStarterLabelCoords[selection][1] + 4) * 8;
-    SetGpuReg(REG_OFFSET_WIN0H, WIN_RANGE(labelLeft, labelRight));
-    SetGpuReg(REG_OFFSET_WIN0V, WIN_RANGE(labelTop, labelBottom));
-}
+//     labelLeft = sStarterLabelCoords[selection][0] * 8 - 4;
+//     labelRight = (sStarterLabelCoords[selection][0] + 13) * 8 + 4;
+//     labelTop = sStarterLabelCoords[selection][1] * 8;
+//     labelBottom = (sStarterLabelCoords[selection][1] + 4) * 8;
+//     SetGpuReg(REG_OFFSET_WIN0H, WIN_RANGE(labelLeft, labelRight));
+//     SetGpuReg(REG_OFFSET_WIN0V, WIN_RANGE(labelTop, labelBottom));
+// }
 
 static void ClearStarterLabel(void)
 {
@@ -657,14 +646,14 @@ static void Task_CreateStarterLabel(u8 taskId)
     gTasks[taskId].func = Task_HandleStarterChooseInput;
 }
 
-static u8 CreatePokemonFrontSprite(u16 species, u8 x, u8 y)
-{
-    u8 spriteId;
+// static u8 CreatePokemonFrontSprite(u16 species, u8 x, u8 y)
+// {
+//     u8 spriteId;
 
-    spriteId = CreateMonPicSprite_Affine(species, SHINY_ODDS, 0, MON_PIC_AFFINE_FRONT, x, y, 14, TAG_NONE);
-    gSprites[spriteId].oam.priority = 0;
-    return spriteId;
-}
+//     spriteId = CreateMonPicSprite_Affine(species, SHINY_ODDS, 0, MON_PIC_AFFINE_FRONT, x, y, 14, TAG_NONE);
+//     gSprites[spriteId].oam.priority = 0;
+//     return spriteId;
+// }
 
 static void SpriteCB_SelectionHand(struct Sprite *sprite)
 {

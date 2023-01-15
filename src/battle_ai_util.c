@@ -12,7 +12,6 @@
 #include "item.h"
 #include "pokemon.h"
 #include "random.h"
-#include "recorded_battle.h"
 #include "util.h"
 #include "constants/abilities.h"
 #include "constants/battle_ai.h"
@@ -689,41 +688,6 @@ bool32 MovesWithSplitUnusable(u32 attacker, u32 target, u32 split)
     return (usable == 0);
 }
 
-static bool32 AI_GetIfCrit(u32 move, u8 battlerAtk, u8 battlerDef)
-{
-    bool32 isCrit;
-
-    switch (CalcCritChanceStage(battlerAtk, battlerDef, move, FALSE))
-    {
-    case -1:
-    case 0:
-    default:
-        isCrit = FALSE;
-        break;
-    case 1:
-        if (gBattleMoves[move].flags & FLAG_HIGH_CRIT && (Random() % 5 == 0))
-            isCrit = TRUE;
-        else
-            isCrit = FALSE;
-        break;
-    case 2:
-        if (gBattleMoves[move].flags & FLAG_HIGH_CRIT && (Random() % 2 == 0))
-            isCrit = TRUE;
-        else if (!(gBattleMoves[move].flags & FLAG_HIGH_CRIT) && (Random() % 4) == 0)
-            isCrit = TRUE;
-        else
-            isCrit = FALSE;
-        break;
-    case -2:
-    case 3:
-    case 4:
-        isCrit = TRUE;
-        break;
-    }
-
-    return isCrit;
-}
-
 s32 AI_CalcDamage(u16 move, u8 battlerAtk, u8 battlerDef, u8 *typeEffectiveness, bool32 considerZPower)
 {
     s32 dmg, moveType, critDmg, normalDmg;
@@ -878,7 +842,6 @@ u8 GetMoveDamageResult(u16 move)
 {
     s32 i, checkedMove, bestId, currId, hp;
     s32 moveDmgs[MAX_MON_MOVES];
-    u8 result;
 
     for (i = 0; sIgnoredPowerfulMoveEffects[i] != IGNORED_MOVES_END; i++)
     {
@@ -1023,7 +986,6 @@ u8 AI_WhoStrikesFirst(u8 battlerAI, u8 battler2, u16 moveConsidered)
 {
     u32 fasterAI = 0, fasterPlayer = 0, i;
     s8 prioAI = 0;
-    s8 prioPlayer = 0;
     s8 prioBattler2 = 0;
     u16 *battler2Moves = GetMovesArray(battler2);
 
@@ -1064,7 +1026,7 @@ u8 AI_WhoStrikesFirst(u8 battlerAI, u8 battler2, u16 moveConsidered)
 // Check if target has means to faint ai mon.
 bool32 CanTargetFaintAi(u8 battlerDef, u8 battlerAtk)
 {
-    s32 i, dmg;
+    s32 i;
     u32 unusable = AI_DATA->moveLimitations[battlerDef];
     u16 *moves = gBattleResources->battleHistory->usedMoves[battlerDef];
 
@@ -1108,7 +1070,7 @@ bool32 CanAIFaintTarget(u8 battlerAtk, u8 battlerDef, u8 numHits)
 
 bool32 CanMoveFaintBattler(u16 move, u8 battlerDef, u8 battlerAtk, u8 nHits)
 {
-    s32 i, dmg;
+    s32 i;
     u8 effectiveness;
     u32 unusable = AI_DATA->moveLimitations[battlerDef];
 
@@ -1278,7 +1240,6 @@ bool32 DoesBattlerIgnoreAbilityChecks(u16 atkAbility, u16 move)
 
 bool32 AI_WeatherHasEffect(void)
 {
-    u32 i;
     if (AI_THINKING_STRUCT->aiFlags & AI_FLAG_NEGATE_UNAWARE)
         return TRUE;   // AI doesn't understand weather supression (handicap)
 
@@ -1287,8 +1248,6 @@ bool32 AI_WeatherHasEffect(void)
 
 u32 AI_GetBattlerMoveTargetType(u8 battlerId, u16 move)
 {
-    u32 target;
-
     if (gBattleMoves[move].effect == EFFECT_EXPANDING_FORCE && AI_IsTerrainAffected(battlerId, STATUS_FIELD_PSYCHIC_TERRAIN))
         return MOVE_TARGET_BOTH;
     else
@@ -1297,8 +1256,6 @@ u32 AI_GetBattlerMoveTargetType(u8 battlerId, u16 move)
 
 bool32 IsAromaVeilProtectedMove(u16 move)
 {
-    u32 i;
-
     switch (move)
     {
     case MOVE_DISABLE:
@@ -1590,8 +1547,6 @@ bool32 ShouldSetSun(u8 battlerAtk, u16 atkAbility, u16 holdEffect)
 void ProtectChecks(u8 battlerAtk, u8 battlerDef, u16 move, u16 predictedMove, s16 *score)
 {
     // TODO more sophisticated logic
-    u16 predictedEffect = gBattleMoves[predictedMove].effect;
-    u8 defAbility = AI_DATA->abilities[battlerDef];
     u32 uses = gDisableStructs[battlerAtk].protectUses;
 
     /*if (GetMoveResultFlags(predictedMove) & (MOVE_RESULT_NO_EFFECT | MOVE_RESULT_MISSED))
@@ -3325,7 +3280,6 @@ bool32 IsPartyFullyHealedExceptBattler(u8 battlerId)
 
 bool32 PartyHasMoveSplit(u8 battlerId, u8 split)
 {
-    u8 firstId, lastId;
     struct Pokemon* party = GetBattlerPartyData(battlerId);
     u32 i, j;
 

@@ -12,7 +12,6 @@
 #include "item.h"
 #include "pokemon.h"
 #include "random.h"
-#include "recorded_battle.h"
 #include "util.h"
 #include "constants/abilities.h"
 #include "constants/battle_ai.h"
@@ -152,9 +151,7 @@ static u32 GetWildAiFlags(void)
 
 void BattleAI_SetupFlags(void)
 {
-    if (gBattleTypeFlags & BATTLE_TYPE_RECORDED)
-        AI_THINKING_STRUCT->aiFlags = GetAiScriptsInRecordedBattle();
-    else if (gBattleTypeFlags & BATTLE_TYPE_SAFARI)
+    if (gBattleTypeFlags & BATTLE_TYPE_SAFARI)
         AI_THINKING_STRUCT->aiFlags = AI_FLAG_SAFARI;
     else if (gBattleTypeFlags & BATTLE_TYPE_ROAMER)
         AI_THINKING_STRUCT->aiFlags = AI_FLAG_ROAMING;
@@ -180,7 +177,7 @@ void BattleAI_SetupFlags(void)
 // sBattler_AI set in ComputeBattleAiScores
 void BattleAI_SetupAIData(u8 defaultScoreMoves)
 {
-    s32 i, move, dmg;
+    s32 i;
     u8 moveLimitations;
 
     // Clear AI data but preserve the flags.
@@ -389,7 +386,7 @@ static u8 ChooseMoveOrAction_Singles(void)
     u8 currentMoveArray[MAX_MON_MOVES];
     u8 consideredMoveArray[MAX_MON_MOVES];
     u32 numOfBestMoves;
-    s32 i, id;
+    s32 i;
     u32 flags = AI_THINKING_STRUCT->aiFlags;
 
     AI_DATA->partnerMove = 0;   // no ally
@@ -663,7 +660,6 @@ static s16 AI_CheckBadMove(u8 battlerAtk, u8 battlerDef, u16 move, s16 score)
     u16 moveEffect = gBattleMoves[move].effect;
     s32 moveType;
     u16 moveTarget = AI_GetBattlerMoveTargetType(battlerAtk, move);
-    u16 accuracy = AI_GetMoveAccuracy(battlerAtk, battlerDef, move);
     u32 effectiveness = AI_DATA->effectiveness[battlerAtk][battlerDef][AI_THINKING_STRUCT->movesetIndex];
     bool32 isDoubleBattle = IsValidDoubleBattle(battlerAtk);
     u32 i;

@@ -1278,13 +1278,6 @@ const u8 *GetApprenticeNameInLanguage(u32 apprenticeId, s32 language)
     }
 }
 
-// Functionally unused
-static void Task_SwitchToFollowupFuncAfterButtonPress(u8 taskId)
-{
-    if (JOY_NEW(A_BUTTON) || JOY_NEW(B_BUTTON))
-        SwitchTaskToFollowupFunc(taskId);
-}
-
 static void Task_ExecuteFuncAfterButtonPress(u8 taskId)
 {
     if (JOY_NEW(A_BUTTON) || JOY_NEW(B_BUTTON))
@@ -1302,9 +1295,3 @@ static void ExecuteFuncAfterButtonPress(void (*func)(void))
     gTasks[taskId].data[1] = (u32)(func) >> 16;
 }
 
-// Unused
-static void ExecuteFollowupFuncAfterButtonPress(TaskFunc task)
-{
-    u8 taskId = CreateTask(Task_SwitchToFollowupFuncAfterButtonPress, 1);
-    SetTaskFuncWithFollowupFunc(taskId, Task_SwitchToFollowupFuncAfterButtonPress, task);
-}

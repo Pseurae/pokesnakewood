@@ -134,22 +134,11 @@ static void HighlightSelectedMainMenuItem(u8, u8, s16);
 static void Task_HandleMainMenuInput(u8);
 static void Task_HandleMainMenuAPressed(u8);
 static void Task_HandleMainMenuBPressed(u8);
-static void Task_NewGameGenderSelection(u8);
-static void Task_GenderSelectionMessage(u8);
-static void Task_GenderSelectionStartSpriteFadeIn(u8);
-static void Task_GenderSelection_WaitForPlayerFadeIn(u8);
 static void Task_DisplayMainMenuInvalidActionError(u8);
-static void AddBirchSpeechObjects(u8);
-static void StartFadeInTarget1OutTarget2(u8, u8);
-static void StartFadePlatformOut(u8, u8);
-static void StartFadeOutTarget1InTarget2(u8, u8);
-static void StartFadePlatformIn(u8, u8);
 static void LoadMainMenuWindowFrameTiles(u8, u16);
 static void DrawMainMenuWindowBorder(const struct WindowTemplate *, u16);
 static void Task_HighlightSelectedMainMenuItem(u8);
 void CreateYesNoMenuParameterized(u8, u8, u16, u16, u8, u8);
-static void SpriteCB_MovePlayerDownWhileShrinking(struct Sprite *);
-static void SpriteCB_Null();
 static void MainMenu_FormatSavegamePlayer(u8);
 static void MainMenu_FormatSavegamePokedex(u8);
 static void MainMenu_FormatSavegameTime(u8);
@@ -768,14 +757,14 @@ static void Task_HandleMainMenuAPressed(u8 taskId)
                 SetMainCallback2(CB2_InitOptionMenu);
                 DestroyTask(taskId);
                 break;
-            case ACTION_MYSTERY_GIFT:
-                SetMainCallback2(CB2_InitMysteryGift);
-                DestroyTask(taskId);
-                break;
-            case ACTION_MYSTERY_EVENTS:
-                SetMainCallback2(CB2_InitMysteryEventMenu);
-                DestroyTask(taskId);
-                break;
+            // case ACTION_MYSTERY_GIFT:
+            //     SetMainCallback2(CB2_InitMysteryGift);
+            //     DestroyTask(taskId);
+            //     break;
+            // case ACTION_MYSTERY_EVENTS:
+            //     SetMainCallback2(CB2_InitMysteryEventMenu);
+            //     DestroyTask(taskId);
+            //     break;
             case ACTION_EREADER:
                 SetMainCallback2(CB2_InitEReader);
                 DestroyTask(taskId);

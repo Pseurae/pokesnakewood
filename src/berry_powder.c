@@ -176,16 +176,6 @@ bool8 GiveBerryPowder(u32 amountToAdd)
     }
 }
 
-static bool8 TakeBerryPowder_(u32 cost)
-{
-    u32 *powder = &gSaveBlock2Ptr->berryCrush.berryPowderAmount;
-    if (!HasEnoughBerryPowder_(cost))
-        return FALSE;
-
-    SetBerryPowder(powder, DecryptBerryPowder(powder) - cost);
-    return TRUE;
-}
-
 bool8 TakeBerryPowder(void)
 {
     u32 *powder = &gSaveBlock2Ptr->berryCrush.berryPowderAmount;

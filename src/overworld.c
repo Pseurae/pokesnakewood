@@ -135,14 +135,11 @@ static void CreateLinkPlayerSprite(u8, u8);
 static void GetLinkPlayerCoords(u8, u16 *, u16 *);
 static u8 GetLinkPlayerFacingDirection(u8);
 static u8 GetLinkPlayerElevation(u8);
-static s32 GetLinkPlayerObjectStepTimer(u8);
 static u8 GetLinkPlayerIdAt(s16, s16);
 static void SetPlayerFacingDirection(u8, u8);
 static void ZeroObjectEvent(struct ObjectEvent *);
 static void SpawnLinkPlayerObjectEvent(u8, s16, s16, u8);
 static void InitLinkPlayerObjectEventPos(struct ObjectEvent *, s16, s16);
-static void SetLinkPlayerObjectRange(u8, u8);
-static void DestroyLinkPlayerObject(u8);
 static u8 GetSpriteForLinkedPlayer(u8);
 static void RunTerminateLinkScript(void);
 static u32 GetLinkSendQueueLength(void);
@@ -1008,12 +1005,6 @@ void SetCurrentMapLayout(u16 mapLayoutId)
 void SetObjectEventLoadFlag(u8 flag)
 {
     sObjectEventLoadFlag = flag;
-}
-
-// Unused, sObjectEventLoadFlag is read directly
-static u8 GetObjectEventLoadFlag(void)
-{
-    return sObjectEventLoadFlag;
 }
 
 static bool16 ShouldLegendaryMusicPlayAtLocation(struct WarpData *warp)
@@ -2652,12 +2643,6 @@ u32 GetCableClubPartnersReady(void)
     return CABLE_SEAT_WAITING;
 }
 
-// Unused
-static bool32 IsAnyPlayerExitingCableClub(void)
-{
-    return IsAnyPlayerInLinkState(PLAYER_LINK_STATE_EXITING_ROOM);
-}
-
 u16 SetInCableClubSeat(void)
 {
     SetKeyInterceptCallback(KeyInterCB_SetReady);
@@ -2961,27 +2946,6 @@ static void InitLinkPlayerObjectEventPos(struct ObjectEvent *objEvent, s16 x, s1
     ObjectEventUpdateElevation(objEvent);
 }
 
-static void SetLinkPlayerObjectRange(u8 linkPlayerId, u8 dir)
-{
-    if (gLinkPlayerObjectEvents[linkPlayerId].active)
-    {
-        u8 objEventId = gLinkPlayerObjectEvents[linkPlayerId].objEventId;
-        struct ObjectEvent *objEvent = &gObjectEvents[objEventId];
-        linkDirection(objEvent) = dir;
-    }
-}
-
-static void DestroyLinkPlayerObject(u8 linkPlayerId)
-{
-    struct LinkPlayerObjectEvent *linkPlayerObjEvent = &gLinkPlayerObjectEvents[linkPlayerId];
-    u8 objEventId = linkPlayerObjEvent->objEventId;
-    struct ObjectEvent *objEvent = &gObjectEvents[objEventId];
-    if (objEvent->spriteId != MAX_SPRITES)
-        DestroySprite(&gSprites[objEvent->spriteId]);
-    linkPlayerObjEvent->active = 0;
-    objEvent->active = 0;
-}
-
 // Returns the spriteId corresponding to this player.
 static u8 GetSpriteForLinkedPlayer(u8 linkPlayerId)
 {
@@ -3010,13 +2974,6 @@ static u8 GetLinkPlayerElevation(u8 linkPlayerId)
     u8 objEventId = gLinkPlayerObjectEvents[linkPlayerId].objEventId;
     struct ObjectEvent *objEvent = &gObjectEvents[objEventId];
     return objEvent->currentElevation;
-}
-
-static s32 GetLinkPlayerObjectStepTimer(u8 linkPlayerId)
-{
-    u8 objEventId = gLinkPlayerObjectEvents[linkPlayerId].objEventId;
-    struct ObjectEvent *objEvent = &gObjectEvents[objEventId];
-    return 16 - (s8)objEvent->directionSequenceIndex;
 }
 
 static u8 GetLinkPlayerIdAt(s16 x, s16 y)

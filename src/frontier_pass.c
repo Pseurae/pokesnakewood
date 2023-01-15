@@ -4,7 +4,6 @@
 #include "trainer_card.h"
 #include "battle_anim.h"
 #include "event_data.h"
-#include "recorded_battle.h"
 #include "malloc.h"
 #include "sprite.h"
 #include "scanline_effect.h"
@@ -622,7 +621,7 @@ static u32 AllocateFrontierPassData(void (*callback)(void))
     }
 
     sPassData->battlePoints = gSaveBlock2Ptr->frontier.battlePoints;
-    sPassData->hasBattleRecord = CanCopyRecordedBattleSaveData();
+    // sPassData->hasBattleRecord = CanCopyRecordedBattleSaveData();
     sPassData->areaToShow = CURSOR_AREA_NOTHING;
     sPassData->trainerStars = CountPlayerTrainerStars();
     for (i = 0; i < NUM_FRONTIER_FACILITIES; i++)
@@ -900,28 +899,6 @@ void CB2_ReshowFrontierPass(void)
     SetMainCallback2(CB2_FrontierPass);
 }
 
-static void CB2_ReturnFromRecord(void)
-{
-    AllocateFrontierPassData(sSavedPassData.callback);
-    sPassData->cursorX = sSavedPassData.cursorX;
-    sPassData->cursorY = sSavedPassData.cursorY;
-    memset(&sSavedPassData, 0, sizeof(sSavedPassData));
-    switch (InBattlePyramid())
-    {
-    case 1:
-        PlayBGM(MUS_B_PYRAMID);
-        break;
-    case 2:
-        PlayBGM(MUS_B_PYRAMID_TOP);
-        break;
-    default:
-        Overworld_PlaySpecialMapMusic();
-        break;
-    }
-
-    SetMainCallback2(CB2_ReshowFrontierPass);
-}
-
 static void CB2_ShowFrontierPassFeature(void)
 {
     if (!HideFrontierPass())
@@ -937,7 +914,7 @@ static void CB2_ShowFrontierPassFeature(void)
         sSavedPassData.cursorX = sPassData->cursorX;
         sSavedPassData.cursorY = sPassData->cursorY;
         FreeFrontierPassData();
-        PlayRecordedBattle(CB2_ReturnFromRecord);
+        // PlayRecordedBattle(CB2_ReturnFromRecord);
         break;
     case CURSOR_AREA_CARD:
         ShowPlayerTrainerCard(CB2_ReshowFrontierPass);

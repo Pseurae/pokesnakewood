@@ -22,7 +22,6 @@
 #include "pokeball.h"
 #include "pokemon.h"
 #include "random.h"
-#include "recorded_battle.h"
 #include "reshow_battle_screen.h"
 #include "sound.h"
 #include "string_util.h"
@@ -347,13 +346,6 @@ static void HandleInputChooseAction(void)
         PlayerBufferExecCompleted();
     }
 #endif
-}
-
-static void UnusedEndBounceEffect(void)
-{
-    EndBounceEffect(gActiveBattler, BOUNCE_HEALTHBOX);
-    EndBounceEffect(gActiveBattler, BOUNCE_MON);
-    gBattlerControllerFuncs[gActiveBattler] = HandleInputChooseTarget;
 }
 
 static void HandleInputChooseTarget(void)
@@ -824,56 +816,6 @@ static void ReloadMoveNames(void)
     MoveSelectionCreateCursorAt(gMoveSelectionCursor[gActiveBattler], 0);
     MoveSelectionDisplayPpNumber();
     MoveSelectionDisplayMoveType();
-}
-
-static u32 HandleMoveInputUnused(void)
-{
-    u32 var = 0;
-
-    if (JOY_NEW(A_BUTTON))
-    {
-        PlaySE(SE_SELECT);
-        var = 1;
-    }
-    if (JOY_NEW(B_BUTTON))
-    {
-        PlaySE(SE_SELECT);
-        gBattle_BG0_X = 0;
-        gBattle_BG0_Y = DISPLAY_HEIGHT * 2;
-        var = 0xFF;
-    }
-    if (JOY_NEW(DPAD_LEFT) && gMoveSelectionCursor[gActiveBattler] & 1)
-    {
-        MoveSelectionDestroyCursorAt(gMoveSelectionCursor[gActiveBattler]);
-        gMoveSelectionCursor[gActiveBattler] ^= 1;
-        PlaySE(SE_SELECT);
-        MoveSelectionCreateCursorAt(gMoveSelectionCursor[gActiveBattler], 0);
-    }
-    if (JOY_NEW(DPAD_RIGHT) && !(gMoveSelectionCursor[gActiveBattler] & 1)
-        && (gMoveSelectionCursor[gActiveBattler] ^ 1) < gNumberOfMovesToChoose)
-    {
-        MoveSelectionDestroyCursorAt(gMoveSelectionCursor[gActiveBattler]);
-        gMoveSelectionCursor[gActiveBattler] ^= 1;
-        PlaySE(SE_SELECT);
-        MoveSelectionCreateCursorAt(gMoveSelectionCursor[gActiveBattler], 0);
-    }
-    if (JOY_NEW(DPAD_UP) && gMoveSelectionCursor[gActiveBattler] & 2)
-    {
-        MoveSelectionDestroyCursorAt(gMoveSelectionCursor[gActiveBattler]);
-        gMoveSelectionCursor[gActiveBattler] ^= 2;
-        PlaySE(SE_SELECT);
-        MoveSelectionCreateCursorAt(gMoveSelectionCursor[gActiveBattler], 0);
-    }
-    if (JOY_NEW(DPAD_DOWN) && !(gMoveSelectionCursor[gActiveBattler] & 2)
-        && (gMoveSelectionCursor[gActiveBattler] ^ 2) < gNumberOfMovesToChoose)
-    {
-        MoveSelectionDestroyCursorAt(gMoveSelectionCursor[gActiveBattler]);
-        gMoveSelectionCursor[gActiveBattler] ^= 2;
-        PlaySE(SE_SELECT);
-        MoveSelectionCreateCursorAt(gMoveSelectionCursor[gActiveBattler], 0);
-    }
-
-    return var;
 }
 
 static void HandleMoveSwitching(void)
@@ -2847,7 +2789,7 @@ static void PlayerChooseMoveInBattlePalace(void)
 {
     if (--*(gBattleStruct->arenaMindPoints + gActiveBattler) == 0)
     {
-        gBattlePalaceMoveSelectionRngValue = gRngValue;
+        // gBattlePalaceMoveSelectionRngValue = gRngValue;
         BtlController_EmitTwoReturnValues(BUFFER_B, 10, ChooseMoveAndTargetInBattlePalace());
         PlayerBufferExecCompleted();
     }
@@ -3336,7 +3278,7 @@ static void PlayerHandleBattleAnimation(void)
 
 static void PlayerHandleLinkStandbyMsg(void)
 {
-    RecordedBattle_RecordAllBattlerData(&gBattleResources->bufferA[gActiveBattler][2]);
+    // RecordedBattle_RecordAllBattlerData(&gBattleResources->bufferA[gActiveBattler][2]);
     switch (gBattleResources->bufferA[gActiveBattler][1])
     {
     case LINK_STANDBY_MSG_STOP_BOUNCE:
@@ -3373,7 +3315,7 @@ static void PlayerHandleResetActionMoveSelection(void)
 
 static void PlayerHandleEndLinkBattle(void)
 {
-    RecordedBattle_RecordAllBattlerData(&gBattleResources->bufferA[gActiveBattler][4]);
+    // RecordedBattle_RecordAllBattlerData(&gBattleResources->bufferA[gActiveBattler][4]);
     gBattleOutcome = gBattleResources->bufferA[gActiveBattler][1];
     gSaveBlock2Ptr->frontier.disableRecordBattle = gBattleResources->bufferA[gActiveBattler][2];
     FadeOutMapMusic(5);

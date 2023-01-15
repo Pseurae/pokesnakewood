@@ -400,7 +400,6 @@ static bool8 ShouldSwitchIfGameStatePrompt(void)
 
 static bool8 ShouldSwitchIfAbilityBenefit(void)
 {
-    s32 monToSwitchId;
     s32 moduloChance = 4; //25% Chance Default
     s32 chanceReducer = 1; //No Reduce default. Increase to reduce
     u8 battlerId = GetBattlerPosition(gActiveBattler);
@@ -915,7 +914,7 @@ u8 GetMostSuitableMonToSwitchInto(void)
     s32 firstId = 0;
     s32 lastId = 0; // + 1
     struct Pokemon *party;
-    s32 i, j, aliveCount = 0;
+    s32 i, aliveCount = 0;
     u8 invalidMons = 0;
 
     if (*(gBattleStruct->monToSwitchIntoId + gActiveBattler) != PARTY_SIZE)
@@ -999,8 +998,6 @@ static u8 GetAI_ItemType(u16 itemId, const u8 *itemEffect)
 
 static bool32 AiExpectsToFaintPlayer(void)
 {
-    bool32 canFaintPlayer;
-    u32 i;
     u8 target = gBattleStruct->aiChosenTarget[gActiveBattler];
 
     if (gBattleStruct->aiMoveOrAction[gActiveBattler] > 3)
@@ -1053,7 +1050,6 @@ static bool8 ShouldUseItem(void)
     {
         u16 item;
         const u8 *itemEffects;
-        u8 paramOffset;
         u8 battlerSide;
 
         if (i != 0 && validMons > (gBattleResources->battleHistory->itemsNo - i) + 1)

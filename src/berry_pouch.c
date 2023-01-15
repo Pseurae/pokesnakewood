@@ -1480,11 +1480,6 @@ static u8 GetOrCreateVariableWindow(u8 winIdx)
     return retval;
 }
 
-static void VariableWindowSetAltFrameTileAndPalette(u8 winIdx)
-{
-    DrawStdFrameWithCustomTileAndPalette(sVariableWindowIds[winIdx], FALSE, 0x001, 0xE);
-}
-
 static void DestroyVariableWindow(u8 winIdx)
 {
     ClearStdWindowAndFrameToTransparent(sVariableWindowIds[winIdx], FALSE);

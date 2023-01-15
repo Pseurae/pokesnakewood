@@ -29,7 +29,6 @@
 #include "pokemon_summary_screen.h"
 #include "pokemon_storage_system.h"
 #include "random.h"
-#include "recorded_battle.h"
 #include "rtc.h"
 #include "sound.h"
 #include "string_util.h"
@@ -3995,10 +3994,10 @@ u16 GetUnionRoomTrainerPic(void)
     u8 linkId;
     u32 arrId;
 
-    if (gBattleTypeFlags & BATTLE_TYPE_RECORDED_LINK)
-        linkId = gRecordedBattleMultiplayerId ^ 1;
-    else
-        linkId = GetMultiplayerId() ^ 1;
+    // if (gBattleTypeFlags & BATTLE_TYPE_RECORDED_LINK)
+    //     linkId = gRecordedBattleMultiplayerId ^ 1;
+    // else
+    linkId = GetMultiplayerId() ^ 1;
 
     arrId = gLinkPlayers[linkId].trainerId % NUM_UNION_ROOM_CLASSES;
     arrId |= gLinkPlayers[linkId].gender * NUM_UNION_ROOM_CLASSES;
@@ -4010,10 +4009,10 @@ u16 GetUnionRoomTrainerClass(void)
     u8 linkId;
     u32 arrId;
 
-    if (gBattleTypeFlags & BATTLE_TYPE_RECORDED_LINK)
-        linkId = gRecordedBattleMultiplayerId ^ 1;
-    else
-        linkId = GetMultiplayerId() ^ 1;
+    // if (gBattleTypeFlags & BATTLE_TYPE_RECORDED_LINK)
+    //     linkId = gRecordedBattleMultiplayerId ^ 1;
+    // else
+    linkId = GetMultiplayerId() ^ 1;
 
     arrId = gLinkPlayers[linkId].trainerId % NUM_UNION_ROOM_CLASSES;
     arrId |= gLinkPlayers[linkId].gender * NUM_UNION_ROOM_CLASSES;
@@ -6888,16 +6887,6 @@ u16 HoennToNationalOrder(u16 hoennNum)
     }                                                                           \
 }
 
-// Same as DrawSpindaSpots but attempts to discern for itself whether or
-// not it's the front pic.
-static void DrawSpindaSpotsUnused(u16 species, u32 personality, u8 *dest)
-{
-    if (species == SPECIES_SPINDA
-        && dest != gMonSpritesGfxPtr->sprites.ptr[B_POSITION_PLAYER_LEFT]
-        && dest != gMonSpritesGfxPtr->sprites.ptr[B_POSITION_PLAYER_RIGHT])
-        DRAW_SPINDA_SPOTS(personality, dest);
-}
-
 void DrawSpindaSpots(u16 species, u32 personality, u8 *dest, bool8 isFrontPic)
 {
     if (species == SPECIES_SPINDA && isFrontPic)
@@ -8019,32 +8008,6 @@ void BattleAnimateBackSprite(struct Sprite *sprite, u16 species)
         LaunchAnimationTaskForBackSprite(sprite, GetSpeciesBackAnimSet(species));
         sprite->callback = SpriteCallbackDummy_2;
     }
-}
-
-// Unused, identical to GetOpposingLinkMultiBattlerId but for the player
-// "rightSide" from that team's perspective, i.e. B_POSITION_*_RIGHT
-static u8 GetOwnOpposingLinkMultiBattlerId(bool8 rightSide)
-{
-    s32 i;
-    s32 battlerId = 0;
-    u8 multiplayerId = GetMultiplayerId();
-    switch (gLinkPlayers[multiplayerId].id)
-    {
-    case 0:
-    case 2:
-        battlerId = rightSide ? 1 : 3;
-        break;
-    case 1:
-    case 3:
-        battlerId = rightSide ? 2 : 0;
-        break;
-    }
-    for (i = 0; i < MAX_LINK_PLAYERS; i++)
-    {
-        if (gLinkPlayers[i].id == (s16)battlerId)
-            break;
-    }
-    return i;
 }
 
 u8 GetOpposingLinkMultiBattlerId(bool8 rightSide, u8 multiplayerId)

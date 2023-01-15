@@ -16,7 +16,6 @@
 #include "palette.h"
 #include "pokeball.h"
 #include "pokemon.h"
-#include "recorded_battle.h"
 #include "reshow_battle_screen.h"
 #include "sound.h"
 #include "string_util.h"
@@ -27,7 +26,6 @@
 #include "constants/battle_anim.h"
 #include "constants/songs.h"
 #include "constants/trainers.h"
-#include "recorded_battle.h"
 
 static void LinkPartnerHandleGetMonData(void);
 static void LinkPartnerHandleGetRawMonData(void);
@@ -1666,7 +1664,7 @@ static void LinkPartnerHandleBattleAnimation(void)
 
 static void LinkPartnerHandleLinkStandbyMsg(void)
 {
-    RecordedBattle_RecordAllBattlerData(&gBattleResources->bufferA[gActiveBattler][2]);
+    // RecordedBattle_RecordAllBattlerData(&gBattleResources->bufferA[gActiveBattler][2]);
     LinkPartnerBufferExecCompleted();
 }
 
@@ -1677,7 +1675,7 @@ static void LinkPartnerHandleResetActionMoveSelection(void)
 
 static void LinkPartnerHandleEndLinkBattle(void)
 {
-    RecordedBattle_RecordAllBattlerData(&gBattleResources->bufferA[gActiveBattler][4]);
+    // RecordedBattle_RecordAllBattlerData(&gBattleResources->bufferA[gActiveBattler][4]);
     gBattleOutcome = gBattleResources->bufferA[gActiveBattler][1];
     gSaveBlock2Ptr->frontier.disableRecordBattle = gBattleResources->bufferA[gActiveBattler][2];
     FadeOutMapMusic(5);

@@ -1477,12 +1477,6 @@ u8 GetTrainerEncounterMusicIdInBattlePyramid(u16 trainerId)
     return TRAINER_ENCOUNTER_MUSIC_MALE;
 }
 
-// Unused
-static void BattlePyramidRetireChallenge(void)
-{
-    ScriptContext_SetupScript(BattlePyramid_Retire);
-}
-
 static u16 GetUniqueTrainerId(u8 objectEventId)
 {
     int i;

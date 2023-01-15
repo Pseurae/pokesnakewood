@@ -17,7 +17,6 @@
 #include "text.h"
 #include "sound.h"
 #include "pokedex.h"
-#include "recorded_battle.h"
 #include "window.h"
 #include "reshow_battle_screen.h"
 #include "main.h"
@@ -305,7 +304,6 @@ static const u16 sWhiteOutBadgeMoney[9] = { 8, 16, 24, 36, 48, 64, 80, 100, 120 
 
 static bool8 IsTwoTurnsMove(u16 move);
 static void TrySetDestinyBondToHappen(void);
-static u8 AttacksThisTurn(u8 battlerId, u16 move); // Note: returns 1 if it's a charging turn, otherwise 2.
 static u32 ChangeStatBuffs(s8 statValue, u32 statId, u32 flags, const u8 *BS_ptr);
 static bool32 IsMonGettingExpSentOut(void);
 static void InitLevelUpBanner(void);
@@ -6605,7 +6603,7 @@ static void Cmd_switchhandleorder(void)
                 *(gBattleStruct->monToSwitchIntoId + i) = gBattleResources->bufferB[i][1];
                 if (!(gBattleStruct->field_93 & gBitTable[i]))
                 {
-                    RecordedBattle_SetBattlerAction(i, gBattleResources->bufferB[i][1]);
+                    // RecordedBattle_SetBattlerAction(i, gBattleResources->bufferB[i][1]);
                     gBattleStruct->field_93 |= gBitTable[i];
                 }
             }
@@ -6618,7 +6616,7 @@ static void Cmd_switchhandleorder(void)
     case 2:
         if (!(gBattleStruct->field_93 & gBitTable[gActiveBattler]))
         {
-            RecordedBattle_SetBattlerAction(gActiveBattler, gBattleResources->bufferB[gActiveBattler][1]);
+            // RecordedBattle_SetBattlerAction(gActiveBattler, gBattleResources->bufferB[gActiveBattler][1]);
             gBattleStruct->field_93 |= gBitTable[gActiveBattler];
         }
         // fall through
@@ -12069,26 +12067,6 @@ static bool8 IsTwoTurnsMove(u16 move)
         return TRUE;
     else
         return FALSE;
-}
-
-// unused
-static u8 AttacksThisTurn(u8 battlerId, u16 move) // Note: returns 1 if it's a charging turn, otherwise 2
-{
-    // first argument is unused
-    if (gBattleMoves[move].effect == EFFECT_SOLAR_BEAM
-        && IsBattlerWeatherAffected(battlerId, B_WEATHER_SUN))
-        return 2;
-
-    if (gBattleMoves[move].effect == EFFECT_SKULL_BASH
-     || gBattleMoves[move].effect == EFFECT_TWO_TURNS_ATTACK
-     || gBattleMoves[move].effect == EFFECT_SOLAR_BEAM
-     || gBattleMoves[move].effect == EFFECT_SEMI_INVULNERABLE
-     || gBattleMoves[move].effect == EFFECT_BIDE)
-    {
-        if ((gHitMarker & HITMARKER_CHARGING))
-            return 1;
-    }
-    return 2;
 }
 
 static void Cmd_trychoosesleeptalkmove(void)

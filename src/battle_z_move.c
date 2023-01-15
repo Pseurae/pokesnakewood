@@ -53,7 +53,6 @@ static void ZMoveSelectionDisplayPpNumber(void);
 static void ZMoveSelectionDisplayPower(u16 move, u16 zMove);
 static void ShowZMoveTriggerSprite(void);
 static bool32 AreStatsMaxed(u8 battlerId, u8 n);
-static u8 GetZMoveScore(u8 battlerAtk, u8 battlerDef, u16 baseMove, u16 zMove);
 static void ZMoveSelectionDisplayMoveType(u16 zMove);
 
 // Const Data

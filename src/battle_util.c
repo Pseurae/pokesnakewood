@@ -1431,23 +1431,6 @@ void PressurePPLoseOnUsingPerishSong(u8 attacker)
     }
 }
 
-// Unused
-static void MarkAllBattlersForControllerExec(void)
-{
-    int i;
-
-    if (gBattleTypeFlags & BATTLE_TYPE_LINK)
-    {
-        for (i = 0; i < gBattlersCount; i++)
-            gBattleControllerExecFlags |= gBitTable[i] << (32 - MAX_BATTLERS_COUNT);
-    }
-    else
-    {
-        for (i = 0; i < gBattlersCount; i++)
-            gBattleControllerExecFlags |= gBitTable[i];
-    }
-}
-
 bool32 IsBattlerMarkedForControllerExec(u8 battlerId)
 {
     if (gBattleTypeFlags & BATTLE_TYPE_LINK)

@@ -20,7 +20,6 @@
 #include "tv.h"
 #include "apprentice.h"
 #include "pokedex.h"
-#include "recorded_battle.h"
 #include "data.h"
 #include "record_mixing.h"
 #include "strings.h"
@@ -1723,17 +1722,17 @@ void CopyFrontierTrainerText(u8 whichText, u16 trainerId)
         }
         else if (trainerId < TRAINER_RECORD_MIXING_APPRENTICE)
         {
-            if (gBattleTypeFlags & BATTLE_TYPE_RECORDED)
-                FrontierSpeechToString(GetRecordedBattleEasyChatSpeech());
-            else
-                FrontierSpeechToString(gSaveBlock2Ptr->frontier.towerRecords[trainerId - TRAINER_RECORD_MIXING_FRIEND].speechWon);
+            // if (gBattleTypeFlags & BATTLE_TYPE_RECORDED)
+            //     FrontierSpeechToString(GetRecordedBattleEasyChatSpeech());
+            // else
+            FrontierSpeechToString(gSaveBlock2Ptr->frontier.towerRecords[trainerId - TRAINER_RECORD_MIXING_FRIEND].speechWon);
         }
         else
         {
-            if (gBattleTypeFlags & BATTLE_TYPE_RECORDED)
-                FrontierSpeechToString(GetRecordedBattleEasyChatSpeech());
-            else
-                FrontierSpeechToString(gSaveBlock2Ptr->apprentices[trainerId - TRAINER_RECORD_MIXING_APPRENTICE].speechWon);
+            // if (gBattleTypeFlags & BATTLE_TYPE_RECORDED)
+            //     FrontierSpeechToString(GetRecordedBattleEasyChatSpeech());
+            // else
+            FrontierSpeechToString(gSaveBlock2Ptr->apprentices[trainerId - TRAINER_RECORD_MIXING_APPRENTICE].speechWon);
         }
         break;
     case FRONTIER_PLAYER_WON_TEXT:
@@ -1751,23 +1750,23 @@ void CopyFrontierTrainerText(u8 whichText, u16 trainerId)
         }
         else if (trainerId < TRAINER_RECORD_MIXING_APPRENTICE)
         {
-            if (gBattleTypeFlags & BATTLE_TYPE_RECORDED)
-                FrontierSpeechToString(GetRecordedBattleEasyChatSpeech());
-            else
-                FrontierSpeechToString(gSaveBlock2Ptr->frontier.towerRecords[trainerId - TRAINER_RECORD_MIXING_FRIEND].speechLost);
+            // if (gBattleTypeFlags & BATTLE_TYPE_RECORDED)
+            //     FrontierSpeechToString(GetRecordedBattleEasyChatSpeech());
+            // else
+            FrontierSpeechToString(gSaveBlock2Ptr->frontier.towerRecords[trainerId - TRAINER_RECORD_MIXING_FRIEND].speechLost);
         }
         else
         {
-            if (gBattleTypeFlags & BATTLE_TYPE_RECORDED)
-            {
-                trainerId = GetRecordedBattleApprenticeId();
-                FrontierSpeechToString(gApprentices[trainerId].speechLost);
-            }
-            else
-            {
-                trainerId = gSaveBlock2Ptr->apprentices[trainerId - TRAINER_RECORD_MIXING_APPRENTICE].id;
-                FrontierSpeechToString(gApprentices[trainerId].speechLost);
-            }
+            // if (gBattleTypeFlags & BATTLE_TYPE_RECORDED)
+            // {
+            //     trainerId = GetRecordedBattleApprenticeId();
+            //     FrontierSpeechToString(gApprentices[trainerId].speechLost);
+            // }
+            // else
+            // {
+            trainerId = gSaveBlock2Ptr->apprentices[trainerId - TRAINER_RECORD_MIXING_APPRENTICE].id;
+            FrontierSpeechToString(gApprentices[trainerId].speechLost);
+            // }
         }
         break;
     }
@@ -2169,7 +2168,7 @@ static void RestoreHeldItems(void)
 
 static void SaveRecordBattle(void)
 {
-    gSpecialVar_Result = MoveRecordedBattleToSaveData();
+    // gSpecialVar_Result = MoveRecordedBattleToSaveData();
     gSaveBlock2Ptr->frontier.disableRecordBattle = TRUE;
 }
 
@@ -2441,10 +2440,10 @@ u8 GetFrontierBrainTrainerPicIndex(void)
 {
     s32 facility;
 
-    if (gBattleTypeFlags & BATTLE_TYPE_RECORDED)
-        facility = GetRecordedBattleFrontierFacility();
-    else
-        facility = VarGet(VAR_FRONTIER_FACILITY);
+    // if (gBattleTypeFlags & BATTLE_TYPE_RECORDED)
+    //     facility = GetRecordedBattleFrontierFacility();
+    // else
+    facility = VarGet(VAR_FRONTIER_FACILITY);
 
     return gTrainers[sFrontierBrainTrainerIds[facility]].trainerPic;
 }
@@ -2453,10 +2452,10 @@ u8 GetFrontierBrainTrainerClass(void)
 {
     s32 facility;
 
-    if (gBattleTypeFlags & BATTLE_TYPE_RECORDED)
-        facility = GetRecordedBattleFrontierFacility();
-    else
-        facility = VarGet(VAR_FRONTIER_FACILITY);
+    // if (gBattleTypeFlags & BATTLE_TYPE_RECORDED)
+    //     facility = GetRecordedBattleFrontierFacility();
+    // else
+    facility = VarGet(VAR_FRONTIER_FACILITY);
 
     return gTrainers[sFrontierBrainTrainerIds[facility]].trainerClass;
 }
@@ -2466,10 +2465,10 @@ void CopyFrontierBrainTrainerName(u8 *dst)
     s32 i;
     s32 facility;
 
-    if (gBattleTypeFlags & BATTLE_TYPE_RECORDED)
-        facility = GetRecordedBattleFrontierFacility();
-    else
-        facility = VarGet(VAR_FRONTIER_FACILITY);
+    // if (gBattleTypeFlags & BATTLE_TYPE_RECORDED)
+    //     facility = GetRecordedBattleFrontierFacility();
+    // else
+    facility = VarGet(VAR_FRONTIER_FACILITY);
 
     for (i = 0; i < PLAYER_NAME_LENGTH; i++)
         dst[i] = gTrainers[sFrontierBrainTrainerIds[facility]].trainerName[i];
@@ -2606,16 +2605,16 @@ static void CopyFrontierBrainText(bool8 playerWonText)
     s32 facility;
     s32 symbol;
 
-    if (gBattleTypeFlags & BATTLE_TYPE_RECORDED)
-    {
-        facility = GetRecordedBattleFrontierFacility();
-        symbol = GetRecordedBattleFronterBrainSymbol();
-    }
-    else
-    {
-        facility = VarGet(VAR_FRONTIER_FACILITY);
-        symbol = GetFronterBrainSymbol();
-    }
+    // if (gBattleTypeFlags & BATTLE_TYPE_RECORDED)
+    // {
+    //     facility = GetRecordedBattleFrontierFacility();
+    //     symbol = GetRecordedBattleFronterBrainSymbol();
+    // }
+    // else
+    // {
+    facility = VarGet(VAR_FRONTIER_FACILITY);
+    symbol = GetFronterBrainSymbol();
+    // }
 
     switch (playerWonText)
     {
