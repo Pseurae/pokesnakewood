@@ -530,8 +530,6 @@ static void CB2_InitBattleInternal(void)
     gBattle_BG3_Y = 0;
 
     gBattleTerrain = BattleSetup_GetTerrainId();
-    if (gBattleTypeFlags & BATTLE_TYPE_RECORDED)
-        gBattleTerrain = BATTLE_TERRAIN_BUILDING;
 
     InitBattleBgsVideo();
     LoadBattleTextboxAndBackground();
@@ -768,15 +766,6 @@ void BattleMainCB2(void)
     UpdatePaletteFade();
     UpdateDayNightPalettes();
     RunTasks();
-
-    // if (JOY_HELD(B_BUTTON) && gBattleTypeFlags & BATTLE_TYPE_RECORDED && RecordedBattle_CanStopPlayback())
-    // {
-    //     // Player pressed B during recorded battle playback, end battle
-    //     gSpecialVar_Result = gBattleOutcome = B_OUTCOME_PLAYER_TELEPORTED;
-    //     ResetPaletteFadeControl();
-    //     BeginNormalPaletteFade(PALETTES_ALL, 0, 0, 16, RGB_BLACK);
-    //     SetMainCallback2(CB2_QuitRecordedBattle);
-    // }
 }
 
 static void FreeRestoreBattleData(void)
@@ -870,7 +859,7 @@ static u8 CreateNPCTrainerParty(struct Pokemon *party, u16 trainerNum, bool8 fir
     if (trainerNum == TRAINER_SECRET_BASE)
         return 0;
 
-    if (gBattleTypeFlags & BATTLE_TYPE_TRAINER && !(gBattleTypeFlags & (BATTLE_TYPE_TRAINER_HILL)))
+    if (gBattleTypeFlags & BATTLE_TYPE_TRAINER)
     {
         if (firstTrainer == TRUE)
             ZeroEnemyPartyMons();
@@ -1996,10 +1985,7 @@ static void DoBattleIntro(void)
         }
         break;
     case 9: // print opponent sends out
-        if (gBattleTypeFlags & BATTLE_TYPE_RECORDED_LINK && !(gBattleTypeFlags & BATTLE_TYPE_RECORDED_IS_MASTER))
-            PrepareStringBattle(STRINGID_INTROSENDOUT, GetBattlerAtPosition(B_POSITION_PLAYER_LEFT));
-        else
-            PrepareStringBattle(STRINGID_INTROSENDOUT, GetBattlerAtPosition(B_POSITION_OPPONENT_LEFT));
+        PrepareStringBattle(STRINGID_INTROSENDOUT, GetBattlerAtPosition(B_POSITION_OPPONENT_LEFT));
         (*state)++;
         break;
     case 10: // wait for opponent sends out text
@@ -2007,11 +1993,7 @@ static void DoBattleIntro(void)
             (*state)++;
         break;
     case 11: // first opponent's mon send out animation
-        if (gBattleTypeFlags & BATTLE_TYPE_RECORDED_LINK && !(gBattleTypeFlags & BATTLE_TYPE_RECORDED_IS_MASTER))
-            gActiveBattler = GetBattlerAtPosition(B_POSITION_PLAYER_LEFT);
-        else
-            gActiveBattler = GetBattlerAtPosition(B_POSITION_OPPONENT_LEFT);
-
+        gActiveBattler = GetBattlerAtPosition(B_POSITION_OPPONENT_LEFT);
         BtlController_EmitIntroTrainerBallThrow(BUFFER_A);
         MarkBattlerForControllerExec(gActiveBattler);
         (*state)++;
@@ -2021,16 +2003,12 @@ static void DoBattleIntro(void)
     case 13: // second opponent's mon send out
         if (gBattleTypeFlags & BATTLE_TYPE_TWO_OPPONENTS && !BATTLE_TWO_VS_ONE_OPPONENT)
         {
-            if (gBattleTypeFlags & BATTLE_TYPE_RECORDED_LINK && !(gBattleTypeFlags & BATTLE_TYPE_RECORDED_IS_MASTER))
-                gActiveBattler = GetBattlerAtPosition(B_POSITION_PLAYER_RIGHT);
-            else
-                gActiveBattler = GetBattlerAtPosition(B_POSITION_OPPONENT_RIGHT);
-
+            gActiveBattler = GetBattlerAtPosition(B_POSITION_OPPONENT_RIGHT);
             BtlController_EmitIntroTrainerBallThrow(BUFFER_A);
             MarkBattlerForControllerExec(gActiveBattler);
         }
     #if B_FAST_INTRO == TRUE
-        if (!(gBattleTypeFlags & (BATTLE_TYPE_RECORDED | BATTLE_TYPE_RECORDED_LINK | BATTLE_TYPE_RECORDED_IS_MASTER)))
+        if (TRUE)
             *state = 15; // Print at the same time as trainer sends out second mon.
         else
     #endif
@@ -2047,15 +2025,11 @@ static void DoBattleIntro(void)
     case 16: // print player sends out
         if (!(gBattleTypeFlags & BATTLE_TYPE_SAFARI))
         {
-            if (gBattleTypeFlags & BATTLE_TYPE_RECORDED_LINK && !(gBattleTypeFlags & BATTLE_TYPE_RECORDED_IS_MASTER))
-                gActiveBattler = GetBattlerAtPosition(B_POSITION_OPPONENT_LEFT);
-            else
-                gActiveBattler = GetBattlerAtPosition(B_POSITION_PLAYER_LEFT);
+            gActiveBattler = GetBattlerAtPosition(B_POSITION_PLAYER_LEFT);
 
             // A hack that makes fast intro work in trainer battles too.
         #if B_FAST_INTRO == TRUE
             if (gBattleTypeFlags & BATTLE_TYPE_TRAINER
-                && !(gBattleTypeFlags & (BATTLE_TYPE_RECORDED | BATTLE_TYPE_RECORDED_LINK | BATTLE_TYPE_RECORDED_IS_MASTER))
                 && gSprites[gHealthboxSpriteIds[gActiveBattler ^ BIT_SIDE]].callback == SpriteCallbackDummy)
             {
                 return;
@@ -2069,21 +2043,13 @@ static void DoBattleIntro(void)
     case 17: // wait for player send out message
         if (!gBattleControllerExecFlags)
         {
-            if (gBattleTypeFlags & BATTLE_TYPE_RECORDED_LINK && !(gBattleTypeFlags & BATTLE_TYPE_RECORDED_IS_MASTER))
-                gActiveBattler = GetBattlerAtPosition(B_POSITION_OPPONENT_LEFT);
-            else
-                gActiveBattler = GetBattlerAtPosition(B_POSITION_PLAYER_LEFT);
-
+            gActiveBattler = GetBattlerAtPosition(B_POSITION_PLAYER_LEFT);
             if (!IsBattlerMarkedForControllerExec(gActiveBattler))
                 (*state)++;
         }
         break;
     case 18: // player 1 send out
-        if (gBattleTypeFlags & BATTLE_TYPE_RECORDED_LINK && !(gBattleTypeFlags & BATTLE_TYPE_RECORDED_IS_MASTER))
-            gActiveBattler = GetBattlerAtPosition(B_POSITION_OPPONENT_LEFT);
-        else
-            gActiveBattler = GetBattlerAtPosition(B_POSITION_PLAYER_LEFT);
-
+        gActiveBattler = GetBattlerAtPosition(B_POSITION_PLAYER_LEFT);
         BtlController_EmitIntroTrainerBallThrow(BUFFER_A);
         MarkBattlerForControllerExec(gActiveBattler);
         (*state)++;
@@ -2091,11 +2057,7 @@ static void DoBattleIntro(void)
     case 19: // player 2 send out
         if (gBattleTypeFlags & BATTLE_TYPE_INGAME_PARTNER)
         {
-            if (gBattleTypeFlags & BATTLE_TYPE_RECORDED_LINK && !(gBattleTypeFlags & BATTLE_TYPE_RECORDED_IS_MASTER))
-                gActiveBattler = GetBattlerAtPosition(B_POSITION_OPPONENT_RIGHT);
-            else
-                gActiveBattler = GetBattlerAtPosition(B_POSITION_PLAYER_RIGHT);
-
+            gActiveBattler = GetBattlerAtPosition(B_POSITION_PLAYER_RIGHT);
             BtlController_EmitIntroTrainerBallThrow(BUFFER_A);
             MarkBattlerForControllerExec(gActiveBattler);
         }
@@ -2618,16 +2580,6 @@ static void HandleTurnActionSelectionState(void)
                 }
 
                 if (gBattleTypeFlags & BATTLE_TYPE_TRAINER
-                    && gBattleTypeFlags & (BATTLE_TYPE_TRAINER_HILL)
-                    && gBattleResources->bufferB[gActiveBattler][1] == B_ACTION_RUN)
-                {
-                    gSelectionBattleScripts[gActiveBattler] = BattleScript_AskIfWantsToForfeitMatch;
-                    gBattleCommunication[gActiveBattler] = STATE_SELECTION_SCRIPT_MAY_RUN;
-                    *(gBattleStruct->selectionScriptFinished + gActiveBattler) = FALSE;
-                    *(gBattleStruct->stateIdAfterSelScript + gActiveBattler) = STATE_BEFORE_ACTION_CHOSEN;
-                    return;
-                }
-                else if (gBattleTypeFlags & BATTLE_TYPE_TRAINER
                          && gBattleResources->bufferB[gActiveBattler][1] == B_ACTION_RUN)
                 {
                     BattleScriptExecute(BattleScript_PrintCantRunFromTrainer);
@@ -3564,8 +3516,7 @@ static void FreeResetData_ReturnToOvOrDoEvolutions(void)
         gIsFishingEncounter = FALSE;
         gIsSurfingEncounter = FALSE;
         ResetSpriteData();
-        if (!(gBattleTypeFlags & (BATTLE_TYPE_RECORDED_LINK
-                                  | BATTLE_TYPE_FIRST_BATTLE
+        if (!(gBattleTypeFlags & (BATTLE_TYPE_FIRST_BATTLE
                                   | BATTLE_TYPE_SAFARI
                                   | BATTLE_TYPE_WALLY_TUTORIAL))
         #if B_EVOLUTION_AFTER_WHITEOUT <= GEN_5

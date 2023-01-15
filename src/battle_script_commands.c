@@ -3353,15 +3353,11 @@ void SetMoveEffect(bool32 primary, u32 certain)
 
                     side = GetBattlerSide(gBattlerAttacker);
                     if (GetBattlerSide(gBattlerAttacker) == B_SIDE_OPPONENT
-                        && !(gBattleTypeFlags &
-                            (BATTLE_TYPE_RECORDED_LINK
-                            | BATTLE_TYPE_SECRET_BASE)))
+                        && !(gBattleTypeFlags & BATTLE_TYPE_SECRET_BASE))
                     {
                         gBattlescriptCurrInstr++;
                     }
-                    else if (!(gBattleTypeFlags &
-                            (BATTLE_TYPE_RECORDED_LINK
-                            | BATTLE_TYPE_SECRET_BASE))
+                    else if (!(gBattleTypeFlags & BATTLE_TYPE_SECRET_BASE)
                         && (gWishFutureKnock.knockedOffMons[side] & gBitTable[gBattlerPartyIndexes[gBattlerAttacker]]))
                     {
                         gBattlescriptCurrInstr++;
@@ -3991,9 +3987,7 @@ static void Cmd_getexp(void)
     {
     case 0: // check if should receive exp at all
         if (GetBattlerSide(gBattlerFainted) != B_SIDE_OPPONENT || (gBattleTypeFlags &
-             (BATTLE_TYPE_RECORDED_LINK
-              | BATTLE_TYPE_TRAINER_HILL
-              | BATTLE_TYPE_SAFARI)))
+             (BATTLE_TYPE_SAFARI)))
         {
             gBattleScripting.getexpState = 6; // goto last case
         }
@@ -4382,32 +4376,7 @@ static void Cmd_checkteamslost(void)
     // For link battles that haven't ended, count number of empty battler spots
     // In link multi battles, jump to pointer if more than 1 spot empty
     // In non-multi battles, jump to pointer if 1 spot is missing on both sides
-    if (gBattleOutcome == 0 && (gBattleTypeFlags & (BATTLE_TYPE_RECORDED_LINK)))
-    {
-        s32 i, emptyPlayerSpots, emptyOpponentSpots;
-
-        for (emptyPlayerSpots = 0, i = 0; i < gBattlersCount; i += 2)
-        {
-            if ((gHitMarker & HITMARKER_FAINTED2(i)) && (!gSpecialStatuses[i].faintedHasReplacement))
-                emptyPlayerSpots++;
-        }
-
-        emptyOpponentSpots = 0;
-        for (i = 1; i < gBattlersCount; i += 2)
-        {
-            if ((gHitMarker & HITMARKER_FAINTED2(i)) && (!gSpecialStatuses[i].faintedHasReplacement))
-                emptyOpponentSpots++;
-        }
-
-        if (emptyOpponentSpots != 0 && emptyPlayerSpots != 0)
-            gBattlescriptCurrInstr = T2_READ_PTR(gBattlescriptCurrInstr + 1);
-        else
-            gBattlescriptCurrInstr += 5;
-    }
-    else
-    {
-        gBattlescriptCurrInstr += 5;
-    }
+    gBattlescriptCurrInstr += 5;
 }
 
 static void MoveValuesCleanUp(void)
@@ -6064,9 +6033,7 @@ static void Cmd_switchinanim(void)
 
     gActiveBattler = GetBattlerForBattleScript(gBattlescriptCurrInstr[1]);
 
-    if (GetBattlerSide(gActiveBattler) == B_SIDE_OPPONENT
-        && !(gBattleTypeFlags & (BATTLE_TYPE_RECORDED_LINK
-                                 | BATTLE_TYPE_TRAINER_HILL)))
+    if (GetBattlerSide(gActiveBattler) == B_SIDE_OPPONENT)
         HandleSetPokedexFlag(SpeciesToNationalPokedexNum(gBattleMons[gActiveBattler].species), FLAG_SET_SEEN, gBattleMons[gActiveBattler].personality);
 
     gAbsentBattlerFlags &= ~(gBitTable[gActiveBattler]);
@@ -11118,7 +11085,7 @@ static void Cmd_tryconversiontypechange(void)
 
 static void Cmd_givepaydaymoney(void)
 {
-    if (!(gBattleTypeFlags & (BATTLE_TYPE_RECORDED_LINK)) && gPaydayMoney != 0)
+    if (gPaydayMoney != 0)
     {
         u32 bonusMoney = gPaydayMoney * gBattleStruct->moneyMultiplier;
         AddMoney(&gSaveBlock1Ptr->money, bonusMoney);
@@ -12857,14 +12824,12 @@ static void Cmd_trysethelpinghand(void)
 static void Cmd_tryswapitems(void)
 {
     // opponent can't swap items with player in regular battles
-    if (gBattleTypeFlags & BATTLE_TYPE_TRAINER_HILL
-        || (GetBattlerSide(gBattlerAttacker) == B_SIDE_OPPONENT
-            && !(gBattleTypeFlags & (BATTLE_TYPE_SECRET_BASE
-                                  | BATTLE_TYPE_RECORDED_LINK
-                                  #if B_TRAINERS_KNOCK_OFF_ITEMS == TRUE
-                                  | BATTLE_TYPE_TRAINER
-                                  #endif
-                                  ))))
+    if ((GetBattlerSide(gBattlerAttacker) == B_SIDE_OPPONENT
+        && !(gBattleTypeFlags & (BATTLE_TYPE_SECRET_BASE
+                                #if B_TRAINERS_KNOCK_OFF_ITEMS == TRUE
+                                | BATTLE_TYPE_TRAINER
+                                #endif
+                                ))))
     {
         gBattlescriptCurrInstr = T1_READ_PTR(gBattlescriptCurrInstr + 1);
     }
@@ -12874,8 +12839,7 @@ static void Cmd_tryswapitems(void)
         u8 sideTarget = GetBattlerSide(gBattlerTarget);
 
         // You can't swap items if they were knocked off in regular battles
-        if (!(gBattleTypeFlags & (BATTLE_TYPE_SECRET_BASE
-                             | BATTLE_TYPE_RECORDED_LINK))
+        if (!(gBattleTypeFlags & (BATTLE_TYPE_SECRET_BASE))
             && (gWishFutureKnock.knockedOffMons[sideAttacker] & gBitTable[gBattlerPartyIndexes[gBattlerAttacker]]
                 || gWishFutureKnock.knockedOffMons[sideTarget] & gBitTable[gBattlerPartyIndexes[gBattlerTarget]]))
         {

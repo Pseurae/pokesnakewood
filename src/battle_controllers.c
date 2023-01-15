@@ -56,9 +56,6 @@ void InitBattleControllers(void)
 {
     s32 i;
 
-    // if (!(gBattleTypeFlags & BATTLE_TYPE_RECORDED))
-    //     RecordedBattle_SaveParties();
-
     InitSinglePlayerBtlControllers();
 
     SetBattlePartyIds();

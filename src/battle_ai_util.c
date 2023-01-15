@@ -2587,8 +2587,7 @@ bool32 CanKnockOffItem(u8 battler, u16 item)
     if (item == ITEM_NONE)
         return FALSE;
 
-    if (!(gBattleTypeFlags & (BATTLE_TYPE_RECORDED_LINK
-      | BATTLE_TYPE_SECRET_BASE
+    if (!(gBattleTypeFlags & (BATTLE_TYPE_SECRET_BASE
       #if B_TRAINERS_KNOCK_OFF_ITEMS == TRUE
       | BATTLE_TYPE_TRAINER
       #endif

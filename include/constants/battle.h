@@ -46,25 +46,21 @@
 
 // Battle Type Flags
 #define BATTLE_TYPE_DOUBLE             (1 << 0)
-#define BATTLE_TYPE_IS_MASTER          (1 << 2) // In not-link battles, it's always set.
-#define BATTLE_TYPE_TRAINER            (1 << 3)
-#define BATTLE_TYPE_FIRST_BATTLE       (1 << 4)
-#define BATTLE_TYPE_SAFARI             (1 << 7)
-#define BATTLE_TYPE_WALLY_TUTORIAL     (1 << 9) // Used in pokefirered as BATTLE_TYPE_OLD_MAN_TUTORIAL.
-#define BATTLE_TYPE_ROAMER             (1 << 10)
-#define BATTLE_TYPE_KYOGRE_GROUDON     (1 << 12)
-#define BATTLE_TYPE_LEGENDARY          (1 << 13)
-#define BATTLE_TYPE_REGI               (1 << 14)
-#define BATTLE_TYPE_TWO_OPPONENTS      (1 << 15) // Used in pokefirered as BATTLE_TYPE_GHOST.
-#define BATTLE_TYPE_INGAME_PARTNER     (1 << 22)
-#define BATTLE_TYPE_RECORDED           (1 << 24)
-#define BATTLE_TYPE_RECORDED_LINK      (1 << 25)
-#define BATTLE_TYPE_TRAINER_HILL       (1 << 26)
-#define BATTLE_TYPE_SECRET_BASE        (1 << 27)
-#define BATTLE_TYPE_GROUDON            (1 << 28)
-#define BATTLE_TYPE_KYOGRE             (1 << 29)
-#define BATTLE_TYPE_RAYQUAZA           (1 << 30)
-#define BATTLE_TYPE_RECORDED_IS_MASTER (1 << 31)
+#define BATTLE_TYPE_IS_MASTER          (1 << 1) // In not-link battles, it's always set.
+#define BATTLE_TYPE_TRAINER            (1 << 2)
+#define BATTLE_TYPE_FIRST_BATTLE       (1 << 3)
+#define BATTLE_TYPE_SAFARI             (1 << 4)
+#define BATTLE_TYPE_WALLY_TUTORIAL     (1 << 5) // Used in pokefirered as BATTLE_TYPE_OLD_MAN_TUTORIAL.
+#define BATTLE_TYPE_ROAMER             (1 << 6)
+#define BATTLE_TYPE_KYOGRE_GROUDON     (1 << 7)
+#define BATTLE_TYPE_LEGENDARY          (1 << 8)
+#define BATTLE_TYPE_REGI               (1 << 9)
+#define BATTLE_TYPE_TWO_OPPONENTS      (1 << 10) // Used in pokefirered as BATTLE_TYPE_GHOST.
+#define BATTLE_TYPE_INGAME_PARTNER     (1 << 11)
+#define BATTLE_TYPE_SECRET_BASE        (1 << 12)
+#define BATTLE_TYPE_GROUDON            (1 << 13)
+#define BATTLE_TYPE_KYOGRE             (1 << 14)
+#define BATTLE_TYPE_RAYQUAZA           (1 << 15)
 
 #define WILD_DOUBLE_BATTLE ((gBattleTypeFlags & BATTLE_TYPE_DOUBLE && !(gBattleTypeFlags & BATTLE_TYPE_TRAINER)))
 #define BATTLE_TWO_VS_ONE_OPPONENT ((gBattleTypeFlags & BATTLE_TYPE_INGAME_PARTNER && gTrainerBattleOpponent_B == 0xFFFF))

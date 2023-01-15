@@ -669,52 +669,28 @@ void HandleAction_Run(void)
 {
     gBattlerAttacker = gBattlerByTurnOrder[gCurrentTurnActionNumber];
 
-    if (gBattleTypeFlags & (BATTLE_TYPE_RECORDED_LINK))
+    if (GetBattlerSide(gBattlerAttacker) == B_SIDE_PLAYER)
     {
-        gCurrentTurnActionNumber = gBattlersCount;
-
-        for (gActiveBattler = 0; gActiveBattler < gBattlersCount; gActiveBattler++)
+        if (!TryRunFromBattle(gBattlerAttacker)) // failed to run away
         {
-            if (GetBattlerSide(gActiveBattler) == B_SIDE_PLAYER)
-            {
-                if (gChosenActionByBattler[gActiveBattler] == B_ACTION_RUN)
-                    gBattleOutcome |= B_OUTCOME_LOST;
-            }
-            else
-            {
-                if (gChosenActionByBattler[gActiveBattler] == B_ACTION_RUN)
-                    gBattleOutcome |= B_OUTCOME_WON;
-            }
+            ClearFuryCutterDestinyBondGrudge(gBattlerAttacker);
+            gBattleCommunication[MULTISTRING_CHOOSER] = B_MSG_CANT_ESCAPE_2;
+            gBattlescriptCurrInstr = BattleScript_PrintFailedToRunString;
+            gCurrentActionFuncId = B_ACTION_EXEC_SCRIPT;
         }
-
-        gBattleOutcome |= B_OUTCOME_LINK_BATTLE_RAN;
-        gSaveBlock2Ptr->frontier.disableRecordBattle = TRUE;
     }
     else
     {
-        if (GetBattlerSide(gBattlerAttacker) == B_SIDE_PLAYER)
+        if (!CanBattlerEscape(gBattlerAttacker))
         {
-            if (!TryRunFromBattle(gBattlerAttacker)) // failed to run away
-            {
-                ClearFuryCutterDestinyBondGrudge(gBattlerAttacker);
-                gBattleCommunication[MULTISTRING_CHOOSER] = B_MSG_CANT_ESCAPE_2;
-                gBattlescriptCurrInstr = BattleScript_PrintFailedToRunString;
-                gCurrentActionFuncId = B_ACTION_EXEC_SCRIPT;
-            }
+            gBattleCommunication[MULTISTRING_CHOOSER] = B_MSG_ATTACKER_CANT_ESCAPE;
+            gBattlescriptCurrInstr = BattleScript_PrintFailedToRunString;
+            gCurrentActionFuncId = B_ACTION_EXEC_SCRIPT;
         }
         else
         {
-            if (!CanBattlerEscape(gBattlerAttacker))
-            {
-                gBattleCommunication[MULTISTRING_CHOOSER] = B_MSG_ATTACKER_CANT_ESCAPE;
-                gBattlescriptCurrInstr = BattleScript_PrintFailedToRunString;
-                gCurrentActionFuncId = B_ACTION_EXEC_SCRIPT;
-            }
-            else
-            {
-                gCurrentTurnActionNumber = gBattlersCount;
-                gBattleOutcome = B_OUTCOME_MON_FLED;
-            }
+            gCurrentTurnActionNumber = gBattlersCount;
+            gBattleOutcome = B_OUTCOME_MON_FLED;
         }
     }
 }
@@ -1935,8 +1911,7 @@ u32 GetBattlerFriendshipScore(u8 battlerId)
     if (side != B_SIDE_PLAYER)
         return FRIENDSHIP_NONE;
     else if (gSpeciesInfo[species].flags & SPECIES_FLAG_MEGA_EVOLUTION
-          || (gBattleTypeFlags & (BATTLE_TYPE_RECORDED_LINK
-                                | BATTLE_TYPE_SECRET_BASE)))
+          || (gBattleTypeFlags & (BATTLE_TYPE_SECRET_BASE)))
         return FRIENDSHIP_NONE;
 
     return GetMonFriendshipScore(&party[gBattlerPartyIndexes[battlerId]]);
@@ -4174,37 +4149,34 @@ u8 AbilityBattleEffects(u8 caseID, u8 battler, u16 ability, u8 special, u16 move
         #endif
             break;
         case ABILITYEFFECT_SWITCH_IN_WEATHER:
-            if (!(gBattleTypeFlags & BATTLE_TYPE_RECORDED))
+            switch (GetCurrentWeather())
             {
-                switch (GetCurrentWeather())
+            case WEATHER_RAIN:
+            case WEATHER_RAIN_THUNDERSTORM:
+            case WEATHER_DOWNPOUR:
+                if (!(gBattleWeather & B_WEATHER_RAIN))
                 {
-                case WEATHER_RAIN:
-                case WEATHER_RAIN_THUNDERSTORM:
-                case WEATHER_DOWNPOUR:
-                    if (!(gBattleWeather & B_WEATHER_RAIN))
-                    {
-                        gBattleWeather = (B_WEATHER_RAIN_TEMPORARY | B_WEATHER_RAIN_PERMANENT);
-                        gBattleScripting.animArg1 = B_ANIM_RAIN_CONTINUES;
-                        effect++;
-                    }
-                    break;
-                case WEATHER_SANDSTORM:
-                    if (!(gBattleWeather & B_WEATHER_SANDSTORM))
-                    {
-                        gBattleWeather = B_WEATHER_SANDSTORM;
-                        gBattleScripting.animArg1 = B_ANIM_SANDSTORM_CONTINUES;
-                        effect++;
-                    }
-                    break;
-                case WEATHER_DROUGHT:
-                    if (!(gBattleWeather & B_WEATHER_SUN))
-                    {
-                        gBattleWeather = (B_WEATHER_SUN_PERMANENT | B_WEATHER_SUN_TEMPORARY);
-                        gBattleScripting.animArg1 = B_ANIM_SUN_CONTINUES;
-                        effect++;
-                    }
-                    break;
+                    gBattleWeather = (B_WEATHER_RAIN_TEMPORARY | B_WEATHER_RAIN_PERMANENT);
+                    gBattleScripting.animArg1 = B_ANIM_RAIN_CONTINUES;
+                    effect++;
                 }
+                break;
+            case WEATHER_SANDSTORM:
+                if (!(gBattleWeather & B_WEATHER_SANDSTORM))
+                {
+                    gBattleWeather = B_WEATHER_SANDSTORM;
+                    gBattleScripting.animArg1 = B_ANIM_SANDSTORM_CONTINUES;
+                    effect++;
+                }
+                break;
+            case WEATHER_DROUGHT:
+                if (!(gBattleWeather & B_WEATHER_SUN))
+                {
+                    gBattleWeather = (B_WEATHER_SUN_PERMANENT | B_WEATHER_SUN_TEMPORARY);
+                    gBattleScripting.animArg1 = B_ANIM_SUN_CONTINUES;
+                    effect++;
+                }
+                break;
             }
             if (effect != 0)
             {
@@ -7593,16 +7565,12 @@ u8 IsMonDisobedient(void)
     s32 calc;
     u8 obedienceLevel = 0;
 
-    if (gBattleTypeFlags & BATTLE_TYPE_RECORDED_LINK)
-        return 0;
     if (GetBattlerSide(gBattlerAttacker) == B_SIDE_OPPONENT)
         return 0;
 
     if (IsMonEventLegal(gBattlerAttacker)) // only false if illegal Mew or Deoxys
     {
         if (gBattleTypeFlags & BATTLE_TYPE_INGAME_PARTNER && GetBattlerPosition(gBattlerAttacker) == 2)
-            return 0;
-        if (gBattleTypeFlags & BATTLE_TYPE_RECORDED)
             return 0;
         if (!IsOtherTrainer(gBattleMons[gBattlerAttacker].otId, gBattleMons[gBattlerAttacker].otName))
             return 0;
@@ -9734,9 +9702,7 @@ bool32 SetIllusionMon(struct Pokemon *mon, u32 battlerId)
 bool8 ShouldGetStatBadgeBoost(u16 badgeFlag, u8 battlerId)
 {
 #if B_BADGE_BOOST == GEN_3
-    if (gBattleTypeFlags & (BATTLE_TYPE_RECORDED_LINK))
-        return FALSE;
-    else if (GetBattlerSide(battlerId) != B_SIDE_PLAYER)
+    if (GetBattlerSide(battlerId) != B_SIDE_PLAYER)
         return FALSE;
     else if (gBattleTypeFlags & BATTLE_TYPE_TRAINER && gTrainerBattleOpponent_A == TRAINER_SECRET_BASE)
         return FALSE;
@@ -10009,14 +9975,10 @@ bool32 CanStealItem(u8 battlerStealing, u8 battlerItem, u16 item)
 {
     u8 stealerSide = GetBattlerSide(battlerStealing);
 
-    if (gBattleTypeFlags & BATTLE_TYPE_TRAINER_HILL)
-        return FALSE;
-
     // Check if the battler trying to steal should be able to
     if (stealerSide == B_SIDE_OPPONENT
         && !(gBattleTypeFlags &
-             (BATTLE_TYPE_RECORDED_LINK
-              | BATTLE_TYPE_SECRET_BASE
+             (BATTLE_TYPE_SECRET_BASE
               #if B_TRAINERS_KNOCK_OFF_ITEMS == TRUE
               | BATTLE_TYPE_TRAINER
               #endif
@@ -10025,8 +9987,7 @@ bool32 CanStealItem(u8 battlerStealing, u8 battlerItem, u16 item)
         return FALSE;
     }
     else if (!(gBattleTypeFlags &
-          (BATTLE_TYPE_RECORDED_LINK
-           | BATTLE_TYPE_SECRET_BASE))
+          (BATTLE_TYPE_SECRET_BASE))
         && (gWishFutureKnock.knockedOffMons[stealerSide] & gBitTable[gBattlerPartyIndexes[battlerStealing]]))
     {
         return FALSE;

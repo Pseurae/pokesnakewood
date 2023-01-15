@@ -2673,14 +2673,7 @@ void BufferStringBattle(u16 stringID)
         }
         else
         {
-            if (gTrainerBattleOpponent_A == TRAINER_LINK_OPPONENT || gBattleTypeFlags & BATTLE_TYPE_RECORDED_LINK)
-            {
-                stringPtr = sText_LinkTrainer1WithdrewPkmn;
-            }
-            else
-            {
-                stringPtr = sText_Trainer1WithdrewPkmn;
-            }
+            stringPtr = sText_Trainer1WithdrewPkmn;
         }
         break;
     case STRINGID_SWITCHINMON: // switch-in msg
