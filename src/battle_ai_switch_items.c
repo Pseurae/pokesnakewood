@@ -33,7 +33,7 @@ void GetAIPartyIndexes(u32 battlerId, s32 *firstId, s32 *lastId)
     {
         *firstId = 0, *lastId = PARTY_SIZE;
     }
-    else if (gBattleTypeFlags & (BATTLE_TYPE_TWO_OPPONENTS | BATTLE_TYPE_INGAME_PARTNER | BATTLE_TYPE_TOWER_LINK_MULTI))
+    else if (gBattleTypeFlags & (BATTLE_TYPE_TWO_OPPONENTS | BATTLE_TYPE_INGAME_PARTNER))
     {
         if ((battlerId & BIT_FLANK) == B_FLANK_LEFT)
             *firstId = 0, *lastId = PARTY_SIZE / 2;
@@ -625,8 +625,6 @@ bool32 ShouldSwitch(void)
         return FALSE;
     if (IsAbilityPreventingEscape(gActiveBattler))
         return FALSE;
-    if (gBattleTypeFlags & BATTLE_TYPE_ARENA)
-        return FALSE;
 
     availableToSwitch = 0;
 
@@ -919,8 +917,6 @@ u8 GetMostSuitableMonToSwitchInto(void)
 
     if (*(gBattleStruct->monToSwitchIntoId + gActiveBattler) != PARTY_SIZE)
         return *(gBattleStruct->monToSwitchIntoId + gActiveBattler);
-    if (gBattleTypeFlags & BATTLE_TYPE_ARENA)
-        return gBattlerPartyIndexes[gActiveBattler] + 1;
 
     if (gBattleTypeFlags & BATTLE_TYPE_DOUBLE)
     {

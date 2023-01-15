@@ -3840,20 +3840,11 @@ bool8 ShouldIgnoreDeoxysForm(u8 caseId, u8 battlerId)
     default:
         return FALSE;
     case 1: // Player's side in battle
-        if (!(gBattleTypeFlags & BATTLE_TYPE_MULTI))
-            return FALSE;
-        if (!gMain.inBattle)
-            return FALSE;
+        return FALSE;
         break;
     case 2:
         break;
     case 3: // Summary Screen
-        if (!(gBattleTypeFlags & BATTLE_TYPE_MULTI))
-            return FALSE;
-        if (!gMain.inBattle)
-            return FALSE;
-        if (battlerId == 1 || battlerId == 4 || battlerId == 5)
-            return TRUE;
         return FALSE;
     case 4:
         break;
@@ -7322,7 +7313,7 @@ u16 GetBattleBGM(void)
         return MUS_VS_KYOGRE_GROUDON;
     else if (gBattleTypeFlags & BATTLE_TYPE_REGI)
         return MUS_VS_REGI;
-    else if (gBattleTypeFlags & (BATTLE_TYPE_LINK | BATTLE_TYPE_RECORDED_LINK))
+    else if (gBattleTypeFlags & (BATTLE_TYPE_RECORDED_LINK))
         return MUS_VS_TRAINER;
     else if (gBattleTypeFlags & BATTLE_TYPE_TRAINER)
     {
@@ -7574,7 +7565,7 @@ static s32 GetWildMonTableIdInAlteringCave(u16 species)
 
 void SetWildMonHeldItem(void)
 {
-    if (!(gBattleTypeFlags & (BATTLE_TYPE_LEGENDARY | BATTLE_TYPE_TRAINER | BATTLE_TYPE_PYRAMID | BATTLE_TYPE_PIKE)))
+    if (!(gBattleTypeFlags & (BATTLE_TYPE_LEGENDARY | BATTLE_TYPE_TRAINER)))
     {
         u16 rnd;
         u16 species;
@@ -7704,7 +7695,7 @@ static void Task_PokemonSummaryAnimateAfterDelay(u8 taskId)
 
 void BattleAnimateFrontSprite(struct Sprite *sprite, u16 species, bool8 noCry, u8 panMode)
 {
-    if (gHitMarker & HITMARKER_NO_ANIMATIONS && !(gBattleTypeFlags & (BATTLE_TYPE_LINK | BATTLE_TYPE_RECORDED_LINK)))
+    if (gHitMarker & HITMARKER_NO_ANIMATIONS && !(gBattleTypeFlags & (BATTLE_TYPE_RECORDED_LINK)))
         DoMonFrontSpriteAnimation(sprite, species, noCry, panMode | SKIP_FRONT_ANIM);
     else
         DoMonFrontSpriteAnimation(sprite, species, noCry, panMode);
@@ -7787,7 +7778,7 @@ void StopPokemonAnimationDelayTask(void)
 
 void BattleAnimateBackSprite(struct Sprite *sprite, u16 species)
 {
-    if (gHitMarker & HITMARKER_NO_ANIMATIONS && !(gBattleTypeFlags & (BATTLE_TYPE_LINK | BATTLE_TYPE_RECORDED_LINK)))
+    if (gHitMarker & HITMARKER_NO_ANIMATIONS && !(gBattleTypeFlags & (BATTLE_TYPE_RECORDED_LINK)))
     {
         sprite->callback = SpriteCallbackDummy;
     }

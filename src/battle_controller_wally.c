@@ -294,7 +294,7 @@ static void Intro_TryShinyAnimShowHealthbox(void)
         && gSprites[gBattleControllerData[gActiveBattler]].callback == SpriteCallbackDummy
         && gSprites[gBattlerSpriteIds[gActiveBattler]].callback == SpriteCallbackDummy)
     {
-        if (IsDoubleBattle() && !(gBattleTypeFlags & BATTLE_TYPE_MULTI))
+        if (IsDoubleBattle())
         {
             DestroySprite(&gSprites[gBattleControllerData[BATTLE_PARTNER(gActiveBattler)]]);
             UpdateHealthboxAttribute(gHealthboxSpriteIds[BATTLE_PARTNER(gActiveBattler)], &gPlayerParty[gBattlerPartyIndexes[BATTLE_PARTNER(gActiveBattler)]], HEALTHBOX_ALL);
@@ -1532,8 +1532,8 @@ static void WallyHandleEndLinkBattle(void)
     BeginFastPaletteFade(3);
     WallyBufferExecCompleted();
 
-    if (!(gBattleTypeFlags & BATTLE_TYPE_IS_MASTER) && gBattleTypeFlags & BATTLE_TYPE_LINK)
-        gBattlerControllerFuncs[gActiveBattler] = SetBattleEndCallbacks;
+    // if (!(gBattleTypeFlags & BATTLE_TYPE_IS_MASTER) && gBattleTypeFlags & BATTLE_TYPE_LINK)
+    //     gBattlerControllerFuncs[gActiveBattler] = SetBattleEndCallbacks;
 }
 
 static void WallyHandleBattleDebug(void)

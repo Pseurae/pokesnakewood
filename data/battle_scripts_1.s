@@ -1463,7 +1463,6 @@ BattleScript_EffectPartingShotTrySpAtk:
 	waitmessage B_WAIT_TIME_LONG
 BattleScript_EffectPartingShotSwitch:
 	moveendall
-	jumpifbattletype BATTLE_TYPE_ARENA, BattleScript_PartingShotEnd
 	jumpifcantswitch SWITCH_IGNORE_ESCAPE_PREVENTION | BS_ATTACKER, BattleScript_PartingShotEnd
 	openpartyscreen BS_ATTACKER, BattleScript_PartingShotEnd
 	switchoutabilities BS_ATTACKER
@@ -2917,7 +2916,6 @@ BattleScript_EffectHitEscape:
 	moveendfrom MOVEEND_TARGET_VISIBLE
 	jumpifbattleend BattleScript_HitEscapeEnd
 	jumpifbyte CMP_NOT_EQUAL gBattleOutcome 0, BattleScript_HitEscapeEnd
-	jumpifbattletype BATTLE_TYPE_ARENA, BattleScript_HitEscapeEnd
 	jumpifcantswitch SWITCH_IGNORE_ESCAPE_PREVENTION | BS_ATTACKER, BattleScript_HitEscapeEnd
 	openpartyscreen BS_ATTACKER, BattleScript_HitEscapeEnd
 	switchoutabilities BS_ATTACKER
@@ -3501,7 +3499,6 @@ BattleScript_EffectRoar::
 	jumpifstatus3 BS_TARGET, STATUS3_ROOTED, BattleScript_PrintMonIsRooted
 	accuracycheck BattleScript_ButItFailed, NO_ACC_CALC_CHECK_LOCK_ON
 	accuracycheck BattleScript_MoveMissedPause, ACC_CURR_MOVE
-	jumpifbattletype BATTLE_TYPE_ARENA, BattleScript_ButItFailed
 BattleScript_ForceRandomSwitch::
 	forcerandomswitch BattleScript_ButItFailed
 
@@ -4786,7 +4783,6 @@ BattleScript_EffectBatonPass::
 	attackcanceler
 	attackstring
 	ppreduce
-	jumpifbattletype BATTLE_TYPE_ARENA, BattleScript_ButItFailed
 	jumpifcantswitch SWITCH_IGNORE_ESCAPE_PREVENTION | BS_ATTACKER, BattleScript_ButItFailed
 	attackanimation
 	waitanimation
@@ -6107,9 +6103,7 @@ BattleScript_FaintedMonTryChoose:
 	openpartyscreen BS_FAINTED, BattleScript_FaintedMonEnd
 	switchhandleorder BS_FAINTED, 2
 	jumpifnotbattletype BATTLE_TYPE_TRAINER, BattleScript_FaintedMonSendOutNew
-	jumpifbattletype BATTLE_TYPE_LINK, BattleScript_FaintedMonSendOutNew
 	jumpifbattletype BATTLE_TYPE_RECORDED_LINK, BattleScript_FaintedMonSendOutNew
-	jumpifbattletype BATTLE_TYPE_FRONTIER, BattleScript_FaintedMonSendOutNew
 	jumpifbattletype BATTLE_TYPE_DOUBLE, BattleScript_FaintedMonSendOutNew
 	jumpifword CMP_COMMON_BITS, gHitMarker, HITMARKER_PLAYER_FAINTED, BattleScript_FaintedMonSendOutNew
 	jumpifbyte CMP_EQUAL, sBATTLE_STYLE, OPTIONS_BATTLE_STYLE_SET, BattleScript_FaintedMonSendOutNew
@@ -6225,10 +6219,7 @@ BattleScript_PayDayMoneyAndPickUpItems::
 
 BattleScript_LocalBattleLost::
 	jumpifbattletype BATTLE_TYPE_INGAME_PARTNER, BattleScript_LocalBattleLostPrintWhiteOut
-	jumpifbattletype BATTLE_TYPE_DOME, BattleScript_CheckDomeDrew
-	jumpifbattletype BATTLE_TYPE_FRONTIER, BattleScript_LocalBattleLostPrintTrainersWinText
 	jumpifbattletype BATTLE_TYPE_TRAINER_HILL, BattleScript_LocalBattleLostPrintTrainersWinText
-	jumpifbattletype BATTLE_TYPE_EREADER_TRAINER, BattleScript_LocalBattleLostEnd
 	jumpifhalfword CMP_EQUAL, gTrainerBattleOpponent_A, TRAINER_SECRET_BASE, BattleScript_LocalBattleLostEnd
 BattleScript_LocalBattleLostPrintWhiteOut::
 .if B_WHITEOUT_MONEY >= GEN_4
@@ -6266,7 +6257,6 @@ BattleScript_LocalBattleLostPrintTrainersWinText::
 	trainerslidein BS_ATTACKER
 	waitstate
 	printstring STRINGID_TRAINER1WINTEXT
-	jumpifbattletype BATTLE_TYPE_TOWER_LINK_MULTI, BattleScript_LocalBattleLostDoTrainer2WinText
 	jumpifnotbattletype BATTLE_TYPE_TWO_OPPONENTS, BattleScript_LocalBattleLostEnd_
 BattleScript_LocalBattleLostDoTrainer2WinText::
 	trainerslideout B_POSITION_OPPONENT_LEFT
@@ -6278,7 +6268,6 @@ BattleScript_LocalBattleLostEnd_::
 	end2
 
 BattleScript_LinkBattleWonOrLost::
-	jumpifbattletype BATTLE_TYPE_BATTLE_TOWER, BattleScript_TowerLinkBattleWon
 	printstring STRINGID_BATTLEEND
 	waitmessage B_WAIT_TIME_LONG
 	jumpifbattletype BATTLE_TYPE_RECORDED, BattleScript_LinkBattleWonOrLostWaitEnd
@@ -6323,7 +6312,6 @@ BattleScript_FrontierTrainerBattleWon_LoseTexts:
 	waitstate
 	printstring STRINGID_TRAINER2LOSETEXT
 BattleScript_TryPickUpItems:
-	jumpifnotbattletype BATTLE_TYPE_PYRAMID, BattleScript_FrontierTrainerBattleWon_End
 	pickup
 BattleScript_FrontierTrainerBattleWon_End:
 	end2

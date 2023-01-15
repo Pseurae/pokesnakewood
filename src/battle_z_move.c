@@ -172,10 +172,10 @@ bool32 IsViableZMove(u8 battlerId, u16 move)
 
     species = gBattleMons[battlerId].species;
     item = gBattleMons[battlerId].item;
-    if (gBattleTypeFlags & (BATTLE_TYPE_SAFARI | BATTLE_TYPE_WALLY_TUTORIAL | BATTLE_TYPE_FRONTIER))
+    if (gBattleTypeFlags & (BATTLE_TYPE_SAFARI | BATTLE_TYPE_WALLY_TUTORIAL))
         return FALSE;
 
-    if ((GetBattlerPosition(battlerId) == B_POSITION_PLAYER_LEFT || (!(gBattleTypeFlags & BATTLE_TYPE_MULTI) && GetBattlerPosition(battlerId) == B_POSITION_PLAYER_RIGHT)) && !CheckBagHasItem(ITEM_Z_POWER_RING, 1))
+    if ((GetBattlerPosition(battlerId) == B_POSITION_PLAYER_LEFT || (GetBattlerPosition(battlerId) == B_POSITION_PLAYER_RIGHT)) && !CheckBagHasItem(ITEM_Z_POWER_RING, 1))
         return FALSE;
 
     if (mega->alreadyEvolved[battlerPosition])

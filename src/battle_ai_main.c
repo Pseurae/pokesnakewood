@@ -107,8 +107,7 @@ void BattleAI_SetupItems(void)
 
     // Items are allowed to use in ONLY trainer battles.
     if ((gBattleTypeFlags & BATTLE_TYPE_TRAINER)
-        && !(gBattleTypeFlags & (BATTLE_TYPE_LINK | BATTLE_TYPE_SAFARI | BATTLE_TYPE_BATTLE_TOWER
-                               | BATTLE_TYPE_EREADER_TRAINER | BATTLE_TYPE_SECRET_BASE | BATTLE_TYPE_FRONTIER
+        && !(gBattleTypeFlags & (BATTLE_TYPE_SAFARI | BATTLE_TYPE_SECRET_BASE
                                | BATTLE_TYPE_INGAME_PARTNER | BATTLE_TYPE_RECORDED_LINK)
             )
        )
@@ -156,7 +155,7 @@ void BattleAI_SetupFlags(void)
         AI_THINKING_STRUCT->aiFlags = AI_FLAG_ROAMING;
     else if (gBattleTypeFlags & BATTLE_TYPE_FIRST_BATTLE)
         AI_THINKING_STRUCT->aiFlags = AI_FLAG_FIRST_BATTLE;
-    else if (gBattleTypeFlags & (BATTLE_TYPE_FRONTIER | BATTLE_TYPE_EREADER_TRAINER | BATTLE_TYPE_TRAINER_HILL | BATTLE_TYPE_SECRET_BASE))
+    else if (gBattleTypeFlags & (BATTLE_TYPE_TRAINER_HILL | BATTLE_TYPE_SECRET_BASE))
         AI_THINKING_STRUCT->aiFlags = AI_FLAG_CHECK_BAD_MOVE | AI_FLAG_CHECK_VIABILITY | AI_FLAG_TRY_TO_FAINT;
     else if (gBattleTypeFlags & BATTLE_TYPE_TWO_OPPONENTS)
         AI_THINKING_STRUCT->aiFlags = gTrainers[gTrainerBattleOpponent_A].aiFlags | gTrainers[gTrainerBattleOpponent_B].aiFlags;
@@ -164,7 +163,7 @@ void BattleAI_SetupFlags(void)
         AI_THINKING_STRUCT->aiFlags = gTrainers[gTrainerBattleOpponent_A].aiFlags;
 
     // check smart wild AI
-    if (!(gBattleTypeFlags & (BATTLE_TYPE_LINK | BATTLE_TYPE_TRAINER)) && IsWildMonSmart())
+    if (!(gBattleTypeFlags & BATTLE_TYPE_TRAINER) && IsWildMonSmart())
         AI_THINKING_STRUCT->aiFlags |= GetWildAiFlags();
 
     if (gBattleTypeFlags & (BATTLE_TYPE_DOUBLE | BATTLE_TYPE_TWO_OPPONENTS) || gTrainers[gTrainerBattleOpponent_A].doubleBattle)
@@ -416,7 +415,6 @@ static u8 ChooseMoveOrAction_Singles(void)
         && !IsAbilityPreventingEscape(sBattler_AI)
         && !(gBattleMons[gActiveBattler].status2 & (STATUS2_WRAPPED | STATUS2_ESCAPE_PREVENTION))
         && !(gStatuses3[gActiveBattler] & STATUS3_ROOTED)
-        && !(gBattleTypeFlags & (BATTLE_TYPE_ARENA | BATTLE_TYPE_PALACE))
         && AI_THINKING_STRUCT->aiFlags & (AI_FLAG_CHECK_VIABILITY | AI_FLAG_CHECK_BAD_MOVE | AI_FLAG_TRY_TO_FAINT | AI_FLAG_PREFER_BATON_PASS))
     {
         // Consider switching if all moves are worthless to use.
@@ -499,10 +497,7 @@ static u8 ChooseMoveOrAction_Doubles(void)
         }
         else
         {
-            if (gBattleTypeFlags & BATTLE_TYPE_PALACE)
-                BattleAI_SetupAIData(gBattleStruct->palaceFlags >> 4);
-            else
-                BattleAI_SetupAIData(0xF);
+            BattleAI_SetupAIData(0xF);
 
             gBattlerTarget = i;
             if ((i & BIT_SIDE) != (sBattler_AI & BIT_SIDE))
@@ -3707,7 +3702,7 @@ static s16 AI_CheckViability(u8 battlerAtk, u8 battlerDef, u16 move, s16 score)
             #if B_TRAINERS_KNOCK_OFF_ITEMS == TRUE
                 canSteal = TRUE;
             #endif
-            if (gBattleTypeFlags & BATTLE_TYPE_FRONTIER || GetBattlerSide(battlerAtk) == B_SIDE_PLAYER)
+            if (GetBattlerSide(battlerAtk) == B_SIDE_PLAYER)
                 canSteal = TRUE;
 
             if (canSteal && AI_DATA->items[battlerAtk] == ITEM_NONE

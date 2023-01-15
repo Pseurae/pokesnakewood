@@ -775,8 +775,7 @@ u8 GetMegaIndicatorSpriteId(u32 healthboxSpriteId)
 u32 WhichBattleCoords(u32 battlerId) // 0 - singles, 1 - doubles
 {
     if (GetBattlerPosition(battlerId) == B_POSITION_PLAYER_LEFT
-        && gPlayerPartyCount == 1
-        && !(gBattleTypeFlags & BATTLE_TYPE_MULTI))
+        && gPlayerPartyCount == 1)
         return 0;
     else
         return IsDoubleBattle();
@@ -1727,62 +1726,33 @@ u8 CreatePartyStatusSummarySprites(u8 battlerId, struct HpAndStatus *partyInfo, 
 
     if (GetBattlerSide(battlerId) == B_SIDE_PLAYER)
     {
-        if (gBattleTypeFlags & BATTLE_TYPE_MULTI)
+
+        for (i = 0, var = PARTY_SIZE - 1, j = 0; j < PARTY_SIZE; j++)
         {
-            for (i = 0; i < PARTY_SIZE; i++)
+            if (partyInfo[j].hp == HP_EMPTY_SLOT)
             {
-                if (partyInfo[i].hp == HP_EMPTY_SLOT)
-                {
                     // empty slot or an egg
-                    gSprites[ballIconSpritesIds[i]].oam.tileNum += 1;
-                    gSprites[ballIconSpritesIds[i]].data[7] = 1;
-                }
-                else if (partyInfo[i].hp == 0)
-                {
-                    // fainted mon
-                    gSprites[ballIconSpritesIds[i]].oam.tileNum += 3;
-                }
-                else if (partyInfo[i].status != 0)
-                {
-                    // mon with major status
-                    gSprites[ballIconSpritesIds[i]].oam.tileNum += 2;
-                }
+                gSprites[ballIconSpritesIds[var]].oam.tileNum += 1;
+                gSprites[ballIconSpritesIds[var]].data[7] = 1;
+                var--;
+                continue;
             }
-        }
-        else
-        {
-            for (i = 0, var = PARTY_SIZE - 1, j = 0; j < PARTY_SIZE; j++)
+            else if (partyInfo[j].hp == 0)
             {
-                if (partyInfo[j].hp == HP_EMPTY_SLOT)
-                {
-                     // empty slot or an egg
-                    gSprites[ballIconSpritesIds[var]].oam.tileNum += 1;
-                    gSprites[ballIconSpritesIds[var]].data[7] = 1;
-                    var--;
-                    continue;
-                }
-                else if (partyInfo[j].hp == 0)
-                {
-                    // fainted mon
-                    gSprites[ballIconSpritesIds[i]].oam.tileNum += 3;
-                }
-                else if (gBattleTypeFlags & BATTLE_TYPE_ARENA && gBattleStruct->arenaLostPlayerMons & gBitTable[j])
-                {
-                    // fainted arena mon
-                    gSprites[ballIconSpritesIds[i]].oam.tileNum += 3;
-                }
-                else if (partyInfo[j].status != 0)
-                {
-                    // mon with primary status
-                    gSprites[ballIconSpritesIds[i]].oam.tileNum += 2;
-                }
-                i++;
+                // fainted mon
+                gSprites[ballIconSpritesIds[i]].oam.tileNum += 3;
             }
+            else if (partyInfo[j].status != 0)
+            {
+                // mon with primary status
+                gSprites[ballIconSpritesIds[i]].oam.tileNum += 2;
+            }
+            i++;
         }
     }
     else
     {
-        if (gBattleTypeFlags & (BATTLE_TYPE_MULTI | BATTLE_TYPE_TWO_OPPONENTS))
+        if (gBattleTypeFlags & BATTLE_TYPE_TWO_OPPONENTS)
         {
             for (var = PARTY_SIZE - 1, i = 0; i < PARTY_SIZE; i++)
             {
@@ -1820,11 +1790,6 @@ u8 CreatePartyStatusSummarySprites(u8 battlerId, struct HpAndStatus *partyInfo, 
                 else if (partyInfo[j].hp == 0)
                 {
                      // fainted mon
-                    gSprites[ballIconSpritesIds[PARTY_SIZE - 1 - var]].oam.tileNum += 3;
-                }
-                else if (gBattleTypeFlags & BATTLE_TYPE_ARENA && gBattleStruct->arenaLostOpponentMons & gBitTable[j])
-                {
-                     // fainted arena mon
                     gSprites[ballIconSpritesIds[PARTY_SIZE - 1 - var]].oam.tileNum += 3;
                 }
                 else if (partyInfo[j].status != 0)
@@ -3324,7 +3289,7 @@ bool32 CanThrowLastUsedBall(void)
 #else
     if (!CanThrowBall())
         return FALSE;
-    if (gBattleTypeFlags & (BATTLE_TYPE_TRAINER | BATTLE_TYPE_FRONTIER))
+    if (gBattleTypeFlags & BATTLE_TYPE_TRAINER)
         return FALSE;
     if (!CheckBagHasItem(gLastThrownBall, 1))
         return FALSE;

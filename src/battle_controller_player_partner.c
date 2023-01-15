@@ -223,7 +223,7 @@ static void Intro_WaitForHealthbox(void)
 {
     bool32 finished = FALSE;
 
-    if (!IsDoubleBattle() || (IsDoubleBattle() && (gBattleTypeFlags & BATTLE_TYPE_MULTI)))
+    if (!IsDoubleBattle())
     {
         if (gSprites[gHealthboxSpriteIds[gActiveBattler]].callback == SpriteCallbackDummy)
             finished = TRUE;
@@ -257,7 +257,7 @@ static void Intro_ShowHealthbox(void)
     {
         gBattleSpritesDataPtr->healthBoxesData[gActiveBattler].introEndDelay = 0;
 
-        if (IsDoubleBattle() && !(gBattleTypeFlags & BATTLE_TYPE_MULTI))
+        if (IsDoubleBattle())
         {
             DestroySprite(&gSprites[gBattleControllerData[BATTLE_PARTNER(gActiveBattler)]]);
             UpdateHealthboxAttribute(gHealthboxSpriteIds[BATTLE_PARTNER(gActiveBattler)], &gPlayerParty[gBattlerPartyIndexes[BATTLE_PARTNER(gActiveBattler)]], HEALTHBOX_ALL);
@@ -1817,7 +1817,7 @@ static void Task_StartSendOutAnim(u8 taskId)
         u8 savedActiveBank = gActiveBattler;
 
         gActiveBattler = gTasks[taskId].data[0];
-        if (!IsDoubleBattle() || (gBattleTypeFlags & BATTLE_TYPE_MULTI))
+        if (!IsDoubleBattle())
         {
             gBattleResources->bufferA[gActiveBattler][1] = gBattlerPartyIndexes[gActiveBattler];
             StartSendOutAnim(gActiveBattler, FALSE);

@@ -296,8 +296,7 @@ static void HandleInputChooseAction(void)
     {
         if ((gBattleTypeFlags & BATTLE_TYPE_DOUBLE)
          && GetBattlerPosition(gActiveBattler) == B_POSITION_PLAYER_RIGHT
-         && !(gAbsentBattlerFlags & gBitTable[GetBattlerAtPosition(B_POSITION_PLAYER_LEFT)])
-         && !(gBattleTypeFlags & BATTLE_TYPE_MULTI))
+         && !(gAbsentBattlerFlags & gBitTable[GetBattlerAtPosition(B_POSITION_PLAYER_LEFT)]))
         {
             if (gBattleResources->bufferA[gActiveBattler][1] == B_ACTION_USE_ITEM)
             {
@@ -758,7 +757,7 @@ static void HandleInputChooseMove(void)
     }
     else if (JOY_NEW(SELECT_BUTTON) && !gBattleStruct->zmove.viewing)
     {
-        if (gNumberOfMovesToChoose > 1 && !(gBattleTypeFlags & BATTLE_TYPE_LINK))
+        if (gNumberOfMovesToChoose > 1)
         {
             MoveSelectionCreateCursorAt(gMoveSelectionCursor[gActiveBattler], 29);
 
@@ -1042,7 +1041,7 @@ static void Intro_WaitForShinyAnimAndHealthbox(void)
     bool8 healthboxAnimDone = FALSE;
 
     // Check if healthbox has finished sliding in
-    if (TwoIntroMons(gActiveBattler) && !(gBattleTypeFlags & BATTLE_TYPE_MULTI))
+    if (TwoIntroMons(gActiveBattler))
     {
         if (gSprites[gHealthboxSpriteIds[gActiveBattler]].callback == SpriteCallbackDummy
          && gSprites[gHealthboxSpriteIds[BATTLE_PARTNER(gActiveBattler)]].callback == SpriteCallbackDummy)
@@ -1097,7 +1096,7 @@ static void Intro_TryShinyAnimShowHealthbox(void)
     {
         if (!gBattleSpritesDataPtr->healthBoxesData[gActiveBattler].healthboxSlideInStarted)
         {
-            if (TwoIntroMons(gActiveBattler) && !(gBattleTypeFlags & BATTLE_TYPE_MULTI))
+            if (TwoIntroMons(gActiveBattler))
             {
                 UpdateHealthboxAttribute(gHealthboxSpriteIds[BATTLE_PARTNER(gActiveBattler)], &gPlayerParty[gBattlerPartyIndexes[BATTLE_PARTNER(gActiveBattler)]], HEALTHBOX_ALL);
                 StartHealthboxSlideIn(BATTLE_PARTNER(gActiveBattler));
@@ -1125,7 +1124,7 @@ static void Intro_TryShinyAnimShowHealthbox(void)
     }
 
     // Wait for battler anims
-    if (TwoIntroMons(gActiveBattler) && !(gBattleTypeFlags & BATTLE_TYPE_MULTI))
+    if (TwoIntroMons(gActiveBattler))
     {
         if (gSprites[gBattleControllerData[gActiveBattler]].callback == SpriteCallbackDummy
             && gSprites[gBattlerSpriteIds[gActiveBattler]].callback == SpriteCallbackDummy
@@ -1147,7 +1146,7 @@ static void Intro_TryShinyAnimShowHealthbox(void)
     // Clean up
     if (bgmRestored && battlerAnimsDone)
     {
-        if (TwoIntroMons(gActiveBattler) && !(gBattleTypeFlags & BATTLE_TYPE_MULTI))
+        if (TwoIntroMons(gActiveBattler))
             DestroySprite(&gSprites[gBattleControllerData[BATTLE_PARTNER(gActiveBattler)]]);
         DestroySprite(&gSprites[gBattleControllerData[gActiveBattler]]);
 
@@ -1677,12 +1676,6 @@ static void CompleteOnFinishedBattleAnimation(void)
 
 static void PrintLinkStandbyMsg(void)
 {
-    if (gBattleTypeFlags & BATTLE_TYPE_LINK)
-    {
-        gBattle_BG0_X = 0;
-        gBattle_BG0_Y = 0;
-        BattlePutTextOnWindow(gText_LinkStandby, B_WIN_MSG);
-    }
 }
 
 static void PlayerHandleGetMonData(void)
@@ -2379,29 +2372,8 @@ static void PlayerHandleDrawTrainerPic(void)
 
     trainerPicId = gSaveBlock2Ptr->playerGender;
 
-    if (gBattleTypeFlags & BATTLE_TYPE_MULTI)
-    {
-        if ((GetBattlerPosition(gActiveBattler) & BIT_FLANK) != B_FLANK_LEFT) // Second mon, on the right.
-            xPos = 90;
-        else // First mon, on the left.
-            xPos = 32;
-
-        if (gBattleTypeFlags & BATTLE_TYPE_INGAME_PARTNER && gPartnerTrainerId != TRAINER_STEVEN_PARTNER && gPartnerTrainerId < TRAINER_CUSTOM_PARTNER)
-        {
-            xPos = 90;
-            yPos = (8 - gTrainerFrontPicCoords[trainerPicId].size) * 4 + 80;
-        }
-        else
-        {
-            yPos = (8 - gTrainerBackPicCoords[trainerPicId].size) * 4 + 80;
-        }
-
-    }
-    else
-    {
-        xPos = 80;
-        yPos = (8 - gTrainerBackPicCoords[trainerPicId].size) * 4 + 80;
-    }
+    xPos = 80;
+    yPos = (8 - gTrainerBackPicCoords[trainerPicId].size) * 4 + 80;
 
     // Use front pic table for any tag battles unless your partner is Steven.
     if (gBattleTypeFlags & BATTLE_TYPE_INGAME_PARTNER && gPartnerTrainerId != TRAINER_STEVEN_PARTNER && gPartnerTrainerId < TRAINER_CUSTOM_PARTNER)
@@ -2726,22 +2698,14 @@ static void PlayerHandleChoosePokemon(void)
     for (i = 0; i < ARRAY_COUNT(gBattlePartyCurrentOrder); i++)
         gBattlePartyCurrentOrder[i] = gBattleResources->bufferA[gActiveBattler][4 + i];
 
-    if (gBattleTypeFlags & BATTLE_TYPE_ARENA && (gBattleResources->bufferA[gActiveBattler][1] & 0xF) != PARTY_ACTION_CANT_SWITCH)
-    {
-        BtlController_EmitChosenMonReturnValue(BUFFER_B, gBattlerPartyIndexes[gActiveBattler] + 1, gBattlePartyCurrentOrder);
-        PlayerBufferExecCompleted();
-    }
-    else
-    {
-        gBattleControllerData[gActiveBattler] = CreateTask(TaskDummy, 0xFF);
-        gTasks[gBattleControllerData[gActiveBattler]].data[0] = gBattleResources->bufferA[gActiveBattler][1] & 0xF;
-        *(&gBattleStruct->battlerPreventingSwitchout) = gBattleResources->bufferA[gActiveBattler][1] >> 4;
-        *(&gBattleStruct->prevSelectedPartySlot) = gBattleResources->bufferA[gActiveBattler][2];
-        *(&gBattleStruct->abilityPreventingSwitchout) = (gBattleResources->bufferA[gActiveBattler][3] & 0xFF) | (gBattleResources->bufferA[gActiveBattler][7] << 8);
-        BeginNormalPaletteFade(0xFFFFFFFF, 0, 0, 0x10, RGB_BLACK);
-        gBattlerControllerFuncs[gActiveBattler] = OpenPartyMenuToChooseMon;
-        gBattlerInMenuId = gActiveBattler;
-    }
+    gBattleControllerData[gActiveBattler] = CreateTask(TaskDummy, 0xFF);
+    gTasks[gBattleControllerData[gActiveBattler]].data[0] = gBattleResources->bufferA[gActiveBattler][1] & 0xF;
+    *(&gBattleStruct->battlerPreventingSwitchout) = gBattleResources->bufferA[gActiveBattler][1] >> 4;
+    *(&gBattleStruct->prevSelectedPartySlot) = gBattleResources->bufferA[gActiveBattler][2];
+    *(&gBattleStruct->abilityPreventingSwitchout) = (gBattleResources->bufferA[gActiveBattler][3] & 0xFF) | (gBattleResources->bufferA[gActiveBattler][7] << 8);
+    BeginNormalPaletteFade(0xFFFFFFFF, 0, 0, 0x10, RGB_BLACK);
+    gBattlerControllerFuncs[gActiveBattler] = OpenPartyMenuToChooseMon;
+    gBattlerInMenuId = gActiveBattler;
 }
 
 static void PlayerHandleCmd23(void)
@@ -3054,7 +3018,7 @@ static void Task_StartSendOutAnim(u8 taskId)
         u8 savedActiveBattler = gActiveBattler;
 
         gActiveBattler = gTasks[taskId].tBattlerId;
-        if (TwoIntroMons(gActiveBattler) && !(gBattleTypeFlags & BATTLE_TYPE_MULTI))
+        if (TwoIntroMons(gActiveBattler))
         {
             gBattleResources->bufferA[gActiveBattler][1] = gBattlerPartyIndexes[gActiveBattler];
             StartSendOutAnim(gActiveBattler, FALSE);

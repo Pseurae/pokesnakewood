@@ -2042,8 +2042,7 @@ static void Cmd_critcalc(void)
 
     // Counter for EVO_CRITICAL_HITS.
     partySlot = gBattlerPartyIndexes[gBattlerAttacker];
-    if (gIsCriticalHit && GetBattlerSide(gBattlerAttacker) == B_SIDE_PLAYER
-        && !(gBattleTypeFlags & BATTLE_TYPE_MULTI && GetBattlerPosition(gBattlerAttacker) == B_POSITION_PLAYER_LEFT))
+    if (gIsCriticalHit && GetBattlerSide(gBattlerAttacker) == B_SIDE_PLAYER)
         gPartyCriticalHits[partySlot]++;
 
     gBattlescriptCurrInstr++;
@@ -3355,19 +3354,13 @@ void SetMoveEffect(bool32 primary, u32 certain)
                     side = GetBattlerSide(gBattlerAttacker);
                     if (GetBattlerSide(gBattlerAttacker) == B_SIDE_OPPONENT
                         && !(gBattleTypeFlags &
-                            (BATTLE_TYPE_EREADER_TRAINER
-                            | BATTLE_TYPE_FRONTIER
-                            | BATTLE_TYPE_LINK
-                            | BATTLE_TYPE_RECORDED_LINK
+                            (BATTLE_TYPE_RECORDED_LINK
                             | BATTLE_TYPE_SECRET_BASE)))
                     {
                         gBattlescriptCurrInstr++;
                     }
                     else if (!(gBattleTypeFlags &
-                            (BATTLE_TYPE_EREADER_TRAINER
-                            | BATTLE_TYPE_FRONTIER
-                            | BATTLE_TYPE_LINK
-                            | BATTLE_TYPE_RECORDED_LINK
+                            (BATTLE_TYPE_RECORDED_LINK
                             | BATTLE_TYPE_SECRET_BASE))
                         && (gWishFutureKnock.knockedOffMons[side] & gBitTable[gBattlerPartyIndexes[gBattlerAttacker]]))
                     {
@@ -3817,7 +3810,7 @@ static void Cmd_cleareffectsonfaint(void)
     {
         gActiveBattler = GetBattlerForBattleScript(gBattlescriptCurrInstr[1]);
 
-        if (!(gBattleTypeFlags & BATTLE_TYPE_ARENA) || gBattleMons[gActiveBattler].hp == 0)
+        if (gBattleMons[gActiveBattler].hp == 0)
         {
             gBattleMons[gActiveBattler].status1 = 0;
             BtlController_EmitSetMonData(BUFFER_A, REQUEST_STATUS_BATTLE, 0, sizeof(gBattleMons[gActiveBattler].status1), &gBattleMons[gActiveBattler].status1);
@@ -3998,13 +3991,9 @@ static void Cmd_getexp(void)
     {
     case 0: // check if should receive exp at all
         if (GetBattlerSide(gBattlerFainted) != B_SIDE_OPPONENT || (gBattleTypeFlags &
-             (BATTLE_TYPE_LINK
-              | BATTLE_TYPE_RECORDED_LINK
+             (BATTLE_TYPE_RECORDED_LINK
               | BATTLE_TYPE_TRAINER_HILL
-              | BATTLE_TYPE_FRONTIER
-              | BATTLE_TYPE_SAFARI
-              | BATTLE_TYPE_BATTLE_TOWER
-              | BATTLE_TYPE_EREADER_TRAINER)))
+              | BATTLE_TYPE_SAFARI)))
         {
             gBattleScripting.getexpState = 6; // goto last case
         }
@@ -4300,7 +4289,7 @@ static bool32 NoAliveMonsForPlayerAndPartner(void)
         for (i = 0; i < PARTY_SIZE; i++)
         {
             if (GetMonData(&gPlayerParty[i], MON_DATA_SPECIES) && !GetMonData(&gPlayerParty[i], MON_DATA_IS_EGG)
-             && (!(gBattleTypeFlags & BATTLE_TYPE_ARENA) || !(gBattleStruct->arenaLostPlayerMons & gBitTable[i])))
+             && (!(gBattleStruct->arenaLostPlayerMons & gBitTable[i])))
             {
                 HP_count += GetMonData(&gPlayerParty[i], MON_DATA_HP);
             }
@@ -4331,7 +4320,7 @@ static bool32 NoAliveMonsForPlayer(void)
         for (i = 0; i < PARTY_SIZE; i++)
         {
             if (GetMonData(&gPlayerParty[i], MON_DATA_SPECIES) && !GetMonData(&gPlayerParty[i], MON_DATA_IS_EGG)
-             && (!(gBattleTypeFlags & BATTLE_TYPE_ARENA) || !(gBattleStruct->arenaLostPlayerMons & gBitTable[i])))
+             && (!(gBattleStruct->arenaLostPlayerMons & gBitTable[i])))
             {
                 HP_count += GetMonData(&gPlayerParty[i], MON_DATA_HP);
             }
@@ -4350,7 +4339,7 @@ static bool32 NoAliveMonsForOpponent(void)
     for (i = 0; i < PARTY_SIZE; i++)
     {
         if (GetMonData(&gEnemyParty[i], MON_DATA_SPECIES) && !GetMonData(&gEnemyParty[i], MON_DATA_IS_EGG)
-         && (!(gBattleTypeFlags & BATTLE_TYPE_ARENA) || !(gBattleStruct->arenaLostOpponentMons & gBitTable[i])))
+         && (!(gBattleStruct->arenaLostOpponentMons & gBitTable[i])))
         {
             HP_count += GetMonData(&gEnemyParty[i], MON_DATA_HP);
         }
@@ -4373,7 +4362,7 @@ static void Cmd_checkteamslost(void)
         return;
 
 #if B_MULTI_BATTLE_WHITEOUT >= GEN_4
-    if (gBattleTypeFlags & (BATTLE_TYPE_MULTI | BATTLE_TYPE_INGAME_PARTNER))
+    if (gBattleTypeFlags & BATTLE_TYPE_INGAME_PARTNER)
     {
         if (NoAliveMonsForPlayerAndPartner())
             gBattleOutcome |= B_OUTCOME_LOST;
@@ -4393,7 +4382,7 @@ static void Cmd_checkteamslost(void)
     // For link battles that haven't ended, count number of empty battler spots
     // In link multi battles, jump to pointer if more than 1 spot empty
     // In non-multi battles, jump to pointer if 1 spot is missing on both sides
-    if (gBattleOutcome == 0 && (gBattleTypeFlags & (BATTLE_TYPE_LINK | BATTLE_TYPE_RECORDED_LINK)))
+    if (gBattleOutcome == 0 && (gBattleTypeFlags & (BATTLE_TYPE_RECORDED_LINK)))
     {
         s32 i, emptyPlayerSpots, emptyOpponentSpots;
 
@@ -4410,20 +4399,10 @@ static void Cmd_checkteamslost(void)
                 emptyOpponentSpots++;
         }
 
-        if (gBattleTypeFlags & BATTLE_TYPE_MULTI)
-        {
-            if (emptyOpponentSpots + emptyPlayerSpots > 1)
-                gBattlescriptCurrInstr = T2_READ_PTR(gBattlescriptCurrInstr + 1);
-            else
-                gBattlescriptCurrInstr += 5;
-        }
+        if (emptyOpponentSpots != 0 && emptyPlayerSpots != 0)
+            gBattlescriptCurrInstr = T2_READ_PTR(gBattlescriptCurrInstr + 1);
         else
-        {
-            if (emptyOpponentSpots != 0 && emptyPlayerSpots != 0)
-                gBattlescriptCurrInstr = T2_READ_PTR(gBattlescriptCurrInstr + 1);
-            else
-                gBattlescriptCurrInstr += 5;
-        }
+            gBattlescriptCurrInstr += 5;
     }
     else
     {
@@ -6071,14 +6050,6 @@ static void Cmd_switchindataupdate(void)
 
     SwitchInClearSetData();
 
-    if (gBattleTypeFlags & BATTLE_TYPE_PALACE
-        && gBattleMons[gActiveBattler].maxHP / 2 >= gBattleMons[gActiveBattler].hp
-        && gBattleMons[gActiveBattler].hp != 0
-        && !(gBattleMons[gActiveBattler].status1 & STATUS1_SLEEP))
-    {
-        gBattleStruct->palaceFlags |= gBitTable[gActiveBattler];
-    }
-
     gBattleScripting.battler = gActiveBattler;
 
     PREPARE_MON_NICK_BUFFER(gBattleTextBuff1, gActiveBattler, gBattlerPartyIndexes[gActiveBattler]);
@@ -6094,11 +6065,8 @@ static void Cmd_switchinanim(void)
     gActiveBattler = GetBattlerForBattleScript(gBattlescriptCurrInstr[1]);
 
     if (GetBattlerSide(gActiveBattler) == B_SIDE_OPPONENT
-        && !(gBattleTypeFlags & (BATTLE_TYPE_LINK
-                                 | BATTLE_TYPE_EREADER_TRAINER
-                                 | BATTLE_TYPE_RECORDED_LINK
-                                 | BATTLE_TYPE_TRAINER_HILL
-                                 | BATTLE_TYPE_FRONTIER)))
+        && !(gBattleTypeFlags & (BATTLE_TYPE_RECORDED_LINK
+                                 | BATTLE_TYPE_TRAINER_HILL)))
         HandleSetPokedexFlag(SpeciesToNationalPokedexNum(gBattleMons[gActiveBattler].species), FLAG_SET_SEEN, gBattleMons[gActiveBattler].personality);
 
     gAbsentBattlerFlags &= ~(gBitTable[gActiveBattler]);
@@ -6411,54 +6379,46 @@ static void Cmd_openpartyscreen(void)
     }
     else if (gBattlescriptCurrInstr[1] == BS_FAINTED_LINK_MULTIPLE_2)
     {
-        if (!(gBattleTypeFlags & BATTLE_TYPE_MULTI))
+        if (gBattleTypeFlags & BATTLE_TYPE_DOUBLE)
         {
-            if (gBattleTypeFlags & BATTLE_TYPE_DOUBLE)
+            hitmarkerFaintBits = gHitMarker >> 28;
+            if (gBitTable[2] & hitmarkerFaintBits && gBitTable[0] & hitmarkerFaintBits)
             {
-                hitmarkerFaintBits = gHitMarker >> 28;
-                if (gBitTable[2] & hitmarkerFaintBits && gBitTable[0] & hitmarkerFaintBits)
+                gActiveBattler = 2;
+                if (HasNoMonsToSwitch(gActiveBattler, gBattleResources->bufferB[0][1], PARTY_SIZE))
                 {
-                    gActiveBattler = 2;
-                    if (HasNoMonsToSwitch(gActiveBattler, gBattleResources->bufferB[0][1], PARTY_SIZE))
-                    {
-                        gAbsentBattlerFlags |= gBitTable[gActiveBattler];
-                        gHitMarker &= ~HITMARKER_FAINTED(gActiveBattler);
-                        BtlController_EmitCantSwitch(BUFFER_A);
-                        MarkBattlerForControllerExec(gActiveBattler);
-                    }
-                    else if (!gSpecialStatuses[gActiveBattler].faintedHasReplacement)
-                    {
-                        ChooseMonToSendOut(gBattleStruct->monToSwitchIntoId[0]);
-                        gSpecialStatuses[gActiveBattler].faintedHasReplacement = TRUE;
-                    }
+                    gAbsentBattlerFlags |= gBitTable[gActiveBattler];
+                    gHitMarker &= ~HITMARKER_FAINTED(gActiveBattler);
+                    BtlController_EmitCantSwitch(BUFFER_A);
+                    MarkBattlerForControllerExec(gActiveBattler);
                 }
-                if (gBitTable[3] & hitmarkerFaintBits && hitmarkerFaintBits & gBitTable[1])
+                else if (!gSpecialStatuses[gActiveBattler].faintedHasReplacement)
                 {
-                    gActiveBattler = 3;
-                    if (HasNoMonsToSwitch(gActiveBattler, gBattleResources->bufferB[1][1], PARTY_SIZE))
-                    {
-                        gAbsentBattlerFlags |= gBitTable[gActiveBattler];
-                        gHitMarker &= ~HITMARKER_FAINTED(gActiveBattler);
-                        BtlController_EmitCantSwitch(BUFFER_A);
-                        MarkBattlerForControllerExec(gActiveBattler);
-                    }
-                    else if (!gSpecialStatuses[gActiveBattler].faintedHasReplacement)
-                    {
-                        ChooseMonToSendOut(gBattleStruct->monToSwitchIntoId[1]);
-                        gSpecialStatuses[gActiveBattler].faintedHasReplacement = TRUE;
-                    }
+                    ChooseMonToSendOut(gBattleStruct->monToSwitchIntoId[0]);
+                    gSpecialStatuses[gActiveBattler].faintedHasReplacement = TRUE;
                 }
-                gBattlescriptCurrInstr += 6;
             }
-            else
+            if (gBitTable[3] & hitmarkerFaintBits && hitmarkerFaintBits & gBitTable[1])
             {
-                // Not multi or double battle
-                gBattlescriptCurrInstr += 6;
+                gActiveBattler = 3;
+                if (HasNoMonsToSwitch(gActiveBattler, gBattleResources->bufferB[1][1], PARTY_SIZE))
+                {
+                    gAbsentBattlerFlags |= gBitTable[gActiveBattler];
+                    gHitMarker &= ~HITMARKER_FAINTED(gActiveBattler);
+                    BtlController_EmitCantSwitch(BUFFER_A);
+                    MarkBattlerForControllerExec(gActiveBattler);
+                }
+                else if (!gSpecialStatuses[gActiveBattler].faintedHasReplacement)
+                {
+                    ChooseMonToSendOut(gBattleStruct->monToSwitchIntoId[1]);
+                    gSpecialStatuses[gActiveBattler].faintedHasReplacement = TRUE;
+                }
             }
+            gBattlescriptCurrInstr += 6;
         }
         else
         {
-            // Multi battle
+            // Not multi or double battle
             gBattlescriptCurrInstr += 6;
         }
 
@@ -6506,26 +6466,12 @@ static void Cmd_openpartyscreen(void)
             if (GetBattlerPosition(gActiveBattler) == B_POSITION_PLAYER_LEFT && gBattleResults.playerSwitchesCounter < 255)
                 gBattleResults.playerSwitchesCounter++;
 
-            if (gBattleTypeFlags & BATTLE_TYPE_MULTI)
-            {
-                for (gActiveBattler = 0; gActiveBattler < gBattlersCount; gActiveBattler++)
-                {
-                    if (gActiveBattler != battlerId)
-                    {
-                        BtlController_EmitLinkStandbyMsg(BUFFER_A, LINK_STANDBY_MSG_ONLY, FALSE);
-                        MarkBattlerForControllerExec(gActiveBattler);
-                    }
-                }
-            }
-            else
-            {
-                gActiveBattler = GetBattlerAtPosition(BATTLE_OPPOSITE(GetBattlerPosition(battlerId)));
-                if (gAbsentBattlerFlags & gBitTable[gActiveBattler])
-                    gActiveBattler ^= BIT_FLANK;
+            gActiveBattler = GetBattlerAtPosition(BATTLE_OPPOSITE(GetBattlerPosition(battlerId)));
+            if (gAbsentBattlerFlags & gBitTable[gActiveBattler])
+                gActiveBattler ^= BIT_FLANK;
 
-                BtlController_EmitLinkStandbyMsg(BUFFER_A, LINK_STANDBY_MSG_ONLY, FALSE);
-                MarkBattlerForControllerExec(gActiveBattler);
-            }
+            BtlController_EmitLinkStandbyMsg(BUFFER_A, LINK_STANDBY_MSG_ONLY, FALSE);
+            MarkBattlerForControllerExec(gActiveBattler);
         }
     }
 }
@@ -6555,8 +6501,7 @@ static void Cmd_switchhandleorder(void)
         }
         break;
     case 1:
-        if (!(gBattleTypeFlags & BATTLE_TYPE_MULTI))
-            SwitchPartyOrder(gActiveBattler);
+        SwitchPartyOrder(gActiveBattler);
         break;
     case 2:
         if (!(gBattleStruct->field_93 & gBitTable[gActiveBattler]))
@@ -6569,17 +6514,7 @@ static void Cmd_switchhandleorder(void)
         gBattleCommunication[0] = gBattleResources->bufferB[gActiveBattler][1];
         *(gBattleStruct->monToSwitchIntoId + gActiveBattler) = gBattleResources->bufferB[gActiveBattler][1];
 
-        if (gBattleTypeFlags & BATTLE_TYPE_LINK && gBattleTypeFlags & BATTLE_TYPE_MULTI)
-        {
-            *(gActiveBattler * 3 + (u8 *)(gBattleStruct->battlerPartyOrders) + 0) &= 0xF;
-            *(gActiveBattler * 3 + (u8 *)(gBattleStruct->battlerPartyOrders) + 0) |= (gBattleResources->bufferB[gActiveBattler][2] & 0xF0);
-            *(gActiveBattler * 3 + (u8 *)(gBattleStruct->battlerPartyOrders) + 1) = gBattleResources->bufferB[gActiveBattler][3];
-
-            *((BATTLE_PARTNER(gActiveBattler)) * 3 + (u8 *)(gBattleStruct->battlerPartyOrders) + 0) &= (0xF0);
-            *((BATTLE_PARTNER(gActiveBattler)) * 3 + (u8 *)(gBattleStruct->battlerPartyOrders) + 0) |= (gBattleResources->bufferB[gActiveBattler][2] & 0xF0) >> 4;
-            *((BATTLE_PARTNER(gActiveBattler)) * 3 + (u8 *)(gBattleStruct->battlerPartyOrders) + 2) = gBattleResources->bufferB[gActiveBattler][3];
-        }
-        else if (gBattleTypeFlags & BATTLE_TYPE_INGAME_PARTNER)
+        if (gBattleTypeFlags & BATTLE_TYPE_INGAME_PARTNER)
         {
             SwitchPartyOrderInGameMulti(gActiveBattler, *(gBattleStruct->monToSwitchIntoId + gActiveBattler));
         }
@@ -8436,7 +8371,7 @@ static void Cmd_various(void)
         }
         break;
     case VARIOUS_RESET_PLAYER_FAINTED:
-        if (!(gBattleTypeFlags & (BATTLE_TYPE_LINK | BATTLE_TYPE_DOUBLE))
+        if (!(gBattleTypeFlags & BATTLE_TYPE_DOUBLE)
             && gBattleTypeFlags & BATTLE_TYPE_TRAINER
             && gBattleMons[0].hp != 0
             && gBattleMons[1].hp != 0)
@@ -8877,7 +8812,7 @@ static void Cmd_various(void)
             u16 megaSpecies;
             gBattleStruct->mega.evolvedSpecies[gActiveBattler] = gBattleMons[gActiveBattler].species;
             if (GetBattlerPosition(gActiveBattler) == B_POSITION_PLAYER_LEFT
-                || (GetBattlerPosition(gActiveBattler) == B_POSITION_PLAYER_RIGHT && !(gBattleTypeFlags & (BATTLE_TYPE_MULTI | BATTLE_TYPE_INGAME_PARTNER))))
+                || (GetBattlerPosition(gActiveBattler) == B_POSITION_PLAYER_RIGHT && !(gBattleTypeFlags & BATTLE_TYPE_INGAME_PARTNER)))
             {
                 gBattleStruct->mega.playerEvolvedSpecies = gBattleStruct->mega.evolvedSpecies[gActiveBattler];
             }
@@ -8924,7 +8859,7 @@ static void Cmd_various(void)
             u16 primalSpecies;
             gBattleStruct->mega.primalRevertedSpecies[gActiveBattler] = gBattleMons[gActiveBattler].species;
             if (GetBattlerPosition(gActiveBattler) == B_POSITION_PLAYER_LEFT
-                || (GetBattlerPosition(gActiveBattler) == B_POSITION_PLAYER_RIGHT && !(gBattleTypeFlags & (BATTLE_TYPE_MULTI | BATTLE_TYPE_INGAME_PARTNER))))
+                || (GetBattlerPosition(gActiveBattler) == B_POSITION_PLAYER_RIGHT && !(gBattleTypeFlags & BATTLE_TYPE_INGAME_PARTNER)))
             {
                 gBattleStruct->mega.playerPrimalRevertedSpecies = gBattleStruct->mega.primalRevertedSpecies[gActiveBattler];
             }
@@ -10985,9 +10920,7 @@ static void Cmd_forcerandomswitch(void)
             battler2PartyId = gBattlerPartyIndexes[gBattlerTarget];
             battler1PartyId = gBattlerPartyIndexes[BATTLE_PARTNER(gBattlerTarget)];
         }
-        else if ((gBattleTypeFlags & BATTLE_TYPE_BATTLE_TOWER && gBattleTypeFlags & BATTLE_TYPE_LINK)
-            || (gBattleTypeFlags & BATTLE_TYPE_BATTLE_TOWER && gBattleTypeFlags & BATTLE_TYPE_RECORDED_LINK)
-            || (gBattleTypeFlags & BATTLE_TYPE_INGAME_PARTNER))
+        else if ((gBattleTypeFlags & BATTLE_TYPE_INGAME_PARTNER))
         {
             if ((gBattlerTarget & BIT_FLANK) != B_FLANK_LEFT)
             {
@@ -11082,17 +11015,7 @@ static void Cmd_forcerandomswitch(void)
 
             *(gBattleStruct->monToSwitchIntoId + gBattlerTarget) = i;
 
-            if (!IsMultiBattle())
-                SwitchPartyOrder(gBattlerTarget);
-
-            if ((gBattleTypeFlags & BATTLE_TYPE_LINK && gBattleTypeFlags & BATTLE_TYPE_BATTLE_TOWER)
-                || (gBattleTypeFlags & BATTLE_TYPE_LINK && gBattleTypeFlags & BATTLE_TYPE_MULTI)
-                || (gBattleTypeFlags & BATTLE_TYPE_RECORDED_LINK && gBattleTypeFlags & BATTLE_TYPE_BATTLE_TOWER)
-                || (gBattleTypeFlags & BATTLE_TYPE_RECORDED_LINK && gBattleTypeFlags & BATTLE_TYPE_MULTI))
-            {
-                SwitchPartyOrderLinkMulti(gBattlerTarget, i, 0);
-                SwitchPartyOrderLinkMulti(BATTLE_PARTNER(gBattlerTarget), i, 1);
-            }
+            SwitchPartyOrder(gBattlerTarget);
 
             if (gBattleTypeFlags & BATTLE_TYPE_INGAME_PARTNER)
                 SwitchPartyOrderInGameMulti(gBattlerTarget, i);
@@ -11195,7 +11118,7 @@ static void Cmd_tryconversiontypechange(void)
 
 static void Cmd_givepaydaymoney(void)
 {
-    if (!(gBattleTypeFlags & (BATTLE_TYPE_LINK | BATTLE_TYPE_RECORDED_LINK)) && gPaydayMoney != 0)
+    if (!(gBattleTypeFlags & (BATTLE_TYPE_RECORDED_LINK)) && gPaydayMoney != 0)
     {
         u32 bonusMoney = gPaydayMoney * gBattleStruct->moneyMultiplier;
         AddMoney(&gSaveBlock1Ptr->money, bonusMoney);
@@ -12936,10 +12859,7 @@ static void Cmd_tryswapitems(void)
     // opponent can't swap items with player in regular battles
     if (gBattleTypeFlags & BATTLE_TYPE_TRAINER_HILL
         || (GetBattlerSide(gBattlerAttacker) == B_SIDE_OPPONENT
-            && !(gBattleTypeFlags & (BATTLE_TYPE_LINK
-                                  | BATTLE_TYPE_EREADER_TRAINER
-                                  | BATTLE_TYPE_FRONTIER
-                                  | BATTLE_TYPE_SECRET_BASE
+            && !(gBattleTypeFlags & (BATTLE_TYPE_SECRET_BASE
                                   | BATTLE_TYPE_RECORDED_LINK
                                   #if B_TRAINERS_KNOCK_OFF_ITEMS == TRUE
                                   | BATTLE_TYPE_TRAINER
@@ -12954,10 +12874,7 @@ static void Cmd_tryswapitems(void)
         u8 sideTarget = GetBattlerSide(gBattlerTarget);
 
         // You can't swap items if they were knocked off in regular battles
-        if (!(gBattleTypeFlags & (BATTLE_TYPE_LINK
-                             | BATTLE_TYPE_EREADER_TRAINER
-                             | BATTLE_TYPE_FRONTIER
-                             | BATTLE_TYPE_SECRET_BASE
+        if (!(gBattleTypeFlags & (BATTLE_TYPE_SECRET_BASE
                              | BATTLE_TYPE_RECORDED_LINK))
             && (gWishFutureKnock.knockedOffMons[sideAttacker] & gBitTable[gBattlerPartyIndexes[gBattlerAttacker]]
                 || gWishFutureKnock.knockedOffMons[sideTarget] & gBitTable[gBattlerPartyIndexes[gBattlerTarget]]))

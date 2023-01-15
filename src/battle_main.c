@@ -870,8 +870,7 @@ static u8 CreateNPCTrainerParty(struct Pokemon *party, u16 trainerNum, bool8 fir
     if (trainerNum == TRAINER_SECRET_BASE)
         return 0;
 
-    if (gBattleTypeFlags & BATTLE_TYPE_TRAINER && !(gBattleTypeFlags & (BATTLE_TYPE_EREADER_TRAINER
-                                                                        | BATTLE_TYPE_TRAINER_HILL)))
+    if (gBattleTypeFlags & BATTLE_TYPE_TRAINER && !(gBattleTypeFlags & (BATTLE_TYPE_TRAINER_HILL)))
     {
         if (firstTrainer == TRUE)
             ZeroEnemyPartyMons();
@@ -1884,7 +1883,7 @@ static void DoBattleIntro(void)
                 }
                 break;
             case B_POSITION_PLAYER_RIGHT:
-                if (gBattleTypeFlags & (BATTLE_TYPE_MULTI | BATTLE_TYPE_INGAME_PARTNER)) // partner sprite
+                if (gBattleTypeFlags & BATTLE_TYPE_INGAME_PARTNER) // partner sprite
                 {
                     BtlController_EmitDrawTrainerPic(BUFFER_A);
                     MarkBattlerForControllerExec(gActiveBattler);
@@ -1893,7 +1892,7 @@ static void DoBattleIntro(void)
             case B_POSITION_OPPONENT_RIGHT:
                 if (gBattleTypeFlags & BATTLE_TYPE_TRAINER)
                 {
-                    if (gBattleTypeFlags & (BATTLE_TYPE_MULTI | BATTLE_TYPE_TWO_OPPONENTS) && !BATTLE_TWO_VS_ONE_OPPONENT) // opponent 2 if exists
+                    if (gBattleTypeFlags & BATTLE_TYPE_TWO_OPPONENTS && !BATTLE_TWO_VS_ONE_OPPONENT) // opponent 2 if exists
                     {
                         BtlController_EmitDrawTrainerPic(BUFFER_A);
                         MarkBattlerForControllerExec(gActiveBattler);
@@ -2020,7 +2019,7 @@ static void DoBattleIntro(void)
     case 12: // nothing
         (*state)++;
     case 13: // second opponent's mon send out
-        if (gBattleTypeFlags & (BATTLE_TYPE_MULTI | BATTLE_TYPE_TWO_OPPONENTS) && !BATTLE_TWO_VS_ONE_OPPONENT)
+        if (gBattleTypeFlags & BATTLE_TYPE_TWO_OPPONENTS && !BATTLE_TWO_VS_ONE_OPPONENT)
         {
             if (gBattleTypeFlags & BATTLE_TYPE_RECORDED_LINK && !(gBattleTypeFlags & BATTLE_TYPE_RECORDED_IS_MASTER))
                 gActiveBattler = GetBattlerAtPosition(B_POSITION_PLAYER_RIGHT);
@@ -2090,7 +2089,7 @@ static void DoBattleIntro(void)
         (*state)++;
         break;
     case 19: // player 2 send out
-        if (gBattleTypeFlags & (BATTLE_TYPE_MULTI | BATTLE_TYPE_INGAME_PARTNER))
+        if (gBattleTypeFlags & BATTLE_TYPE_INGAME_PARTNER)
         {
             if (gBattleTypeFlags & BATTLE_TYPE_RECORDED_LINK && !(gBattleTypeFlags & BATTLE_TYPE_RECORDED_IS_MASTER))
                 gActiveBattler = GetBattlerAtPosition(B_POSITION_OPPONENT_RIGHT);
@@ -2253,12 +2252,6 @@ static void TryDoEventsBeforeFirstTurn(void)
     gRandomTurnNumber = Random();
 
     GetAiLogicData(); // get assumed abilities, hold effects, etc of all battlers
-
-    if (gBattleTypeFlags & BATTLE_TYPE_ARENA)
-    {
-        StopCryAndClearCrySongs();
-        BattleScriptExecute(BattleScript_ArenaTurnBeginning);
-    }
 }
 
 static void HandleEndTurn_ContinueBattle(void)
@@ -2345,11 +2338,7 @@ void BattleTurnPassed(void)
     gBattleMainFunc = HandleTurnActionSelectionState;
     gRandomTurnNumber = Random();
 
-    if (gBattleTypeFlags & BATTLE_TYPE_PALACE)
-        BattleScriptExecute(BattleScript_PalacePrintFlavorText);
-    else if (gBattleTypeFlags & BATTLE_TYPE_ARENA && gBattleStruct->arenaTurnCounter == 0)
-        BattleScriptExecute(BattleScript_ArenaTurnBeginning);
-    else if (ShouldDoTrainerSlide(GetBattlerAtPosition(B_POSITION_OPPONENT_LEFT), gTrainerBattleOpponent_A, TRAINER_SLIDE_LAST_LOW_HP))
+    if (ShouldDoTrainerSlide(GetBattlerAtPosition(B_POSITION_OPPONENT_LEFT), gTrainerBattleOpponent_A, TRAINER_SLIDE_LAST_LOW_HP))
         BattleScriptExecute(BattleScript_TrainerSlideMsgEnd2);
 }
 
@@ -2460,24 +2449,20 @@ static void HandleTurnActionSelectionState(void)
 
             // Do AI score computations here so we can use them in AI_TrySwitchOrUseItem
             if ((gBattleTypeFlags & BATTLE_TYPE_HAS_AI || IsWildMonSmart())
-                && (IsBattlerAIControlled(gActiveBattler) && !(gBattleTypeFlags & BATTLE_TYPE_PALACE))) {
+                && (IsBattlerAIControlled(gActiveBattler))) {
                 gBattleStruct->aiMoveOrAction[gActiveBattler] = ComputeBattleAiScores(gActiveBattler);
             }
             break;
         case STATE_BEFORE_ACTION_CHOSEN: // Choose an action.
             *(gBattleStruct->monToSwitchIntoId + gActiveBattler) = PARTY_SIZE;
-            if (gBattleTypeFlags & BATTLE_TYPE_MULTI
-                || (position & BIT_FLANK) == B_FLANK_LEFT
+            if ((position & BIT_FLANK) == B_FLANK_LEFT
                 || gBattleStruct->absentBattlerFlags & gBitTable[GetBattlerAtPosition(BATTLE_PARTNER(position))]
                 || gBattleCommunication[GetBattlerAtPosition(BATTLE_PARTNER(position))] == STATE_WAIT_ACTION_CONFIRMED)
             {
                 if (gBattleStruct->absentBattlerFlags & gBitTable[gActiveBattler])
                 {
                     gChosenActionByBattler[gActiveBattler] = B_ACTION_NOTHING_FAINTED;
-                    if (!(gBattleTypeFlags & BATTLE_TYPE_MULTI))
-                        gBattleCommunication[gActiveBattler] = STATE_WAIT_ACTION_CONFIRMED;
-                    else
-                        gBattleCommunication[gActiveBattler] = STATE_WAIT_ACTION_CONFIRMED_STANDBY;
+                    gBattleCommunication[gActiveBattler] = STATE_WAIT_ACTION_CONFIRMED;
                 }
                 else
                 {
@@ -2581,12 +2566,7 @@ static void HandleTurnActionSelectionState(void)
                     break;
                 case B_ACTION_SWITCH:
                     *(gBattleStruct->battlerPartyIndexes + gActiveBattler) = gBattlerPartyIndexes[gActiveBattler];
-                    if (gBattleTypeFlags & BATTLE_TYPE_ARENA
-                        || !CanBattlerEscape(gActiveBattler))
-                    {
-                        BtlController_EmitChoosePokemon(BUFFER_A, PARTY_ACTION_CANT_SWITCH, PARTY_SIZE, ABILITY_NONE, gBattleStruct->battlerPartyOrders[gActiveBattler]);
-                    }
-                    else if (ItemId_GetHoldEffect(gBattleMons[gActiveBattler].item) != HOLD_EFFECT_SHED_SHELL
+                    if (ItemId_GetHoldEffect(gBattleMons[gActiveBattler].item) != HOLD_EFFECT_SHED_SHELL
                       && (i = IsAbilityPreventingEscape(gActiveBattler)))   // must be last to keep i value integrity
                     {
                         BtlController_EmitChoosePokemon(BUFFER_A, ((i - 1) << 4) | PARTY_ACTION_ABILITY_PREVENTS, PARTY_SIZE, gBattleMons[i - 1].ability, gBattleStruct->battlerPartyOrders[gActiveBattler]);
@@ -2619,7 +2599,6 @@ static void HandleTurnActionSelectionState(void)
                 case B_ACTION_CANCEL_PARTNER:
                     gBattleCommunication[gActiveBattler] = STATE_WAIT_SET_BEFORE_ACTION;
                     gBattleCommunication[GetBattlerAtPosition(BATTLE_PARTNER(GetBattlerPosition(gActiveBattler)))] = STATE_BEFORE_ACTION_CHOSEN;
-                    // RecordedBattle_ClearBattlerAction(gActiveBattler, 1);
                     if (gBattleMons[GetBattlerAtPosition(BATTLE_PARTNER(GetBattlerPosition(gActiveBattler)))].status2 & STATUS2_MULTIPLETURNS
                         || gBattleMons[GetBattlerAtPosition(BATTLE_PARTNER(GetBattlerPosition(gActiveBattler)))].status2 & STATUS2_RECHARGE)
                     {
@@ -2627,31 +2606,6 @@ static void HandleTurnActionSelectionState(void)
                         MarkBattlerForControllerExec(gActiveBattler);
                         return;
                     }
-                    // else if (gChosenActionByBattler[GetBattlerAtPosition(BATTLE_PARTNER(GetBattlerPosition(gActiveBattler)))] == B_ACTION_SWITCH)
-                    // {
-                    //     RecordedBattle_ClearBattlerAction(GetBattlerAtPosition(BATTLE_PARTNER(GetBattlerPosition(gActiveBattler))), 2);
-                    // }
-                    // else if (gChosenActionByBattler[GetBattlerAtPosition(BATTLE_PARTNER(GetBattlerPosition(gActiveBattler)))] == B_ACTION_RUN)
-                    // {
-                    //     RecordedBattle_ClearBattlerAction(GetBattlerAtPosition(BATTLE_PARTNER(GetBattlerPosition(gActiveBattler))), 1);
-                    // }
-                    // else if (gChosenActionByBattler[GetBattlerAtPosition(BATTLE_PARTNER(GetBattlerPosition(gActiveBattler)))] == B_ACTION_USE_MOVE
-                    //          && (gProtectStructs[GetBattlerAtPosition(BATTLE_PARTNER(GetBattlerPosition(gActiveBattler)))].noValidMoves
-                    //             || gDisableStructs[GetBattlerAtPosition(BATTLE_PARTNER(GetBattlerPosition(gActiveBattler)))].encoredMove))
-                    // {
-                    //     RecordedBattle_ClearBattlerAction(GetBattlerAtPosition(BATTLE_PARTNER(GetBattlerPosition(gActiveBattler))), 1);
-                    // }
-                    // else if (gBattleTypeFlags & BATTLE_TYPE_PALACE
-                    //          && gChosenActionByBattler[GetBattlerAtPosition(BATTLE_PARTNER(GetBattlerPosition(gActiveBattler)))] == B_ACTION_USE_MOVE)
-                    // {
-                    //     // gRngValue = gBattlePalaceMoveSelectionRngValue;
-                    //     RecordedBattle_ClearBattlerAction(GetBattlerAtPosition(BATTLE_PARTNER(GetBattlerPosition(gActiveBattler))), 1);
-                    // }
-                    // else
-                    // {
-                    //     RecordedBattle_ClearBattlerAction(GetBattlerAtPosition(BATTLE_PARTNER(GetBattlerPosition(gActiveBattler))), 3);
-                    // }
-
                     gBattleStruct->mega.toEvolve &= ~(gBitTable[BATTLE_PARTNER(GetBattlerPosition(gActiveBattler))]);
                     gBattleStruct->zmove.toBeUsed[BATTLE_PARTNER(GetBattlerPosition(gActiveBattler))] = MOVE_NONE;
                     BtlController_EmitEndBounceEffect(BUFFER_A);
@@ -2733,11 +2687,6 @@ static void HandleTurnActionSelectionState(void)
                         }
                         else
                         {
-                            // if (!(gBattleTypeFlags & BATTLE_TYPE_PALACE))
-                            // {
-                            //     RecordedBattle_SetBattlerAction(gActiveBattler, gBattleResources->bufferB[gActiveBattler][2]);
-                            //     RecordedBattle_SetBattlerAction(gActiveBattler, gBattleResources->bufferB[gActiveBattler][3]);
-                            // }
                             *(gBattleStruct->chosenMovePositions + gActiveBattler) = gBattleResources->bufferB[gActiveBattler][2] & ~RET_MEGA_EVOLUTION;
                             gChosenMoveByBattler[gActiveBattler] = gBattleMons[gActiveBattler].moves[*(gBattleStruct->chosenMovePositions + gActiveBattler)];
                             *(gBattleStruct->moveTarget + gActiveBattler) = gBattleResources->bufferB[gActiveBattler][3];
@@ -3554,7 +3503,6 @@ static void HandleEndTurn_FinishBattle(void)
     {
         if (!(gBattleTypeFlags & (BATTLE_TYPE_FIRST_BATTLE
                                   | BATTLE_TYPE_SAFARI
-                                  | BATTLE_TYPE_EREADER_TRAINER
                                   | BATTLE_TYPE_WALLY_TUTORIAL)))
         {
             for (gActiveBattler = 0; gActiveBattler < gBattlersCount; gActiveBattler++)
@@ -3619,7 +3567,6 @@ static void FreeResetData_ReturnToOvOrDoEvolutions(void)
         if (!(gBattleTypeFlags & (BATTLE_TYPE_RECORDED_LINK
                                   | BATTLE_TYPE_FIRST_BATTLE
                                   | BATTLE_TYPE_SAFARI
-                                  | BATTLE_TYPE_EREADER_TRAINER
                                   | BATTLE_TYPE_WALLY_TUTORIAL))
         #if B_EVOLUTION_AFTER_WHITEOUT <= GEN_5
             && (gBattleOutcome == B_OUTCOME_WON || gBattleOutcome == B_OUTCOME_CAUGHT)

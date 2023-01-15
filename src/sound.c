@@ -327,8 +327,7 @@ void PlayCry_ReleaseDouble(u16 species, s8 pan, u8 mode)
     }
     else
     {
-        if (!(gBattleTypeFlags & BATTLE_TYPE_MULTI))
-            m4aMPlayVolumeControl(&gMPlayInfo_BGM, TRACKS_ALL, 85);
+        m4aMPlayVolumeControl(&gMPlayInfo_BGM, TRACKS_ALL, 85);
         PlayCryInternal(species, pan, CRY_VOLUME, CRY_PRIORITY_NORMAL, mode);
     }
 }

@@ -2606,7 +2606,7 @@ void BufferStringBattle(u16 stringID)
         {
             if (BATTLE_TWO_VS_ONE_OPPONENT)
                 stringPtr = sText_Trainer1WantsToBattle;
-            else if (gBattleTypeFlags & (BATTLE_TYPE_MULTI | BATTLE_TYPE_INGAME_PARTNER))
+            else if (gBattleTypeFlags & BATTLE_TYPE_INGAME_PARTNER)
                 stringPtr = sText_TwoTrainersWantToBattle;
             else if (gBattleTypeFlags & BATTLE_TYPE_TWO_OPPONENTS)
                 stringPtr = sText_TwoTrainersWantToBattle;
@@ -2634,8 +2634,6 @@ void BufferStringBattle(u16 stringID)
                     stringPtr = sText_InGamePartnerSentOutZGoN;
                 else if (gBattleTypeFlags & BATTLE_TYPE_TWO_OPPONENTS)
                     stringPtr = sText_GoTwoPkmn;
-                else if (gBattleTypeFlags & BATTLE_TYPE_MULTI)
-                    stringPtr = sText_LinkPartnerSentOutPkmnGoPkmn;
                 else
                     stringPtr = sText_GoTwoPkmn;
             }
@@ -2652,10 +2650,6 @@ void BufferStringBattle(u16 stringID)
                     stringPtr = sText_Trainer1SentOutTwoPkmn;
                 else if (gBattleTypeFlags & BATTLE_TYPE_TWO_OPPONENTS)
                     stringPtr = sText_TwoTrainersSentPkmn;
-                else if (gBattleTypeFlags & BATTLE_TYPE_TOWER_LINK_MULTI)
-                    stringPtr = sText_TwoTrainersSentPkmn;
-                else if (gBattleTypeFlags & BATTLE_TYPE_MULTI)
-                    stringPtr = sText_TwoLinkTrainersSentOutPkmn;
                 else
                     stringPtr = sText_Trainer1SentOutTwoPkmn;
             }
@@ -2681,10 +2675,7 @@ void BufferStringBattle(u16 stringID)
         {
             if (gTrainerBattleOpponent_A == TRAINER_LINK_OPPONENT || gBattleTypeFlags & BATTLE_TYPE_RECORDED_LINK)
             {
-                if (gBattleTypeFlags & BATTLE_TYPE_MULTI)
-                    stringPtr = sText_LinkTrainer2WithdrewPkmn;
-                else
-                    stringPtr = sText_LinkTrainer1WithdrewPkmn;
+                stringPtr = sText_LinkTrainer1WithdrewPkmn;
             }
             else
             {
@@ -2738,8 +2729,6 @@ void BufferStringBattle(u16 stringID)
 
             if (gBattleTextBuff1[0] == B_OUTCOME_LOST || gBattleTextBuff1[0] == B_OUTCOME_DREW)
                 stringPtr = sText_GotAwaySafely;
-            else if (gBattleTypeFlags & BATTLE_TYPE_MULTI)
-                stringPtr = sText_TwoWildFled;
             else
                 stringPtr = sText_WildFled;
         }
@@ -2748,25 +2737,7 @@ void BufferStringBattle(u16 stringID)
             if (GetBattlerSide(gActiveBattler) == B_SIDE_OPPONENT && gBattleTextBuff1[0] != B_OUTCOME_DREW)
                 gBattleTextBuff1[0] ^= (B_OUTCOME_LOST | B_OUTCOME_WON);
 
-            if (gBattleTypeFlags & BATTLE_TYPE_MULTI)
-            {
-                switch (gBattleTextBuff1[0])
-                {
-                case B_OUTCOME_WON:
-                    if (gBattleTypeFlags & BATTLE_TYPE_TOWER_LINK_MULTI)
-                        stringPtr = sText_TwoInGameTrainersDefeated;
-                    else
-                        stringPtr = sText_TwoLinkTrainersDefeated;
-                    break;
-                case B_OUTCOME_LOST:
-                    stringPtr = sText_PlayerLostToTwo;
-                    break;
-                case B_OUTCOME_DREW:
-                    stringPtr = sText_PlayerBattledToDrawVsTwo;
-                    break;
-                }
-            }
-            else if (gTrainerBattleOpponent_A == TRAINER_UNION_ROOM)
+            if (gTrainerBattleOpponent_A == TRAINER_UNION_ROOM)
             {
                 switch (gBattleTextBuff1[0])
                 {
@@ -2916,7 +2887,7 @@ static const u8 *BattleStringGetOpponentName(u8 *text, u8 multiplayerId, u8 batt
         toCpy = BattleStringGetOpponentNameByTrainerId(gTrainerBattleOpponent_A, text, multiplayerId, battlerId);
         break;
     case B_POSITION_OPPONENT_RIGHT:
-        if (gBattleTypeFlags & (BATTLE_TYPE_TWO_OPPONENTS | BATTLE_TYPE_MULTI) && !BATTLE_TWO_VS_ONE_OPPONENT)
+        if (gBattleTypeFlags & BATTLE_TYPE_TWO_OPPONENTS && !BATTLE_TWO_VS_ONE_OPPONENT)
             toCpy = BattleStringGetOpponentNameByTrainerId(gTrainerBattleOpponent_B, text, multiplayerId, battlerId);
         else
             toCpy = BattleStringGetOpponentNameByTrainerId(gTrainerBattleOpponent_A, text, multiplayerId, battlerId);

@@ -65,7 +65,6 @@ struct TrainerBattleParameter
 };
 
 // this file's functions
-static void DoBattlePikeWildBattle(void);
 static void DoSafariBattle(void);
 static void DoStandardWildBattle(bool32 isDouble);
 static void CB2_EndWildBattle(void);
@@ -390,11 +389,6 @@ void BattleSetup_StartDoubleWildBattle(void)
     DoStandardWildBattle(TRUE);
 }
 
-void BattleSetup_StartBattlePikeWildBattle(void)
-{
-    DoBattlePikeWildBattle();
-}
-
 static void DoStandardWildBattle(bool32 isDouble)
 {
     LockPlayerFieldControls();
@@ -431,19 +425,6 @@ static void DoSafariBattle(void)
     gMain.savedCallback = CB2_EndSafariBattle;
     gBattleTypeFlags = BATTLE_TYPE_SAFARI;
     CreateBattleStartTask(GetWildBattleTransition(), 0);
-}
-
-static void DoBattlePikeWildBattle(void)
-{
-    LockPlayerFieldControls();
-    FreezeObjectEvents();
-    StopPlayerAvatar();
-    gMain.savedCallback = CB2_EndWildBattle;
-    gBattleTypeFlags = BATTLE_TYPE_PIKE;
-    CreateBattleStartTask(GetWildBattleTransition(), 0);
-    IncrementGameStat(GAME_STAT_TOTAL_BATTLES);
-    IncrementGameStat(GAME_STAT_WILD_BATTLES);
-    TryUpdateGymLeaderRematchFromWild();
 }
 
 static void DoTrainerBattle(void)
@@ -1026,7 +1007,7 @@ void DoSpecialTrainerBattle(void)
         BattleTransition_StartOnField(GetSpecialBattleTransition(B_TRANSITION_GROUP_SECRET_BASE));
         break;
     case SPECIAL_BATTLE_STEVEN:
-        gBattleTypeFlags = BATTLE_TYPE_TRAINER | BATTLE_TYPE_DOUBLE | BATTLE_TYPE_TWO_OPPONENTS | BATTLE_TYPE_MULTI | BATTLE_TYPE_INGAME_PARTNER;
+        gBattleTypeFlags = BATTLE_TYPE_TRAINER | BATTLE_TYPE_DOUBLE | BATTLE_TYPE_TWO_OPPONENTS | BATTLE_TYPE_INGAME_PARTNER;
         FillPartnerParty(TRAINER_STEVEN_PARTNER);
         gApproachingTrainerId = 0;
         BattleSetup_ConfigureTrainerBattle(MossdeepCity_SpaceCenter_2F_EventScript_MaxieTrainer + 1);

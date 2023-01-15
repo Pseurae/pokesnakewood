@@ -663,8 +663,8 @@ static void SafariHandleEndLinkBattle(void)
     FadeOutMapMusic(5);
     BeginFastPaletteFade(3);
     SafariBufferExecCompleted();
-    if ((gBattleTypeFlags & BATTLE_TYPE_LINK) && !(gBattleTypeFlags & BATTLE_TYPE_IS_MASTER))
-        gBattlerControllerFuncs[gActiveBattler] = SafariSetBattleEndCallbacks;
+    // if ((gBattleTypeFlags & BATTLE_TYPE_LINK) && !(gBattleTypeFlags & BATTLE_TYPE_IS_MASTER))
+    //     gBattlerControllerFuncs[gActiveBattler] = SafariSetBattleEndCallbacks;
 }
 
 static void SafariHandleBattleDebug(void)
