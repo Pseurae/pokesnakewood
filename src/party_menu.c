@@ -1332,6 +1332,10 @@ static void HandleChooseMonCancel(u8 taskId, s8 *slotPtr)
         CancelParticipationPrompt(taskId);
         break;
     default:
+        gSpecialVar_0x8004 = PARTY_SIZE + 1;
+        gPartyMenuUseExitCallback = FALSE;
+        *slotPtr = PARTY_SIZE + 1;
+        Task_ClosePartyMenu(taskId);
         PlaySE(SE_SELECT);
         break;
     }
@@ -2628,7 +2632,7 @@ static void Task_TryCreateSelectionWindow(u8 taskId)
 
 static void Task_HandleSelectionMenuInput(u8 taskId)
 {
-    if (!gPaletteFade.active && MenuHelpers_ShouldWaitForLinkRecv() != TRUE)
+    if (!gPaletteFade.active)
     {
         s8 input;
         s16 *data = gTasks[taskId].data;

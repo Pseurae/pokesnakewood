@@ -735,16 +735,6 @@ u8 HandleSavingData(u8 saveType)
         CopyPartyAndObjectsToSave();
         WriteSaveSectorOrSlot(FULL_SAVE_SLOT, gRamSaveSectorLocations);
         break;
-    case SAVE_LINK:
-    case SAVE_EREADER: // Dummied, now duplicate of SAVE_LINK
-        // Used by link / Battle Frontier
-        // Write only SaveBlocks 1 and 2 (skips the PC)
-        CopyPartyAndObjectsToSave();
-        for(i = SECTOR_ID_SAVEBLOCK2; i <= SECTOR_ID_SAVEBLOCK1_END; i++)
-            HandleReplaceSector(i, gRamSaveSectorLocations);
-        for(i = SECTOR_ID_SAVEBLOCK2; i <= SECTOR_ID_SAVEBLOCK1_END; i++)
-            WriteSectorSignatureByte_NoOffset(i, gRamSaveSectorLocations);
-        break;
     case SAVE_OVERWRITE_DIFFERENT_FILE:
         // Erase Hall of Fame
         for (i = SECTOR_ID_HOF_1; i < SECTORS_COUNT; i++)
@@ -857,10 +847,6 @@ bool8 WriteSaveBlock1Sector(void)
         WriteSectorSignatureByte(sectorId, gRamSaveSectorLocations);
         finished = TRUE;
     }
-
-    if (gDamagedSaveSectors)
-        DoSaveFailedScreen(SAVE_LINK);
-
     return finished;
 }
 

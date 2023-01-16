@@ -29,7 +29,6 @@ static void Task_HandleYesNoInput(u8 taskId);
 static void Task_HandleMultichoiceGridInput(u8 taskId);
 static void DrawMultichoiceMenu(u8 left, u8 top, u8 multichoiceId, bool8 ignoreBPress, u8 cursorPos);
 static void InitMultichoiceCheckWrap(bool8 ignoreBPress, u8 count, u8 windowId, u8 multichoiceId);
-static void DrawLinkServicesMultichoiceMenu(u8 multichoiceId);
 static void CreatePCMultichoice(void);
 static void CreateLilycoveSSTidalMultichoice(void);
 static bool8 IsPicboxClosed(void);
@@ -179,14 +178,6 @@ static void InitMultichoiceCheckWrap(bool8 ignoreBPress, u8 count, u8 windowId, 
     u8 taskId;
     sProcessInputDelay = 2;
 
-    for (i = 0; i < ARRAY_COUNT(sLinkServicesMultichoiceIds); i++)
-    {
-        if (sLinkServicesMultichoiceIds[i] == multichoiceId)
-        {
-            sProcessInputDelay = 12;
-        }
-    }
-
     taskId = CreateTask(Task_HandleMultichoiceInput, 80);
 
     gTasks[taskId].tIgnoreBPress = ignoreBPress;
@@ -198,8 +189,6 @@ static void InitMultichoiceCheckWrap(bool8 ignoreBPress, u8 count, u8 windowId, 
 
     gTasks[taskId].tWindowId = windowId;
     gTasks[taskId].tMultichoiceId = multichoiceId;
-
-    DrawLinkServicesMultichoiceMenu(multichoiceId);
 }
 
 static void Task_HandleMultichoiceInput(u8 taskId)
@@ -219,11 +208,6 @@ static void Task_HandleMultichoiceInput(u8 taskId)
                 selection = Menu_ProcessInputNoWrap();
             else
                 selection = Menu_ProcessInput();
-
-            if (JOY_NEW(DPAD_UP | DPAD_DOWN))
-            {
-                DrawLinkServicesMultichoiceMenu(tMultichoiceId);
-            }
 
             if (selection != MENU_NOTHING_CHOSEN)
             {
@@ -688,37 +672,6 @@ void ClearToTransparentAndRemoveWindow(u8 windowId)
 {
     ClearStdWindowAndFrameToTransparent(windowId, TRUE);
     RemoveWindow(windowId);
-}
-
-static void DrawLinkServicesMultichoiceMenu(u8 multichoiceId)
-{
-    switch (multichoiceId)
-    {
-    case MULTI_WIRELESS_NO_BERRY:
-        FillWindowPixelBuffer(0, PIXEL_FILL(1));
-        AddTextPrinterParameterized2(0, FONT_NORMAL, sWirelessOptionsNoBerryCrush[Menu_GetCursorPos()], 0, NULL, TEXT_COLOR_DARK_GRAY, TEXT_COLOR_WHITE, TEXT_COLOR_LIGHT_GRAY);
-        break;
-    case MULTI_CABLE_CLUB_WITH_RECORD_MIX:
-        FillWindowPixelBuffer(0, PIXEL_FILL(1));
-        AddTextPrinterParameterized2(0, FONT_NORMAL, sCableClubOptions_WithRecordMix[Menu_GetCursorPos()], 0, NULL, TEXT_COLOR_DARK_GRAY, TEXT_COLOR_WHITE, TEXT_COLOR_LIGHT_GRAY);
-        break;
-    case MULTI_WIRELESS_NO_RECORD:
-        FillWindowPixelBuffer(0, PIXEL_FILL(1));
-        AddTextPrinterParameterized2(0, FONT_NORMAL, sWirelessOptions_NoRecordMix[Menu_GetCursorPos()], 0, NULL, TEXT_COLOR_DARK_GRAY, TEXT_COLOR_WHITE, TEXT_COLOR_LIGHT_GRAY);
-        break;
-    case MULTI_WIRELESS_ALL_SERVICES:
-        FillWindowPixelBuffer(0, PIXEL_FILL(1));
-        AddTextPrinterParameterized2(0, FONT_NORMAL, sWirelessOptions_AllServices[Menu_GetCursorPos()], 0, NULL, TEXT_COLOR_DARK_GRAY, TEXT_COLOR_WHITE, TEXT_COLOR_LIGHT_GRAY);
-        break;
-    case MULTI_WIRELESS_NO_RECORD_BERRY:
-        FillWindowPixelBuffer(0, PIXEL_FILL(1));
-        AddTextPrinterParameterized2(0, FONT_NORMAL, sWirelessOptions_NoRecordMixBerryCrush[Menu_GetCursorPos()], 0, NULL, TEXT_COLOR_DARK_GRAY, TEXT_COLOR_WHITE, TEXT_COLOR_LIGHT_GRAY);
-        break;
-    case MULTI_CABLE_CLUB_NO_RECORD_MIX:
-        FillWindowPixelBuffer(0, PIXEL_FILL(1));
-        AddTextPrinterParameterized2(0, FONT_NORMAL, sCableClubOptions_NoRecordMix[Menu_GetCursorPos()], 0, NULL, TEXT_COLOR_DARK_GRAY, TEXT_COLOR_WHITE, TEXT_COLOR_LIGHT_GRAY);
-        break;
-    }
 }
 
 bool16 ScriptMenu_CreateStartMenuForPokenavTutorial(void)
