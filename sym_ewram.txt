@@ -4,7 +4,6 @@
 	.include "gflib/text.o"
 	.include "gflib/sprite.o"
 	.include "gflib/string_util.o"
-	.include "src/berry_powder.o"
 	.include "src/main_menu.o"
 	.include "src/battle_controllers.o"
 	.include "src/digit_obj_util.o"

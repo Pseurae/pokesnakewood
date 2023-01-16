@@ -33,23 +33,14 @@
 #include "secret_base.h"
 #include "player_pc.h"
 #include "field_specials.h"
-#include "berry_powder.h"
 #include "constants/items.h"
 
 extern const u8 EventScript_ResetAllMapFlags[];
 
-static void ClearFrontierRecord(void);
 static void WarpToLittleroot(void);
-static void ResetMiniGamesRecords(void);
 
 EWRAM_DATA bool8 gDifferentSaveFile = FALSE;
 EWRAM_DATA bool8 gEnableContestDebugging = FALSE;
-
-static const struct ContestWinner sContestWinnerPicDummy =
-{
-    .monName = _(""),
-    .trainerName = _("")
-};
 
 void SetTrainerId(u32 trainerId, u8 *dst)
 {
@@ -95,14 +86,6 @@ static void ClearPokedexFlags(void)
     memset(&gSaveBlock1Ptr->dexSeen, 0, sizeof(gSaveBlock1Ptr->dexSeen));
 }
 
-static void ClearFrontierRecord(void)
-{
-    CpuFill32(0, &gSaveBlock2Ptr->frontier, sizeof(gSaveBlock2Ptr->frontier));
-
-    gSaveBlock2Ptr->frontier.opponentNames[0][0] = EOS;
-    gSaveBlock2Ptr->frontier.opponentNames[1][0] = EOS;
-}
-
 static void WarpToLittleroot(void)
 {
     SetWarpDestination(MAP_GROUP(LITTLEROOT_TOWN), MAP_NUM(LITTLEROOT_TOWN), WARP_ID_NONE, 12, 11);
@@ -135,7 +118,6 @@ void NewGameInitData(void)
     ZeroPlayerPartyMons();
     ZeroEnemyPartyMons();
     ResetPokedex();
-    ClearFrontierRecord();
     ClearSav1();
     ClearAllMail();
     gSaveBlock2Ptr->specialSaveWarpFlags = 0;
@@ -167,14 +149,6 @@ void NewGameInitData(void)
     ResetLotteryCorner();
     WarpToLittleroot();
     RunScriptImmediately(EventScript_ResetAllMapFlags);
-    ResetMiniGamesRecords();
     InitLilycoveLady();
     InitMatchCallCounters();
-}
-
-static void ResetMiniGamesRecords(void)
-{
-    CpuFill16(0, &gSaveBlock2Ptr->berryCrush, sizeof(struct BerryCrush));
-    SetBerryPowder(&gSaveBlock2Ptr->berryCrush.berryPowderAmount, 0);
-    CpuFill16(0, &gSaveBlock2Ptr->berryPick, sizeof(struct BerryPickingResults));
 }

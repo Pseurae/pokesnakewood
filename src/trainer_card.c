@@ -706,19 +706,6 @@ static void TrainerCard_GenerateCardForPlayer(struct TrainerCard *trainerCard)
         trainerCard->unionRoomClass = gUnionRoomFacilityClasses[trainerCard->trainerId % NUM_UNION_ROOM_CLASSES];
 }
 
-void TrainerCard_GenerateCardForLinkPlayer(struct TrainerCard *trainerCard)
-{
-    memset(trainerCard, 0, 0x60);
-    trainerCard->version = GAME_VERSION;
-    SetPlayerCardData(trainerCard, CARD_TYPE_EMERALD);
-    *((u16 *)&trainerCard->linkPoints.frontier) = gSaveBlock2Ptr->frontier.cardBattlePoints;
-
-    if (trainerCard->gender == FEMALE)
-        trainerCard->unionRoomClass = gUnionRoomFacilityClasses[(trainerCard->trainerId % NUM_UNION_ROOM_CLASSES) + NUM_UNION_ROOM_CLASSES];
-    else
-        trainerCard->unionRoomClass = gUnionRoomFacilityClasses[trainerCard->trainerId % NUM_UNION_ROOM_CLASSES];
-}
-
 void CopyTrainerCardData(struct TrainerCard *dst, struct TrainerCard *src, u8 gameVersion)
 {
     memset(dst, 0, sizeof(struct TrainerCard));
@@ -735,7 +722,6 @@ void CopyTrainerCardData(struct TrainerCard *dst, struct TrainerCard *src, u8 ga
     case CARD_TYPE_EMERALD:
         memcpy(dst, src, 0x60);
         dst->linkPoints.frontier = 0;
-        dst->frontierBP = *((u16 *)&src->linkPoints.frontier);
         break;
     }
 }

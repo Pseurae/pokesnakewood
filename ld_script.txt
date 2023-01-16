@@ -62,7 +62,6 @@ SECTIONS {
         gflib/text.o(.text);
         gflib/sprite.o(.text);
         gflib/string_util.o(.text);
-        src/berry_powder.o(.text);
         src/rtc.o(.text);
         src/main_menu.o(.text);
         src/battle_controllers.o(.text);
@@ -398,7 +397,6 @@ SECTIONS {
         gflib/sprite.o(.rodata);
         gflib/io_reg.o(.rodata);
         gflib/string_util.o(.rodata);
-        src/berry_powder.o(.rodata);
         src/rtc.o(.rodata);
         src/main_menu.o(.rodata);
         src/battle_controllers.o(.rodata);

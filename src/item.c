@@ -669,50 +669,6 @@ u16 CountTotalItemQuantityInBag(u16 itemId)
     return ownedCount;
 }
 
-static bool8 CheckPyramidBagHasItem(u16 itemId, u16 count)
-{
-    u8 i;
-    u16 *items = gSaveBlock2Ptr->frontier.pyramidBag.itemId[gSaveBlock2Ptr->frontier.lvlMode];
-    u8 *quantities = gSaveBlock2Ptr->frontier.pyramidBag.quantity[gSaveBlock2Ptr->frontier.lvlMode];
-
-    for (i = 0; i < PYRAMID_BAG_ITEMS_COUNT; i++)
-    {
-        if (items[i] == itemId)
-        {
-            if (quantities[i] >= count)
-                return TRUE;
-
-            count -= quantities[i];
-            if (count == 0)
-                return TRUE;
-        }
-    }
-
-    return FALSE;
-}
-
-static bool8 CheckPyramidBagHasSpace(u16 itemId, u16 count)
-{
-    u8 i;
-    u16 *items = gSaveBlock2Ptr->frontier.pyramidBag.itemId[gSaveBlock2Ptr->frontier.lvlMode];
-    u8 *quantities = gSaveBlock2Ptr->frontier.pyramidBag.quantity[gSaveBlock2Ptr->frontier.lvlMode];
-
-    for (i = 0; i < PYRAMID_BAG_ITEMS_COUNT; i++)
-    {
-        if (items[i] == itemId || items[i] == ITEM_NONE)
-        {
-            if (quantities[i] + count <= MAX_BAG_ITEM_CAPACITY)
-                return TRUE;
-
-            count = (quantities[i] + count) - MAX_BAG_ITEM_CAPACITY;
-            if (count == 0)
-                return TRUE;
-        }
-    }
-
-    return FALSE;
-}
-
 static u16 SanitizeItemId(u16 itemId)
 {
     if (itemId >= ITEMS_COUNT)

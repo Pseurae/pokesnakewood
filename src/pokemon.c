@@ -3698,60 +3698,6 @@ void CreateMonWithEVSpread(struct Pokemon *mon, u16 species, u8 level, u8 fixedI
     CalculateMonStats(mon);
 }
 
-void CreateBattleTowerMon(struct Pokemon *mon, struct BattleTowerPokemon *src)
-{
-    s32 i;
-    u8 nickname[30];
-    u8 language;
-    u8 value;
-
-    CreateMon(mon, src->species, src->level, 0, TRUE, src->personality, OT_ID_PRESET, src->otId);
-
-    for (i = 0; i < MAX_MON_MOVES; i++)
-        SetMonMoveSlot(mon, src->moves[i], i);
-
-    SetMonData(mon, MON_DATA_PP_BONUSES, &src->ppBonuses);
-    SetMonData(mon, MON_DATA_HELD_ITEM, &src->heldItem);
-    SetMonData(mon, MON_DATA_FRIENDSHIP, &src->friendship);
-
-    StringCopy(nickname, src->nickname);
-
-    if (nickname[0] == EXT_CTRL_CODE_BEGIN && nickname[1] == EXT_CTRL_CODE_JPN)
-    {
-        language = LANGUAGE_JAPANESE;
-        StripExtCtrlCodes(nickname);
-    }
-    else
-    {
-        language = GAME_LANGUAGE;
-    }
-
-    SetMonData(mon, MON_DATA_LANGUAGE, &language);
-    SetMonData(mon, MON_DATA_NICKNAME, nickname);
-    SetMonData(mon, MON_DATA_HP_EV, &src->hpEV);
-    SetMonData(mon, MON_DATA_ATK_EV, &src->attackEV);
-    SetMonData(mon, MON_DATA_DEF_EV, &src->defenseEV);
-    SetMonData(mon, MON_DATA_SPEED_EV, &src->speedEV);
-    SetMonData(mon, MON_DATA_SPATK_EV, &src->spAttackEV);
-    SetMonData(mon, MON_DATA_SPDEF_EV, &src->spDefenseEV);
-    value = src->abilityNum;
-    SetMonData(mon, MON_DATA_ABILITY_NUM, &value);
-    value = src->hpIV;
-    SetMonData(mon, MON_DATA_HP_IV, &value);
-    value = src->attackIV;
-    SetMonData(mon, MON_DATA_ATK_IV, &value);
-    value = src->defenseIV;
-    SetMonData(mon, MON_DATA_DEF_IV, &value);
-    value = src->speedIV;
-    SetMonData(mon, MON_DATA_SPEED_IV, &value);
-    value = src->spAttackIV;
-    SetMonData(mon, MON_DATA_SPATK_IV, &value);
-    value = src->spDefenseIV;
-    SetMonData(mon, MON_DATA_SPDEF_IV, &value);
-    MonRestorePP(mon);
-    CalculateMonStats(mon);
-}
-
 void CreateMonWithEVSpreadNatureOTID(struct Pokemon *mon, u16 species, u8 level, u8 nature, u8 fixedIV, u8 evSpread, u32 otId)
 {
     s32 i;
@@ -3784,43 +3730,6 @@ void CreateMonWithEVSpreadNatureOTID(struct Pokemon *mon, u16 species, u8 level,
     }
 
     CalculateMonStats(mon);
-}
-
-void ConvertPokemonToBattleTowerPokemon(struct Pokemon *mon, struct BattleTowerPokemon *dest)
-{
-    s32 i;
-    u16 heldItem;
-
-    dest->species = GetMonData(mon, MON_DATA_SPECIES, NULL);
-    heldItem = GetMonData(mon, MON_DATA_HELD_ITEM, NULL);
-
-    if (heldItem == ITEM_ENIGMA_BERRY_E_READER)
-        heldItem = ITEM_NONE;
-
-    dest->heldItem = heldItem;
-
-    for (i = 0; i < MAX_MON_MOVES; i++)
-        dest->moves[i] = GetMonData(mon, MON_DATA_MOVE1 + i, NULL);
-
-    dest->level = GetMonData(mon, MON_DATA_LEVEL, NULL);
-    dest->ppBonuses = GetMonData(mon, MON_DATA_PP_BONUSES, NULL);
-    dest->otId = GetMonData(mon, MON_DATA_OT_ID, NULL);
-    dest->hpEV = GetMonData(mon, MON_DATA_HP_EV, NULL);
-    dest->attackEV = GetMonData(mon, MON_DATA_ATK_EV, NULL);
-    dest->defenseEV = GetMonData(mon, MON_DATA_DEF_EV, NULL);
-    dest->speedEV = GetMonData(mon, MON_DATA_SPEED_EV, NULL);
-    dest->spAttackEV = GetMonData(mon, MON_DATA_SPATK_EV, NULL);
-    dest->spDefenseEV = GetMonData(mon, MON_DATA_SPDEF_EV, NULL);
-    dest->friendship = GetMonData(mon, MON_DATA_FRIENDSHIP, NULL);
-    dest->hpIV = GetMonData(mon, MON_DATA_HP_IV, NULL);
-    dest->attackIV = GetMonData(mon, MON_DATA_ATK_IV, NULL);
-    dest->defenseIV = GetMonData(mon, MON_DATA_DEF_IV, NULL);
-    dest->speedIV  = GetMonData(mon, MON_DATA_SPEED_IV, NULL);
-    dest->spAttackIV  = GetMonData(mon, MON_DATA_SPATK_IV, NULL);
-    dest->spDefenseIV  = GetMonData(mon, MON_DATA_SPDEF_IV, NULL);
-    dest->abilityNum = GetMonData(mon, MON_DATA_ABILITY_NUM, NULL);
-    dest->personality = GetMonData(mon, MON_DATA_PERSONALITY, NULL);
-    GetMonData(mon, MON_DATA_NICKNAME, dest->nickname);
 }
 
 void CreateEventLegalMon(struct Pokemon *mon, u16 species, u8 level, u8 fixedIV, u8 hasFixedPersonality, u32 fixedPersonality, u8 otIdType, u32 fixedOtId)

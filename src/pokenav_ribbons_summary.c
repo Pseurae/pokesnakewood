@@ -828,19 +828,6 @@ static void PrintRibbonNameAndDescription(struct Pokenav_RibbonsSummaryMenu *men
     }
     else
     {
-        // ribbonId here is one of the 'gift' ribbon slots, used to read
-        // its actual value from giftRibbons to determine which specific
-        // gift ribbon it is
-        ribbonId = gSaveBlock1Ptr->giftRibbons[ribbonId - FIRST_GIFT_RIBBON];
-
-        // If 0, this gift ribbon slot is unoccupied
-        if (ribbonId == 0)
-            return;
-
-        // Print gift ribbon name/description
-        ribbonId--;
-        for (i = 0; i < 2; i++)
-            AddTextPrinterParameterized3(menu->ribbonCountWindowId, FONT_NORMAL, 0, (i * 16) + 1, color, TEXT_SKIP_DRAW, gGiftRibbonDescriptionPointers[ribbonId][i]);
     }
 
     CopyWindowToVram(menu->ribbonCountWindowId, COPYWIN_GFX);

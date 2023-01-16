@@ -311,11 +311,6 @@ gSpecials::
 	def_special CloseBattlePointsWindow
 	def_special ShowFrontierExchangeCornerItemIconWindow
 	def_special CloseFrontierExchangeCornerItemIconWindow
-	def_special DisplayBerryPowderVendorMenu
-	def_special RemoveBerryPowderVendorMenu
-	def_special HasEnoughBerryPowder
-	def_special TakeBerryPowder
-	def_special PrintPlayerBerryPowderAmount
 	def_special Script_DoRayquazaScene
 	def_special OpenPokenavForTutorial
 	def_special ScriptMenu_CreateStartMenuForPokenavTutorial
@@ -348,7 +343,6 @@ gSpecials::
 	def_special GetLilycoveSSTidalSelection
 	def_special SetMewAboveGrass
 	def_special ShouldDistributeEonTicket
-	def_special Script_DoRayquazaScene @ Listed twice
 	def_special LoopWingFlapSE
 	def_special DestroyMewEmergingGrassSprite
 	def_special TryBufferWaldaPhrase

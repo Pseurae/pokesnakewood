@@ -118,7 +118,6 @@ static void Task_CloseBattlePikeCurtain(u8);
 static u8 DidPlayerGetFirstFans(void);
 static void SetInitialFansOfPlayer(void);
 static u16 PlayerGainRandomTrainerFan(void);
-static void BufferFanClubTrainerName_(struct LinkBattleRecords *, u8, u8);
 
 void Special_ShowDiploma(void)
 {
@@ -2352,7 +2351,7 @@ void UpdateBattlePointsWindow(void)
 {
     u8 string[32];
     u32 x;
-    StringCopy(ConvertIntToDecimalStringN(string, gSaveBlock2Ptr->frontier.battlePoints, STR_CONV_MODE_RIGHT_ALIGN, 4), gText_BP);
+    StringCopy(ConvertIntToDecimalStringN(string, 0, STR_CONV_MODE_RIGHT_ALIGN, 4), gText_BP);
     x = GetStringRightAlignXOffset(FONT_NORMAL, string, 48);
     AddTextPrinterParameterized(sBattlePointsWindowId, FONT_NORMAL, string, x, 1, 0, NULL);
 }
@@ -3298,76 +3297,6 @@ static void SetInitialFansOfPlayer(void)
 
 void BufferFanClubTrainerName(void)
 {
-    u8 whichLinkTrainer = 0;
-    u8 whichNPCTrainer = 0;
-    switch (gSpecialVar_0x8004)
-    {
-    case FANCLUB_MEMBER1:
-        break;
-    case FANCLUB_MEMBER2:
-        break;
-    case FANCLUB_MEMBER3:
-        whichLinkTrainer = 0;
-        whichNPCTrainer = 3;
-        break;
-    case FANCLUB_MEMBER4:
-        whichLinkTrainer = 0;
-        whichNPCTrainer = 1;
-        break;
-    case FANCLUB_MEMBER5:
-        whichLinkTrainer = 1;
-        whichNPCTrainer = 0;
-        break;
-    case FANCLUB_MEMBER6:
-        whichLinkTrainer = 0;
-        whichNPCTrainer = 4;
-        break;
-    case FANCLUB_MEMBER7:
-        whichLinkTrainer = 1;
-        whichNPCTrainer = 5;
-        break;
-    case FANCLUB_MEMBER8:
-        break;
-    }
-    BufferFanClubTrainerName_(&gSaveBlock1Ptr->linkBattleRecords, whichLinkTrainer, whichNPCTrainer);
-}
-
-static void BufferFanClubTrainerName_(struct LinkBattleRecords *linkRecords, u8 whichLinkTrainer, u8 whichNPCTrainer)
-{
-    struct LinkBattleRecord *record = &linkRecords->entries[whichLinkTrainer];
-    if (record->name[0] == EOS)
-    {
-        switch (whichNPCTrainer)
-        {
-        case 0:
-            StringCopy(gStringVar1, gText_Wallace);
-            break;
-        case 1:
-            StringCopy(gStringVar1, gText_Steven);
-            break;
-        case 2:
-            StringCopy(gStringVar1, gText_Brawly);
-            break;
-        case 3:
-            StringCopy(gStringVar1, gText_Winona);
-            break;
-        case 4:
-            StringCopy(gStringVar1, gText_Phoebe);
-            break;
-        case 5:
-            StringCopy(gStringVar1, gText_Glacia);
-            break;
-        default:
-            StringCopy(gStringVar1, gText_Wallace);
-            break;
-        }
-    }
-    else
-    {
-        StringCopyN(gStringVar1, record->name, PLAYER_NAME_LENGTH);
-        gStringVar1[PLAYER_NAME_LENGTH] = EOS;
-        ConvertInternationalString(gStringVar1, linkRecords->languages[whichLinkTrainer]);
-    }
 }
 
 void UpdateTrainerFansAfterLinkBattle(void)
