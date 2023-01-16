@@ -36,38 +36,33 @@
 #define B_TXT_EFF_ABILITY 0x17
 #define B_TXT_TRAINER1_CLASS 0x18
 #define B_TXT_TRAINER1_NAME 0x19
-#define B_TXT_LINK_PLAYER_NAME 0x1A
-#define B_TXT_LINK_PARTNER_NAME 0x1B
-#define B_TXT_LINK_OPPONENT1_NAME 0x1C
-#define B_TXT_LINK_OPPONENT2_NAME 0x1D
-#define B_TXT_LINK_SCR_TRAINER_NAME 0x1E
-#define B_TXT_PLAYER_NAME 0x1F
-#define B_TXT_TRAINER1_LOSE_TEXT 0x20
-#define B_TXT_TRAINER1_WIN_TEXT 0x21
-#define B_TXT_26 0x22
-#define B_TXT_PC_CREATOR_NAME 0x23
-#define B_TXT_ATK_PREFIX1 0x24
-#define B_TXT_DEF_PREFIX1 0x25
-#define B_TXT_ATK_PREFIX2 0x26
-#define B_TXT_DEF_PREFIX2 0x27
-#define B_TXT_ATK_PREFIX3 0x28
-#define B_TXT_DEF_PREFIX3 0x29
-#define B_TXT_TRAINER2_CLASS 0x2A
-#define B_TXT_TRAINER2_NAME 0x2B
-#define B_TXT_TRAINER2_LOSE_TEXT 0x2C
-#define B_TXT_TRAINER2_WIN_TEXT 0x2D
-#define B_TXT_PARTNER_CLASS 0x2E
-#define B_TXT_PARTNER_NAME 0x2F
-#define B_TXT_BUFF3 0x30
-#define B_TXT_ATK_TRAINER_NAME 0x31
-#define B_TXT_ATK_TRAINER_CLASS 0x32
-#define B_TXT_ATK_TEAM1 0x33 // Your/The opposing
-#define B_TXT_ATK_TEAM2 0x34 // your/the opposing
-#define B_TXT_DEF_NAME 0x35
-#define B_TXT_DEF_TEAM1 0x36 // Your/The opposing
-#define B_TXT_DEF_TEAM2 0x37 // your/the opposing
-#define B_TXT_ACTIVE_NAME 0x38
-#define B_TXT_ACTIVE_NAME2 0x39 // no Illusion check
+#define B_TXT_PLAYER_NAME 0x1A
+#define B_TXT_TRAINER1_LOSE_TEXT 0x1B
+#define B_TXT_TRAINER1_WIN_TEXT 0x1C
+#define B_TXT_26 0x1D
+#define B_TXT_PC_CREATOR_NAME 0x1E
+#define B_TXT_ATK_PREFIX1 0x1F
+#define B_TXT_DEF_PREFIX1 0x20
+#define B_TXT_ATK_PREFIX2 0x21
+#define B_TXT_DEF_PREFIX2 0x22
+#define B_TXT_ATK_PREFIX3 0x23
+#define B_TXT_DEF_PREFIX3 0x24
+#define B_TXT_TRAINER2_CLASS 0x25
+#define B_TXT_TRAINER2_NAME 0x26
+#define B_TXT_TRAINER2_LOSE_TEXT 0x27
+#define B_TXT_TRAINER2_WIN_TEXT 0x28
+#define B_TXT_PARTNER_CLASS 0x29
+#define B_TXT_PARTNER_NAME 0x2A
+#define B_TXT_BUFF3 0x2B
+#define B_TXT_ATK_TRAINER_NAME 0x2C
+#define B_TXT_ATK_TRAINER_CLASS 0x2D
+#define B_TXT_ATK_TEAM1 0x2E // Your/The opposing
+#define B_TXT_ATK_TEAM2 0x2F // your/the opposing
+#define B_TXT_DEF_NAME 0x30
+#define B_TXT_DEF_TEAM1 0x31 // Your/The opposing
+#define B_TXT_DEF_TEAM2 0x32 // your/the opposing
+#define B_TXT_ACTIVE_NAME 0x33
+#define B_TXT_ACTIVE_NAME2 0x34 // no Illusion check
 
 // for B_TXT_BUFF1, B_TXT_BUFF2 and B_TXT_BUFF3
 
