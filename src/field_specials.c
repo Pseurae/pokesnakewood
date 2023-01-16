@@ -23,7 +23,6 @@
 #include "menu.h"
 #include "overworld.h"
 #include "party_menu.h"
-#include "pokeblock.h"
 #include "pokemon.h"
 #include "pokemon_storage_system.h"
 #include "random.h"
@@ -1140,11 +1139,6 @@ void ReturnCameraToPlayer(void)
 {
     MoveCameraAndRedrawMap(gSaveBlock1Ptr->savedPos.x - gSaveBlock1Ptr->pos.x,
                            gSaveBlock1Ptr->savedPos.y - gSaveBlock1Ptr->pos.y);
-}
-
-u8 GetPokeblockNameByMonNature(void)
-{
-    return CopyMonFavoritePokeblockName(GetNature(&gPlayerParty[GetLeadMonIndex()]), gStringVar1);
 }
 
 void GetSecretBaseNearbyMapName(void)

@@ -271,16 +271,7 @@ void SetControllerToOpponent(void);
 // player partner controller
 void SetControllerToPlayerPartner(void);
 
-// safari controller
-void SetControllerToSafari(void);
-
 // wally controller
 void SetControllerToWally(void);
-
-// link opponent
-void SetControllerToLinkOpponent(void);
-
-// link partner
-void SetControllerToLinkPartner(void);
 
 #endif // GUARD_BATTLE_CONTROLLERS_H

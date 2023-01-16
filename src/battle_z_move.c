@@ -26,7 +26,6 @@
 #include "pokedex.h"
 #include "palette.h"
 #include "international_string_util.h"
-#include "safari_zone.h"
 #include "battle_anim.h"
 #include "constants/battle_anim.h"
 #include "constants/rgb.h"
@@ -172,7 +171,7 @@ bool32 IsViableZMove(u8 battlerId, u16 move)
 
     species = gBattleMons[battlerId].species;
     item = gBattleMons[battlerId].item;
-    if (gBattleTypeFlags & (BATTLE_TYPE_SAFARI | BATTLE_TYPE_WALLY_TUTORIAL))
+    if (gBattleTypeFlags & BATTLE_TYPE_WALLY_TUTORIAL)
         return FALSE;
 
     if ((GetBattlerPosition(battlerId) == B_POSITION_PLAYER_LEFT || (GetBattlerPosition(battlerId) == B_POSITION_PLAYER_RIGHT)) && !CheckBagHasItem(ITEM_Z_POWER_RING, 1))

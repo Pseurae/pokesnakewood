@@ -27,7 +27,6 @@
 #include "pokenav.h"
 #include "region_map.h"
 #include "rtc.h"
-#include "safari_zone.h"
 #include "save.h"
 #include "scanline_effect.h"
 #include "script.h"
@@ -99,7 +98,6 @@ static bool8 StartMenuPlayerNameCallback(void);
 static bool8 StartMenuSaveCallback(void);
 static bool8 StartMenuOptionCallback(void);
 static bool8 StartMenuExitCallback(void);
-static bool8 StartMenuSafariZoneRetireCallback(void);
 static bool8 StartMenuDebugCallback(void);
 
 // Menu callbacks
@@ -153,8 +151,6 @@ static const struct MenuAction sStartMenuItems[] =
     [MENU_ACTION_SAVE]            = {gText_MenuSave,    {.u8_void = StartMenuSaveCallback}},
     [MENU_ACTION_OPTION]          = {gText_MenuOption,  {.u8_void = StartMenuOptionCallback}},
     [MENU_ACTION_EXIT]            = {gText_MenuExit,    {.u8_void = StartMenuExitCallback}},
-    [MENU_ACTION_RETIRE_SAFARI]   = {gText_MenuRetire,  {.u8_void = StartMenuSafariZoneRetireCallback}},
-    [MENU_ACTION_REST_FRONTIER]   = {gText_MenuRest,    {.u8_void = StartMenuSaveCallback}},
     [MENU_ACTION_DEBUG]           = {gText_MenuDebug,   {.u8_void = StartMenuDebugCallback}},
 };
 
@@ -206,7 +202,6 @@ static void BuildUnionRoomStartMenu(void);
 static void BuildBattlePikeStartMenu(void);
 static void BuildBattlePyramidStartMenu(void);
 static void BuildMultiPartnerRoomStartMenu(void);
-static void ShowSafariBallsWindow(void);
 static void ShowClockWindow(void);
 static void RemoveExtraStartMenuWindows(void);
 static bool32 PrintStartMenuActions(s8 *pIndex, u32 count);
@@ -238,18 +233,11 @@ void SetDexPokemonPokenavFlags(void) // unused
 static void BuildStartMenuActions(void)
 {
     sNumStartMenuActions = 0;
-    if (GetSafariZoneFlag() == TRUE)
-    {
-        BuildSafariZoneStartMenu();
-    }
-    else
-    {
-    #if DEBUG_SYSTEM_ENABLE == TRUE && DEBUG_SYSTEM_IN_MENU == TRUE
-        BuildDebugStartMenu();
-    #else
-        BuildNormalStartMenu();
-    #endif
-    }
+#if DEBUG_SYSTEM_ENABLE == TRUE && DEBUG_SYSTEM_IN_MENU == TRUE
+    BuildDebugStartMenu();
+#else
+    BuildNormalStartMenu();
+#endif
 }
 
 static void AddStartMenuAction(u8 action)
@@ -365,17 +353,6 @@ static void BuildMultiPartnerRoomStartMenu(void)
     AddStartMenuAction(MENU_ACTION_EXIT);
 }
 
-static void ShowSafariBallsWindow(void)
-{
-    sSafariBallsWindowId = AddWindow(&sSafariBallsWindowTemplate);
-    PutWindowTilemap(sSafariBallsWindowId);
-    DrawStdWindowFrame(sSafariBallsWindowId, FALSE);
-    ConvertIntToDecimalStringN(gStringVar1, gNumSafariBalls, STR_CONV_MODE_RIGHT_ALIGN, 2);
-    StringExpandPlaceholders(gStringVar4, gText_SafariBallStock);
-    AddTextPrinterParameterized(sSafariBallsWindowId, FONT_NORMAL, gStringVar4, 0, 1, TEXT_SKIP_DRAW, NULL);
-    CopyWindowToVram(sSafariBallsWindowId, COPYWIN_GFX);
-}
-
 static const u8 sTimeFormat1[] = _("{STR_VAR_1}:{STR_VAR_2} {STR_VAR_3}");
 static const u8 sTimeFormat2[] = _("{STR_VAR_1}{COLOR TRANSPARENT}{SHADOW TRANSPARENT}:{COLOR DARK_GRAY}{SHADOW LIGHT_GRAY}{STR_VAR_2} {STR_VAR_3}");
 static const u8 sTimeAM[] = _("AM");
@@ -438,18 +415,9 @@ static void ShowClockWindow(void)
 
 static void RemoveExtraStartMenuWindows(void)
 {
-    if (GetSafariZoneFlag())
-    {
-        ClearStdWindowAndFrameToTransparent(sSafariBallsWindowId, FALSE);
-        CopyWindowToVram(sSafariBallsWindowId, COPYWIN_GFX);
-        RemoveWindow(sSafariBallsWindowId);
-    }
-    else
-    {
-        ClearStdWindowAndFrameToTransparent(sClockWindowId, FALSE);
-        RemoveWindow(sClockWindowId);
-        DestroyTask(sClockUpdateTaskId);
-    }
+    ClearStdWindowAndFrameToTransparent(sClockWindowId, FALSE);
+    RemoveWindow(sClockWindowId);
+    DestroyTask(sClockUpdateTaskId);
 }
 
 static bool32 PrintStartMenuActions(s8 *pIndex, u32 count)
@@ -503,10 +471,7 @@ static bool32 InitStartMenuStep(void)
         sInitStartMenuData[0]++;
         break;
     case 3:
-        if (GetSafariZoneFlag())
-            ShowSafariBallsWindow();
-        else
-            ShowClockWindow();
+        ShowClockWindow();
         sInitStartMenuData[0]++;
         break;
     case 4:
@@ -620,8 +585,7 @@ static bool8 HandleStartMenuInput(void)
 
         if (gMenuCallback != StartMenuSaveCallback
             && gMenuCallback != StartMenuExitCallback
-            && gMenuCallback != StartMenuDebugCallback
-            && gMenuCallback != StartMenuSafariZoneRetireCallback)
+            && gMenuCallback != StartMenuDebugCallback)
         {
            FadeScreen(FADE_TO_BLACK, 0);
         }
@@ -757,15 +721,6 @@ static bool8 StartMenuDebugCallback(void)
 #endif
 
 return TRUE;
-}
-
-static bool8 StartMenuSafariZoneRetireCallback(void)
-{
-    RemoveExtraStartMenuWindows();
-    HideStartMenu();
-    SafariZoneRetirePrompt();
-
-    return TRUE;
 }
 
 static void HideStartMenuDebug(void)

@@ -92,7 +92,6 @@ gSpecials::
 	def_special StartWallyTutorialBattle
 	def_special ChangePokemonNickname
 	def_special ChoosePartyMon
-	def_special GetFirstFreePokeblockSlot
 	def_special PlayRoulette
 	def_special IsFanClubMemberFanOfPlayer
 	def_special GetNumFansOfPlayerInTrainerFanClub
@@ -127,10 +126,6 @@ gSpecials::
 	def_special RotatingGate_InitPuzzleAndGraphics
 	def_special SetSSTidalFlag
 	def_special ResetSSTidalFlag
-	def_special EnterSafariMode
-	def_special ExitSafariMode
-	def_special GetPokeblockFeederInFront
-	def_special OpenPokeblockCaseOnFeeder
 	def_special IsMirageIslandPresent
 	def_special UpdateShoalTideFlag
 	def_special InitBirchState
@@ -180,7 +175,6 @@ gSpecials::
 	def_special RemoveCameraObject
 	def_special TeleportCamera
 	def_special ReturnCameraToPlayer
-	def_special GetPokeblockNameByMonNature
 	def_special GetSecretBaseNearbyMapName
 	def_special CheckRelicanthWailord
 	def_special ShouldDoBrailleRegirockEffectOld

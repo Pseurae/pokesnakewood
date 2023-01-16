@@ -3,7 +3,6 @@
 #include "overworld.h"
 #include "fldeff.h"
 #include "field_specials.h"
-#include "pokeblock.h"
 #include "event_data.h"
 #include "script.h"
 #include "random.h"
@@ -762,7 +761,7 @@ void Script_BufferContestLadyCategoryAndMonName(void)
 
 void OpenPokeblockCaseForContestLady(void)
 {
-    OpenPokeblockCase(PBLOCK_CASE_GIVE, CB2_ReturnToField);
+    // OpenPokeblockCase(PBLOCK_CASE_GIVE, CB2_ReturnToField);
 }
 
 void SetContestLadyGivenPokeblock(void)

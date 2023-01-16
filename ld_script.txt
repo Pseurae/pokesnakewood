@@ -151,7 +151,6 @@ SECTIONS {
         src/fldeff_misc.o(.text);
         src/field_special_scene.o(.text);
         src/rotating_gate.o(.text);
-        src/safari_zone.o(.text);
         src/item_use.o(.text);
         src/battle_anim_effects_1.o(.text);
         src/battle_anim_effects_2.o(.text);
@@ -190,7 +189,6 @@ SECTIONS {
         src/wallclock.o(.text);
         src/fldeff_rocksmash.o(.text);
         src/fldeff_dig.o(.text);
-        src/pokeblock.o(.text);
         src/fldeff_flash.o(.text);
         src/post_battle_event_funcs.o(.text);
         src/time_events.o(.text);
@@ -213,14 +211,12 @@ SECTIONS {
         src/save.o(.text);
         src/field_effect_helpers.o(.text);
         src/battle_anim_sound_tasks.o(.text);
-        src/battle_controller_safari.o(.text);
         src/fldeff_sweetscent.o(.text);
         src/battle_anim_effects_3.o(.text);
         src/move_relearner.o(.text);
         src/fldeff_softboiled.o(.text);
         src/decoration_inventory.o(.text);
         src/roamer.o(.text);
-        src/use_pokeblock.o(.text);
         src/battle_controller_wally.o(.text);
         src/player_pc.o(.text);
         src/intro.o(.text);
@@ -234,7 +230,6 @@ SECTIONS {
         src/berry_tag_screen.o(.text);
         src/save_failed_screen.o(.text);
         src/braille_puzzles.o(.text);
-        src/pokeblock_feed.o(.text);
         src/clear_save_data_screen.o(.text);
         src/intro_credits_graphics.o(.text);
         src/evolution_graphics.o(.text);
@@ -511,7 +506,6 @@ SECTIONS {
 		src/battle_ai_util.o(.rodata);
         src/starter_choose.o(.rodata);
         src/wallclock.o(.rodata);
-        src/pokeblock.o(.rodata);
         src/fldeff_flash.o(.rodata);
         src/time_events.o(.rodata);
         src/field_specials.o(.rodata);
@@ -526,11 +520,9 @@ SECTIONS {
         src/save.o(.rodata);
         src/field_effect_helpers.o(.rodata);
         src/battle_anim_sound_tasks.o(.rodata);
-        src/battle_controller_safari.o(.rodata);
         src/battle_anim_effects_3.o(.rodata);
         src/move_relearner.o(.rodata);
         src/roamer.o(.rodata);
-        src/use_pokeblock.o(.rodata);
         src/battle_controller_wally.o(.rodata);
         src/player_pc.o(.rodata);
         src/intro.o(.rodata);
@@ -544,7 +536,6 @@ SECTIONS {
         src/berry_tag_screen.o(.rodata);
         src/save_failed_screen.o(.rodata);
         src/braille_puzzles.o(.rodata);
-        src/pokeblock_feed.o(.rodata);
         src/clear_save_data_screen.o(.rodata);
         src/intro_credits_graphics.o(.rodata);
         src/evolution_graphics.o(.rodata);

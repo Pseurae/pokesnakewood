@@ -28,7 +28,6 @@
 #include "overworld.h"
 #include "palette.h"
 #include "party_menu.h"
-#include "pokeblock.h"
 #include "pokemon.h"
 #include "script.h"
 #include "sound.h"
@@ -688,7 +687,7 @@ static void InitBerryPouchFromBattle(void)
 
 static void CB2_OpenPokeblockFromBag(void)
 {
-    OpenPokeblockCase(PBLOCK_CASE_FIELD, CB2_ReturnToBagMenuPocket);
+    // OpenPokeblockCase(PBLOCK_CASE_FIELD, CB2_ReturnToBagMenuPocket);
 }
 
 static void Task_OpenRegisteredPokeblockCase(u8 taskId)
@@ -696,7 +695,7 @@ static void Task_OpenRegisteredPokeblockCase(u8 taskId)
     if (!gPaletteFade.active)
     {
         CleanupOverworldWindowsAndTilemaps();
-        OpenPokeblockCase(PBLOCK_CASE_FIELD, CB2_ReturnToField);
+        // OpenPokeblockCase(PBLOCK_CASE_FIELD, CB2_ReturnToField);
         DestroyTask(taskId);
     }
 }

@@ -13,7 +13,6 @@
 #include "battle_scripts.h"
 #include "random.h"
 #include "text.h"
-#include "safari_zone.h"
 #include "sound.h"
 #include "sprite.h"
 #include "string_util.h"
@@ -706,13 +705,6 @@ void HandleAction_WatchesCarefully(void)
 
 void HandleAction_SafariZoneBallThrow(void)
 {
-    gBattlerAttacker = gBattlerByTurnOrder[gCurrentTurnActionNumber];
-    gBattle_BG0_X = 0;
-    gBattle_BG0_Y = 0;
-    gNumSafariBalls--;
-    gLastUsedItem = ITEM_SAFARI_BALL;
-    gBattlescriptCurrInstr = BattleScript_SafariBallThrow;
-    gCurrentActionFuncId = B_ACTION_EXEC_SCRIPT;
 }
 
 void HandleAction_ThrowBall(void)
@@ -784,10 +776,6 @@ void HandleAction_GoNear(void)
 
 void HandleAction_SafariZoneRun(void)
 {
-    gBattlerAttacker = gBattlerByTurnOrder[gCurrentTurnActionNumber];
-    PlaySE(SE_FLEE);
-    gCurrentTurnActionNumber = gBattlersCount;
-    gBattleOutcome = B_OUTCOME_RAN;
 }
 
 void HandleAction_WallyBallThrow(void)
@@ -3109,8 +3097,6 @@ bool8 HandleWishPerishSongOnTurnEnd(void)
 
 bool8 HandleFaintedMonActions(void)
 {
-    if (gBattleTypeFlags & BATTLE_TYPE_SAFARI)
-        return FALSE;
     do
     {
         s32 i;
@@ -4082,9 +4068,6 @@ u8 AbilityBattleEffects(u8 caseID, u8 battler, u16 ability, u8 special, u16 move
     u32 pidAtk, pidDef;
     u32 moveType, move;
     u32 i, j;
-
-    if (gBattleTypeFlags & BATTLE_TYPE_SAFARI)
-        return 0;
 
     if (gBattlerAttacker >= gBattlersCount)
         gBattlerAttacker = battler;

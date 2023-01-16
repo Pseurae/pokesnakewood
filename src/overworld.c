@@ -39,7 +39,6 @@
 #include "random.h"
 #include "roamer.h"
 #include "rotating_gate.h"
-#include "safari_zone.h"
 #include "save.h"
 #include "save_location.h"
 #include "script.h"
@@ -1338,11 +1337,6 @@ void CleanupOverworldWindowsAndTilemaps(void)
     TRY_FREE_AND_SET_NULL(gOverworldTilemapBuffer_Bg1);
 }
 
-static void ResetSafariZoneFlag_(void)
-{
-    ResetSafariZoneFlag();
-}
-
 bool32 IsOverworldLinkActive(void)
 {
     return FALSE;
@@ -1448,7 +1442,6 @@ void CB2_NewGame(void)
 {
     FieldClearVBlankHBlankCallbacks();
     StopMapMusic();
-    ResetSafariZoneFlag_();
     NewGameInitData();
     ResetInitialPlayerAvatarState();
     PlayTimeCounter_Start();
@@ -1470,7 +1463,6 @@ void CB2_WhiteOut(void)
     {
         FieldClearVBlankHBlankCallbacks();
         StopMapMusic();
-        ResetSafariZoneFlag_();
         DoWhiteOut();
         ResetInitialPlayerAvatarState();
         ScriptContext_Init();
@@ -1573,7 +1565,6 @@ void CB2_ContinueSavedGame(void)
 {
     FieldClearVBlankHBlankCallbacks();
     StopMapMusic();
-    ResetSafariZoneFlag_();
     LoadSaveblockMapHeader();
     ClearDiveAndHoleWarps();
     LoadSaveblockObjEventScripts();

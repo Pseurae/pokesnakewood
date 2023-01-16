@@ -21,7 +21,6 @@
 #include "overworld.h"
 #include "party_menu.h"
 #include "pokemon.h"
-#include "safari_zone.h"
 #include "script.h"
 #include "secret_base.h"
 #include "sound.h"
@@ -587,8 +586,6 @@ static bool8 TryStartStepCountScript(u16 metatileBehavior)
         }
     }
 
-    if (SafariZoneTakeStep() == TRUE)
-        return TRUE;
     if (CountSSTidalStep(1) == TRUE)
     {
         ScriptContext_SetupScript(SSTidalCorridor_EventScript_ReachedStepCount);
