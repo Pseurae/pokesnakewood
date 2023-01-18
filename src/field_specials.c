@@ -2,7 +2,6 @@
 #include "malloc.h"
 #include "battle.h"
 #include "data.h"
-#include "decoration.h"
 #include "diploma.h"
 #include "event_data.h"
 #include "event_object_movement.h"
@@ -49,7 +48,6 @@
 #include "constants/map_types.h"
 #include "constants/mystery_gift.h"
 #include "constants/script_menu.h"
-#include "constants/slot_machine.h"
 #include "constants/songs.h"
 #include "constants/moves.h"
 #include "constants/party_menu.h"
@@ -68,10 +66,8 @@ static EWRAM_DATA u16 sLilycoveDeptStore_NeverRead = 0;
 static EWRAM_DATA u16 sLilycoveDeptStore_DefaultFloorChoice = 0;
 static EWRAM_DATA struct ListMenuItem *sScrollableMultichoice_ListMenuItem = NULL;
 static EWRAM_DATA u16 sScrollableMultichoice_ScrollOffset = 0;
-static EWRAM_DATA u16 sFrontierExchangeCorner_NeverRead = 0;
 static EWRAM_DATA u8 sScrollableMultichoice_ItemSpriteId = 0;
 static EWRAM_DATA u8 sBattlePointsWindowId = 0;
-static EWRAM_DATA u8 sFrontierExchangeCorner_ItemIconWindowId = 0;
 static EWRAM_DATA u8 sPCBoxToSendMon = 0;
 static EWRAM_DATA u32 sBattleTowerMultiBattleTypeFlags = 0;
 
@@ -97,18 +93,14 @@ static void Task_MoveElevator(u8);
 static void MoveElevatorWindowLights(u16, bool8);
 static void Task_MoveElevatorWindowLights(u8);
 static void Task_ShowScrollableMultichoice(u8);
-static void FillFrontierExchangeCornerWindowAndItemIcon(u16, u16);
-static void ShowBattleFrontierTutorWindow(u8, u16);
 static void InitScrollableMultichoice(void);
 static void ScrollableMultichoice_ProcessInput(u8);
 static void ScrollableMultichoice_UpdateScrollArrows(u8);
 static void ScrollableMultichoice_MoveCursor(s32, bool8, struct ListMenu *);
-static void HideFrontierExchangeCornerItemIcon(u16, u16);
 static void CloseScrollableMultichoice(u8);
 static void ScrollableMultichoice_RemoveScrollArrows(u8);
 static void Task_ScrollableMultichoice_WaitReturnToList(u8);
 static void Task_ScrollableMultichoice_ReturnToList(u8);
-static void ShowFrontierExchangeCornerItemIcon(u16);
 static void Task_DeoxysRockInteraction(u8);
 static void ChangeDeoxysRockLevel(u8);
 static void WaitForDeoxysRockMovement(u8);
@@ -1146,42 +1138,6 @@ void GetSecretBaseNearbyMapName(void)
     GetMapName(gStringVar1, VarGet(VAR_SECRET_BASE_MAP), 0);
 }
 
-u16 GetSlotMachineId(void)
-{
-    static const u8 sSlotMachineRandomSeeds[SLOT_MACHINE_COUNT] = {12, 2, 4, 5, 1, 8, 7, 11, 3, 10, 9, 6};
-    static const u8 sSlotMachineIds[SLOT_MACHINE_COUNT] = {
-        SLOT_MACHINE_UNLUCKIEST,
-        SLOT_MACHINE_UNLUCKIER,
-        SLOT_MACHINE_UNLUCKIER,
-        SLOT_MACHINE_UNLUCKY,
-        SLOT_MACHINE_UNLUCKY,
-        SLOT_MACHINE_UNLUCKY,
-        SLOT_MACHINE_LUCKY,
-        SLOT_MACHINE_LUCKY,
-        SLOT_MACHINE_LUCKY,
-        SLOT_MACHINE_LUCKIER,
-        SLOT_MACHINE_LUCKIER,
-        SLOT_MACHINE_LUCKIEST
-    };
-    static const u8 sSlotMachineServiceDayIds[SLOT_MACHINE_COUNT] = {
-        SLOT_MACHINE_LUCKY,
-        SLOT_MACHINE_LUCKY,
-        SLOT_MACHINE_LUCKY,
-        SLOT_MACHINE_LUCKY,
-        SLOT_MACHINE_LUCKY,
-        SLOT_MACHINE_LUCKY,
-        SLOT_MACHINE_LUCKIER,
-        SLOT_MACHINE_LUCKIER,
-        SLOT_MACHINE_LUCKIER,
-        SLOT_MACHINE_LUCKIER,
-        SLOT_MACHINE_LUCKIEST,
-        SLOT_MACHINE_LUCKIEST
-    };
-
-    u32 rnd = gSaveBlock1Ptr->dewfordTrends[0].trendiness + gSaveBlock1Ptr->dewfordTrends[0].rand + sSlotMachineRandomSeeds[gSpecialVar_0x8004];
-    return sSlotMachineIds[rnd % SLOT_MACHINE_COUNT];
-}
-
 bool8 FoundAbandonedShipRoom1Key(void)
 {
     u16 *specVar = &gSpecialVar_0x8004;
@@ -2130,10 +2086,7 @@ static void Task_ShowScrollableMultichoice(u8 taskId)
     LockPlayerFieldControls();
     sScrollableMultichoice_ScrollOffset = 0;
     sScrollableMultichoice_ItemSpriteId = MAX_SPRITES;
-    FillFrontierExchangeCornerWindowAndItemIcon(task->tScrollMultiId, 0);
-    ShowBattleFrontierTutorWindow(task->tScrollMultiId, 0);
     sScrollableMultichoice_ListMenuItem = AllocZeroed(task->tNumItems * 8);
-    sFrontierExchangeCorner_NeverRead = 0;
     InitScrollableMultichoice();
 
     for (width = 0, i = 0; i < task->tNumItems; i++)
@@ -2204,9 +2157,6 @@ static void ScrollableMultichoice_MoveCursor(s32 itemIndex, bool8 onInit, struct
         ListMenuGetScrollAndRow(task->tListTaskId, &selection, NULL);
         sScrollableMultichoice_ScrollOffset = selection;
         ListMenuGetCurrentItemArrayId(task->tListTaskId, &selection);
-        HideFrontierExchangeCornerItemIcon(task->tScrollMultiId, sFrontierExchangeCorner_NeverRead);
-        FillFrontierExchangeCornerWindowAndItemIcon(task->tScrollMultiId, selection);
-        sFrontierExchangeCorner_NeverRead = selection;
     }
 }
 
@@ -2252,7 +2202,6 @@ static void CloseScrollableMultichoice(u8 taskId)
     u16 selection;
     struct Task *task = &gTasks[taskId];
     ListMenuGetCurrentItemArrayId(task->tListTaskId, &selection);
-    HideFrontierExchangeCornerItemIcon(task->tScrollMultiId, selection);
     ScrollableMultichoice_RemoveScrollArrows(taskId);
     DestroyListMenuTask(task->tListTaskId, NULL, NULL);
     Free(sScrollableMultichoice_ListMenuItem);
@@ -2356,124 +2305,7 @@ void CloseBattlePointsWindow(void)
     RemoveWindow(sBattlePointsWindowId);
 }
 
-void ShowFrontierExchangeCornerItemIconWindow(void)
-{
-    static const struct WindowTemplate sFrontierExchangeCorner_ItemIconWindowTemplate =
-    {
-        .bg = 0,
-        .tilemapLeft = 2,
-        .tilemapTop = 9,
-        .width = 4,
-        .height = 4,
-        .paletteNum = 15,
-        .baseBlock = 20,
-    };
-
-    sFrontierExchangeCorner_ItemIconWindowId = AddWindow(&sFrontierExchangeCorner_ItemIconWindowTemplate);
-    SetStandardWindowBorderStyle(sFrontierExchangeCorner_ItemIconWindowId, FALSE);
-    CopyWindowToVram(sFrontierExchangeCorner_ItemIconWindowId, COPYWIN_GFX);
-}
-
-void CloseFrontierExchangeCornerItemIconWindow(void)
-{
-    ClearStdWindowAndFrameToTransparent(sFrontierExchangeCorner_ItemIconWindowId, TRUE);
-    RemoveWindow(sFrontierExchangeCorner_ItemIconWindowId);
-}
-
 #define TAG_ITEM_ICON 5500
-
-static void FillFrontierExchangeCornerWindowAndItemIcon(u16 menu, u16 selection)
-{
-    #include "data/battle_frontier/battle_frontier_exchange_corner.h"
-
-    if (menu >= SCROLL_MULTI_BF_EXCHANGE_CORNER_DECOR_VENDOR_1 && menu <= SCROLL_MULTI_BF_EXCHANGE_CORNER_HOLD_ITEM_VENDOR)
-    {
-        FillWindowPixelRect(0, PIXEL_FILL(1), 0, 0, 216, 32);
-        switch (menu)
-        {
-        case SCROLL_MULTI_BF_EXCHANGE_CORNER_DECOR_VENDOR_1:
-            AddTextPrinterParameterized2(0, FONT_NORMAL, sFrontierExchangeCorner_Decor1Descriptions[selection], 0, NULL, TEXT_COLOR_DARK_GRAY, TEXT_COLOR_WHITE, TEXT_COLOR_LIGHT_GRAY);
-            if (sFrontierExchangeCorner_Decor1[selection] == ITEM_LIST_END)
-            {
-                ShowFrontierExchangeCornerItemIcon(sFrontierExchangeCorner_Decor1[selection]);
-            }
-            else
-            {
-                FreeSpriteTilesByTag(TAG_ITEM_ICON);
-                FreeSpritePaletteByTag(TAG_ITEM_ICON);
-                sScrollableMultichoice_ItemSpriteId = AddDecorationIconObject(sFrontierExchangeCorner_Decor1[selection], 33, 88, 0, TAG_ITEM_ICON, TAG_ITEM_ICON);
-            }
-            break;
-        case SCROLL_MULTI_BF_EXCHANGE_CORNER_DECOR_VENDOR_2:
-            AddTextPrinterParameterized2(0, FONT_NORMAL, sFrontierExchangeCorner_Decor2Descriptions[selection], 0, NULL, TEXT_COLOR_DARK_GRAY, TEXT_COLOR_WHITE, TEXT_COLOR_LIGHT_GRAY);
-            if (sFrontierExchangeCorner_Decor2[selection] == ITEM_LIST_END)
-            {
-                ShowFrontierExchangeCornerItemIcon(sFrontierExchangeCorner_Decor2[selection]);
-            }
-            else
-            {
-                FreeSpriteTilesByTag(TAG_ITEM_ICON);
-                FreeSpritePaletteByTag(TAG_ITEM_ICON);
-                sScrollableMultichoice_ItemSpriteId = AddDecorationIconObject(sFrontierExchangeCorner_Decor2[selection], 33, 88, 0, TAG_ITEM_ICON, TAG_ITEM_ICON);
-            }
-            break;
-        case SCROLL_MULTI_BF_EXCHANGE_CORNER_VITAMIN_VENDOR:
-            AddTextPrinterParameterized2(0, FONT_NORMAL, sFrontierExchangeCorner_VitaminsDescriptions[selection], 0, NULL, TEXT_COLOR_DARK_GRAY, TEXT_COLOR_WHITE, TEXT_COLOR_LIGHT_GRAY);
-            ShowFrontierExchangeCornerItemIcon(sFrontierExchangeCorner_Vitamins[selection]);
-            break;
-        case SCROLL_MULTI_BF_EXCHANGE_CORNER_HOLD_ITEM_VENDOR:
-            AddTextPrinterParameterized2(0, FONT_NORMAL, sFrontierExchangeCorner_HoldItemsDescriptions[selection], 0, NULL, TEXT_COLOR_DARK_GRAY, TEXT_COLOR_WHITE, TEXT_COLOR_LIGHT_GRAY);
-            ShowFrontierExchangeCornerItemIcon(sFrontierExchangeCorner_HoldItems[selection]);
-            break;
-        }
-    }
-}
-
-static void ShowFrontierExchangeCornerItemIcon(u16 item)
-{
-    FreeSpriteTilesByTag(TAG_ITEM_ICON);
-    FreeSpritePaletteByTag(TAG_ITEM_ICON);
-    sScrollableMultichoice_ItemSpriteId = AddItemIconSprite(TAG_ITEM_ICON, TAG_ITEM_ICON, item);
-
-    if (sScrollableMultichoice_ItemSpriteId != MAX_SPRITES)
-    {
-        gSprites[sScrollableMultichoice_ItemSpriteId].oam.priority = 0;
-        gSprites[sScrollableMultichoice_ItemSpriteId].x = 36;
-        gSprites[sScrollableMultichoice_ItemSpriteId].y = 92;
-    }
-}
-
-static void HideFrontierExchangeCornerItemIcon(u16 menu, u16 unused)
-{
-    if (sScrollableMultichoice_ItemSpriteId != MAX_SPRITES)
-    {
-        switch (menu)
-        {
-        case SCROLL_MULTI_BF_EXCHANGE_CORNER_DECOR_VENDOR_1:
-        case SCROLL_MULTI_BF_EXCHANGE_CORNER_DECOR_VENDOR_2:
-        case SCROLL_MULTI_BF_EXCHANGE_CORNER_VITAMIN_VENDOR:
-        case SCROLL_MULTI_BF_EXCHANGE_CORNER_HOLD_ITEM_VENDOR:
-            DestroySpriteAndFreeResources(&gSprites[sScrollableMultichoice_ItemSpriteId]);
-            break;
-        }
-        sScrollableMultichoice_ItemSpriteId = MAX_SPRITES;
-    }
-}
-
-void BufferBattleFrontierTutorMoveName(void)
-{
-    StringCopy(gStringVar1, gMoveNames[gSpecialVar_0x8005]);
-}
-
-static void ShowBattleFrontierTutorWindow(u8 menu, u16 selection)
-{
-}
-
-void CloseBattleFrontierTutorWindow(void)
-{
-    ClearStdWindowAndFrameToTransparent(sTutorMoveAndElevatorWindowId, TRUE);
-    RemoveWindow(sTutorMoveAndElevatorWindowId);
-}
 
 // Never called
 void ScrollableMultichoice_RedrawPersistentMenu(void)

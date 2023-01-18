@@ -20,7 +20,6 @@
 #include "field_message_box.h"
 #include "sound.h"
 #include "strings.h"
-#include "secret_base.h"
 #include "string_util.h"
 #include "overworld.h"
 #include "field_weather.h"
@@ -756,9 +755,6 @@ u8 GetTrainerBattleTransition(void)
     u8 enemyLevel;
     u8 playerLevel;
 
-    if (gTrainerBattleOpponent_A == TRAINER_SECRET_BASE)
-        return B_TRANSITION_CHAMPION;
-
     if (gTrainers[gTrainerBattleOpponent_A].trainerClass == TRAINER_CLASS_ELITE_FOUR)
     {
         if (gTrainerBattleOpponent_A == TRAINER_SIDNEY)
@@ -1308,11 +1304,7 @@ void BattleSetup_StartTrainerBattle(void)
 
 static void CB2_EndTrainerBattle(void)
 {
-    if (gTrainerBattleOpponent_A == TRAINER_SECRET_BASE)
-    {
-        SetMainCallback2(CB2_ReturnToFieldContinueScriptPlayMapMusic);
-    }
-    else if (IsPlayerDefeated(gBattleOutcome) == TRUE)
+    if (IsPlayerDefeated(gBattleOutcome) == TRUE)
     {
         SetMainCallback2(CB2_WhiteOut);
     }
@@ -1326,11 +1318,7 @@ static void CB2_EndTrainerBattle(void)
 
 static void CB2_EndRematchBattle(void)
 {
-    if (gTrainerBattleOpponent_A == TRAINER_SECRET_BASE)
-    {
-        SetMainCallback2(CB2_ReturnToFieldContinueScriptPlayMapMusic);
-    }
-    else if (IsPlayerDefeated(gBattleOutcome) == TRUE)
+    if (IsPlayerDefeated(gBattleOutcome) == TRUE)
     {
         SetMainCallback2(CB2_WhiteOut);
     }
@@ -1471,12 +1459,7 @@ static const u8 *GetIntroSpeechOfApproachingTrainer(void)
 
 const u8 *GetTrainerALoseText(void)
 {
-    const u8 *string;
-
-    if (gTrainerBattleOpponent_A == TRAINER_SECRET_BASE)
-        string = GetSecretBaseTrainerLoseText();
-    else
-        string = sTrainerADefeatSpeech;
+    const u8 *string = sTrainerADefeatSpeech;
 
     StringExpandPlaceholders(gStringVar4, ReturnEmptyStringIfNull(string));
     return gStringVar4;

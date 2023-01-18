@@ -12,7 +12,6 @@
 #include "field_player_avatar.h"
 #include "fldeff.h"
 #include "fldeff_misc.h"
-#include "secret_base.h"
 #include "event_data.h"
 #include "event_scripts.h"
 #include "event_object_movement.h"
@@ -490,12 +489,6 @@ static void Task_ComputerScreenCloseEffect(u8 taskId)
 #undef tBlendCnt
 #undef tBlendY
 
-static void SetCurrentSecretBase(void)
-{
-    SetCurSecretBaseIdFromPosition(&gPlayerFacingPosition, gMapHeader.events);
-    TrySetCurSecretBaseIndex();
-}
-
 static void AdjustSecretPowerSpritePixelOffsets(void)
 {
     if (gPlayerAvatar.flags & (PLAYER_AVATAR_FLAG_MACH_BIKE | PLAYER_AVATAR_FLAG_ACRO_BIKE))
@@ -546,47 +539,13 @@ static void AdjustSecretPowerSpritePixelOffsets(void)
 
 bool8 SetUpFieldMove_SecretPower(void)
 {
-    u8 mb;
-
-    CheckPlayerHasSecretBase();
-
-    if (gSpecialVar_Result == 1 || GetPlayerFacingDirection() != DIR_NORTH)
-        return FALSE;
-
-    GetXYCoordsOneStepInFrontOfPlayer(&gPlayerFacingPosition.x, &gPlayerFacingPosition.y);
-    mb = MapGridGetMetatileBehaviorAt(gPlayerFacingPosition.x, gPlayerFacingPosition.y);
-
-    if (MetatileBehavior_IsSecretBaseCave(mb) == TRUE)
-    {
-        SetCurrentSecretBase();
-        gFieldCallback2 = FieldCallback_PrepareFadeInFromMenu;
-        gPostMenuFieldCallback = FieldCallback_SecretBaseCave;
-        return TRUE;
-    }
-
-    if (MetatileBehavior_IsSecretBaseTree(mb) == TRUE)
-    {
-        SetCurrentSecretBase();
-        gFieldCallback2 = FieldCallback_PrepareFadeInFromMenu;
-        gPostMenuFieldCallback = FieldCallback_SecretBaseTree;
-        return TRUE;
-    }
-
-    if (MetatileBehavior_IsSecretBaseShrub(mb) == TRUE)
-    {
-        SetCurrentSecretBase();
-        gFieldCallback2 = FieldCallback_PrepareFadeInFromMenu;
-        gPostMenuFieldCallback = FieldCallback_SecretBaseShrub;
-        return TRUE;
-    }
-
     return FALSE;
 }
 
 static void FieldCallback_SecretBaseCave(void)
 {
     gFieldEffectArguments[0] = GetCursorSelectionMonId();
-    ScriptContext_SetupScript(SecretBase_EventScript_CaveUseSecretPower);
+    // ScriptContext_SetupScript(SecretBase_EventScript_CaveUseSecretPower);
 }
 
 bool8 FldEff_UseSecretPowerCave(void)
@@ -627,8 +586,7 @@ static void SpriteCB_CaveEntranceOpen(struct Sprite *sprite)
 {
     if (sprite->data[0] < 40)
     {
-        if (++sprite->data[0] == 20)
-            ToggleSecretBaseEntranceMetatile();
+        // if (++sprite->data[0] == 20)
     }
     else
     {
@@ -646,7 +604,7 @@ static void SpriteCB_CaveEntranceEnd(struct Sprite *sprite)
 static void FieldCallback_SecretBaseTree(void)
 {
     gFieldEffectArguments[0] = GetCursorSelectionMonId();
-    ScriptContext_SetupScript(SecretBase_EventScript_TreeUseSecretPower);
+    // ScriptContext_SetupScript(SecretBase_EventScript_TreeUseSecretPower);
 }
 
 bool8 FldEff_UseSecretPowerTree(void)
@@ -682,8 +640,8 @@ bool8 FldEff_SecretPowerTree(void)
                  gSprites[gPlayerAvatar.spriteId].oam.y + gFieldEffectArguments[6],
                  148);
 
-    if (gFieldEffectArguments[7] == 1 || gFieldEffectArguments[7] == 3)
-        ToggleSecretBaseEntranceMetatile();
+    // if (gFieldEffectArguments[7] == 1 || gFieldEffectArguments[7] == 3)
+    //     ToggleSecretBaseEntranceMetatile();
 
     return FALSE;
 }
@@ -703,8 +661,8 @@ static void SpriteCB_TreeEntranceOpen(struct Sprite *sprite)
 
     if (sprite->data[0] >= 40)
     {
-        if (gFieldEffectArguments[7] == 0 || gFieldEffectArguments[7] == 2)
-            ToggleSecretBaseEntranceMetatile();
+        // if (gFieldEffectArguments[7] == 0 || gFieldEffectArguments[7] == 2)
+        //     ToggleSecretBaseEntranceMetatile();
 
         sprite->data[0] = 0;
         sprite->callback = SpriteCB_TreeEntranceEnd;
@@ -720,7 +678,7 @@ static void SpriteCB_TreeEntranceEnd(struct Sprite *sprite)
 static void FieldCallback_SecretBaseShrub(void)
 {
     gFieldEffectArguments[0] = GetCursorSelectionMonId();
-    ScriptContext_SetupScript(SecretBase_EventScript_ShrubUseSecretPower);
+    // ScriptContext_SetupScript(SecretBase_EventScript_ShrubUseSecretPower);
 }
 
 bool8 FldEff_UseSecretPowerShrub(void)
@@ -765,8 +723,8 @@ static void SpriteCB_ShrubEntranceOpen(struct Sprite *sprite)
     {
         sprite->data[0]++;
 
-        if (sprite->data[0] == 20)
-            ToggleSecretBaseEntranceMetatile();
+        // if (sprite->data[0] == 20)
+        //     ToggleSecretBaseEntranceMetatile();
     }
     else
     {
@@ -1174,30 +1132,6 @@ void InteractWithShieldOrTVDecoration(void)
         VarSet(VAR_SECRET_BASE_LOW_TV_FLAGS, VarGet(VAR_SECRET_BASE_LOW_TV_FLAGS));
         break;
     }
-}
-
-// As opposed to a small one (single metatile) like the balloons
-bool8 IsLargeBreakableDecoration(u16 metatileId, bool8 checkBase)
-{
-    if (!CurMapIsSecretBase())
-        return FALSE;
-
-    if (!checkBase)
-    {
-        if (metatileId == METATILE_SecretBase_SandOrnament_Top || metatileId == METATILE_SecretBase_SandOrnament_TopWall)
-            return TRUE;
-        if (metatileId == METATILE_SecretBase_BreakableDoor_TopClosed)
-            return TRUE;
-    }
-    else
-    {
-        if (metatileId == METATILE_SecretBase_SandOrnament_Base1)
-            return TRUE;
-        if (metatileId == METATILE_SecretBase_BreakableDoor_BottomClosed)
-            return TRUE;
-    }
-
-    return FALSE;
 }
 
 #define tState  data[0]

@@ -9686,7 +9686,7 @@ bool8 ShouldGetStatBadgeBoost(u16 badgeFlag, u8 battlerId)
 #if B_BADGE_BOOST == GEN_3
     if (GetBattlerSide(battlerId) != B_SIDE_PLAYER)
         return FALSE;
-    else if (gBattleTypeFlags & BATTLE_TYPE_TRAINER && gTrainerBattleOpponent_A == TRAINER_SECRET_BASE)
+    else if (gBattleTypeFlags & BATTLE_TYPE_TRAINER)
         return FALSE;
     else if (FlagGet(badgeFlag))
         return TRUE;

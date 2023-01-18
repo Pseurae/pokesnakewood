@@ -43,7 +43,6 @@
 #include "save_location.h"
 #include "script.h"
 #include "script_pokemon_util.h"
-#include "secret_base.h"
 #include "sound.h"
 #include "start_menu.h"
 #include "task.h"
@@ -782,7 +781,6 @@ static void LoadMapFromWarp(bool32 a1)
     isOutdoors = IsMapTypeOutdoors(gMapHeader.mapType);
     isIndoors = IsMapTypeIndoors(gMapHeader.mapType);
 
-    CheckLeftFriendsSecretBase();
     TrySetMapSaveWarpStatus();
     ClearTempFieldEventData();
     ResetCyclingRoadChallengeData();
@@ -800,11 +798,6 @@ static void LoadMapFromWarp(bool32 a1)
     UpdateLocationHistoryForRoamer();
     RoamerMoveToOtherLocationSet();
     InitMap();
-
-    if (a1 != TRUE && isIndoors)
-    {
-        InitSecretBaseAppearance(TRUE);
-    }
 }
 
 void ResetInitialPlayerAvatarState(void)
@@ -1555,7 +1548,7 @@ void CB2_ReturnToFieldFadeFromBlack(void)
 
 static void FieldCB_FadeTryShowMapPopup(void)
 {
-    if (gMapHeader.showMapName == TRUE && SecretBaseMapPopupEnabled() == TRUE)
+    if (gMapHeader.showMapName == TRUE)
         ShowMapNamePopup();
     FieldCB_WarpExitFadeFromBlack();
 }
@@ -1689,7 +1682,7 @@ static bool32 LoadMapInStepsLocal(u8 *state, bool32 a2)
         (*state)++;
         break;
     case 11:
-        if (gMapHeader.showMapName == TRUE && SecretBaseMapPopupEnabled() == TRUE)
+        if (gMapHeader.showMapName == TRUE)
             ShowMapNamePopup();
         (*state)++;
         break;

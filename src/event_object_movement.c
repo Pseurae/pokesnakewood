@@ -4,7 +4,6 @@
 #include "characters.h"
 #include "day_night.h"
 #include "debug.h"
-#include "decoration.h"
 #include "event_data.h"
 #include "event_object_movement.h"
 #include "event_scripts.h"
@@ -2207,12 +2206,6 @@ void OverrideSecretBaseDecorationSpriteScript(u8 localId, u8 mapNum, u8 mapGroup
     {
         switch (decorationCategory)
         {
-        case DECORCAT_DOLL:
-            OverrideObjectEventTemplateScript(&gObjectEvents[objectEventId], SecretBase_EventScript_DollInteract);
-            break;
-        case DECORCAT_CUSHION:
-            OverrideObjectEventTemplateScript(&gObjectEvents[objectEventId], SecretBase_EventScript_CushionInteract);
-            break;
         }
     }
 }

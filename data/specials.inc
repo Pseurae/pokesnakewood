@@ -9,26 +9,6 @@
 		.align 2
 gSpecials::
 	def_special HealPlayerParty
-	def_special SetPlayerSecretBase
-	def_special CheckPlayerHasSecretBase
-	def_special EnterSecretBase
-	def_special ClearAndLeaveSecretBase
-	def_special MoveOutOfSecretBase
-	def_special IsCurSecretBaseOwnedByAnotherPlayer
-	def_special GetCurSecretBaseRegistrationValidity
-	def_special ToggleCurSecretBaseRegistry
-	def_special ShowSecretBaseDecorationMenu
-	def_special ShowSecretBaseRegistryMenu
-	def_special PrepSecretBaseBattleFlags
-	def_special GetSecretBaseOwnerAndState
-	def_special InitSecretBaseDecorationSprites
-	def_special SetDecoration
-	def_special GetObjectEventLocalIdByFlag
-	def_special GetSecretBaseTypeInFrontOfPlayer
-	def_special SetSecretBaseOwnerGfxId
-	def_special PutAwayDecorationIteration
-	def_special EnterNewlyCreatedSecretBase
-	def_special SetBattledOwnerFromResult
 	def_special DoSecretBasePCTurnOffEffect
 	def_special SavePlayerParty
 	def_special LoadPlayerParty
@@ -173,7 +153,6 @@ gSpecials::
 	def_special DoOrbEffect
 	def_special FadeOutOrbEffect
 	def_special WaitWeather
-	def_special GetSlotMachineId
 	def_special GetPlayerFacingDirection
 	def_special FoundAbandonedShipRoom1Key
 	def_special FoundAbandonedShipRoom2Key
@@ -190,7 +169,6 @@ gSpecials::
 	def_special DoContestHallWarp
 	def_special PutZigzagoonInPlayerParty
 	def_special IsStarterInParty
-	def_special CopyCurSecretBaseOwnerName_StrVar1
 	def_special ScriptCheckFreePokemonStorageSpace
 	def_special DoSealedChamberShakingEffect_Long
 	def_special ShowDeptStoreElevatorFloorSelect
@@ -213,7 +191,6 @@ gSpecials::
 	def_special ScriptGetPartyMonSpecies
 	def_special IsSelectedMonEgg
 	def_special TryInitBattleTowerAwardManObjectEvent
-	def_special MoveOutOfSecretBaseFromOutside
 	def_special LoadPlayerBag
 	def_special Script_FadeOutMapMusic
 	def_special SetPacifidlogTMReceivedDay
@@ -223,18 +200,6 @@ gSpecials::
 	def_special DoesPartyHaveEnigmaBerry
 	def_special SetChampionSaveWarp
 	def_special ShowGlassWorkshopMenu
-	def_special InitSecretBaseVars
-	def_special CheckInteractedWithFriendsSandOrnament
-	def_special DeclinedSecretBaseBattle
-	def_special DrewSecretBaseBattle
-	def_special WonSecretBaseBattle
-	def_special LostSecretBaseBattle
-	def_special CheckInteractedWithFriendsDollDecor
-	def_special CheckInteractedWithFriendsCushionDecor
-	def_special CheckInteractedWithFriendsFurnitureBottom
-	def_special CheckInteractedWithFriendsFurnitureMiddle
-	def_special CheckInteractedWithFriendsFurnitureTop
-	def_special CheckInteractedWithFriendsPosterDecor
 	def_special CloseBattlePikeCurtain
 	def_special ShouldTryGetTrainerScript
 	def_special ShowMapNamePopup
@@ -255,14 +220,10 @@ gSpecials::
 	def_special BattlePyramidChooseMonHeldItems
 	def_special UpdateBattlePointsWindow
 	def_special CloseBattlePointsWindow
-	def_special ShowFrontierExchangeCornerItemIconWindow
-	def_special CloseFrontierExchangeCornerItemIconWindow
 	def_special Script_DoRayquazaScene
 	def_special OpenPokenavForTutorial
 	def_special ScriptMenu_CreateStartMenuForPokenavTutorial
 	def_special CountPlayerTrainerStars
-	def_special BufferBattleFrontierTutorMoveName
-	def_special CloseBattleFrontierTutorWindow
 	def_special ScrollableMultichoice_RedrawPersistentMenu
 	def_special ChooseMonForMoveTutor
 	def_special ScrollableMultichoice_ClosePersistentMenu

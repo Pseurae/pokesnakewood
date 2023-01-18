@@ -854,9 +854,6 @@ static u8 CreateNPCTrainerParty(struct Pokemon *party, u16 trainerNum, bool8 fir
     u8 monsCount;
     u16 ball;
 
-    if (trainerNum == TRAINER_SECRET_BASE)
-        return 0;
-
     if (gBattleTypeFlags & BATTLE_TYPE_TRAINER)
     {
         if (firstTrainer == TRUE)

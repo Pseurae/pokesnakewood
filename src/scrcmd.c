@@ -4,8 +4,6 @@
 #include "clock.h"
 #include "coins.h"
 #include "data.h"
-#include "decoration.h"
-#include "decoration_inventory.h"
 #include "event_data.h"
 #include "field_door.h"
 #include "field_effect.h"
@@ -37,7 +35,6 @@
 #include "script_movement.h"
 #include "script_pokemon_util.h"
 #include "shop.h"
-#include "slot_machine.h"
 #include "sound.h"
 #include "string_util.h"
 #include "text.h"
@@ -542,33 +539,21 @@ bool8 ScrCmd_checkpcitem(struct ScriptContext *ctx)
 
 bool8 ScrCmd_adddecoration(struct ScriptContext *ctx)
 {
-    u32 decorId = VarGet(ScriptReadHalfword(ctx));
-
-    gSpecialVar_Result = DecorationAdd(decorId);
     return FALSE;
 }
 
 bool8 ScrCmd_removedecoration(struct ScriptContext *ctx)
 {
-    u32 decorId = VarGet(ScriptReadHalfword(ctx));
-
-    gSpecialVar_Result = DecorationRemove(decorId);
     return FALSE;
 }
 
 bool8 ScrCmd_checkdecorspace(struct ScriptContext *ctx)
 {
-    u32 decorId = VarGet(ScriptReadHalfword(ctx));
-
-    gSpecialVar_Result = DecorationCheckSpace(decorId);
     return FALSE;
 }
 
 bool8 ScrCmd_checkdecor(struct ScriptContext *ctx)
 {
-    u32 decorId = VarGet(ScriptReadHalfword(ctx));
-
-    gSpecialVar_Result = CheckHasDecoration(decorId);
     return FALSE;
 }
 
@@ -1584,10 +1569,6 @@ bool8 ScrCmd_bufferitemnameplural(struct ScriptContext *ctx)
 
 bool8 ScrCmd_bufferdecorationname(struct ScriptContext *ctx)
 {
-    u8 stringVarIndex = ScriptReadByte(ctx);
-    u16 decorId = VarGet(ScriptReadHalfword(ctx));
-
-    StringCopy(sScriptStringVars[stringVarIndex], gDecorations[decorId].name);
     return FALSE;
 }
 
@@ -1914,10 +1895,6 @@ bool8 ScrCmd_pokemartdecoration2(struct ScriptContext *ctx)
 
 bool8 ScrCmd_playslotmachine(struct ScriptContext *ctx)
 {
-    u8 machineId = VarGet(ScriptReadHalfword(ctx));
-
-    PlaySlotMachine(machineId, CB2_ReturnToFieldContinueScriptPlayMapMusic);
-    ScriptContext_Stop();
     return TRUE;
 }
 

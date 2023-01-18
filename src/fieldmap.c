@@ -10,7 +10,6 @@
 #include "palette.h"
 #include "pokenav.h"
 #include "script.h"
-#include "secret_base.h"
 #include "constants/field_tint.h"
 #include "constants/rgb.h"
 #include "constants/metatile_behaviors.h"
@@ -68,15 +67,12 @@ struct MapHeader const *const GetMapHeaderFromConnection(struct MapConnection *c
 void InitMap(void)
 {
     InitMapLayoutData(&gMapHeader);
-    SetOccupiedSecretBaseEntranceMetatiles(gMapHeader.events);
     RunOnLoadMapScript();
 }
 
 void InitMapFromSavedGame(void)
 {
     InitMapLayoutData(&gMapHeader);
-    InitSecretBaseAppearance(FALSE);
-    SetOccupiedSecretBaseEntranceMetatiles(gMapHeader.events);
     RunOnLoadMapScript();
 }
 

@@ -143,7 +143,6 @@ SECTIONS {
         src/script_menu.o(.text);
         src/naming_screen.o(.text);
         src/money.o(.text);
-        src/secret_base.o(.text);
         src/script_pokemon_util.o(.text);
         src/field_poison.o(.text);
         src/pokemon_size_record.o(.text);
@@ -177,8 +176,6 @@ SECTIONS {
         src/heal_location.o(.text);
         src/region_map.o(.text);
         src/image_processing_effects.o(.text);
-        src/decoration.o(.text);
-        src/slot_machine.o(.text);
         src/battle_ai_main.o(.text);
 		src/battle_ai_util.o(.text);
         src/starter_choose.o(.text);
@@ -210,7 +207,6 @@ SECTIONS {
         src/battle_anim_effects_3.o(.text);
         src/move_relearner.o(.text);
         src/fldeff_softboiled.o(.text);
-        src/decoration_inventory.o(.text);
         src/roamer.o(.text);
         src/battle_controller_wally.o(.text);
         src/player_pc.o(.text);
@@ -457,7 +453,6 @@ SECTIONS {
         src/script_menu.o(.rodata);
         src/naming_screen.o(.rodata);
         src/money.o(.rodata);
-        src/secret_base.o(.rodata);
         src/script_pokemon_util.o(.rodata);
         src/pokemon_size_record.o(.rodata)
         src/fldeff_misc.o(.rodata);
@@ -490,8 +485,6 @@ SECTIONS {
         src/heal_location.o(.rodata);
         src/region_map.o(.rodata);
         src/image_processing_effects.o(.rodata);
-        src/decoration.o(.rodata);
-        src/slot_machine.o(.rodata);
         src/battle_ai_main.o(.rodata);
 		src/battle_ai_util.o(.rodata);
         src/starter_choose.o(.rodata);
