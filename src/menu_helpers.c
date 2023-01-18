@@ -10,7 +10,6 @@
 #include "graphics.h"
 #include "string_util.h"
 #include "sound.h"
-#include "mail.h"
 #include "overworld.h"
 #include "decompress.h"
 #include "constants/songs.h"
@@ -280,14 +279,6 @@ bool8 IsHoldingItemAllowed(u16 itemId)
      && ((gSaveBlock1Ptr->location.mapGroup == MAP_GROUP(TRADE_CENTER)
        && gSaveBlock1Ptr->location.mapNum == MAP_NUM(TRADE_CENTER))
       ))
-        return FALSE;
-    else
-        return TRUE;
-}
-
-bool8 IsWritingMailAllowed(u16 itemId)
-{
-    if ((IsOverworldLinkActive() == TRUE) && ItemIsMail(itemId) == TRUE)
         return FALSE;
     else
         return TRUE;

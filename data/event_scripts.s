@@ -3,13 +3,10 @@
 #include "constants/battle_config.h"
 #include "constants/battle_setup.h"
 #include "constants/berry.h"
-#include "constants/cable_club.h"
 #include "constants/character_names.h"
 #include "constants/coins.h"
-#include "constants/contest.h"
 #include "constants/daycare.h"
 #include "constants/decorations.h"
-#include "constants/easy_chat.h"
 #include "constants/event_objects.h"
 #include "constants/event_object_movement.h"
 #include "constants/field_effects.h"
@@ -25,7 +22,6 @@
 #include "constants/items.h"
 #include "constants/heal_locations.h"
 #include "constants/layouts.h"
-#include "constants/lilycove_lady.h"
 #include "constants/map_scripts.h"
 #include "constants/maps.h"
 #include "constants/mauville_old_man.h"
@@ -33,17 +29,12 @@
 #include "constants/moves.h"
 #include "constants/party_menu.h"
 #include "constants/pokemon.h"
-#include "constants/roulette.h"
 #include "constants/script_menu.h"
 #include "constants/secret_bases.h"
 #include "constants/songs.h"
 #include "constants/sound.h"
 #include "constants/species.h"
-#include "constants/trade.h"
-#include "constants/trainer_hill.h"
 #include "constants/trainers.h"
-#include "constants/tv.h"
-#include "constants/union_room.h"
 #include "constants/vars.h"
 #include "constants/weather.h"
 	.include "asm/macros.inc"
@@ -654,21 +645,9 @@ Common_EventScript_ShowPokemonCenterSign::
 	msgbox gText_PokemonCenterSign, MSGBOX_SIGN
 	end
 
-Common_ShowEasyChatScreen::
-	fadescreen FADE_TO_BLACK
-	special ShowEasyChatScreen
-	fadescreen FADE_FROM_BLACK
-	return
-
 Common_EventScript_ReadyPetalburgGymForBattle::
 	clearflag FLAG_HIDE_PETALBURG_GYM_GREETER
 	setflag FLAG_PETALBURG_MART_EXPANDED_ITEMS
-	return
-
-Common_EventScript_BufferTrendyPhrase::
-	dotimebasedevents
-	setvar VAR_0x8004, 0
-	special BufferTrendyPhraseString
 	return
 
 EventScript_BackupMrBrineyLocation::
@@ -1006,7 +985,6 @@ Common_EventScript_LegendaryFlewAway::
 	.include "data/text/trainers.inc"
 	.include "data/scripts/repel.inc"
 	.include "data/scripts/safari_zone.inc"
-	.include "data/scripts/roulette.inc"
 	.include "data/text/pokedex_rating.inc"
 	.include "data/text/lottery_corner.inc"
 	.include "data/text/event_ticket_1.inc"
@@ -1015,7 +993,6 @@ Common_EventScript_LegendaryFlewAway::
 	.include "data/text/shoal_cave.inc"
 	.include "data/text/check_furniture.inc"
 	.include "data/scripts/cave_hole.inc"
-	.include "data/scripts/lilycove_lady.inc"
 	.include "data/text/match_call.inc"
 	.include "data/text/blend_master.inc"
 	.include "data/text/event_ticket_2.inc"

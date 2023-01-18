@@ -29,7 +29,6 @@
 #include "constants/items.h"
 #include "constants/mauville_old_man.h"
 #include "constants/trainer_types.h"
-#include "constants/union_room.h"
 #include "constants/weather.h"
 
 // this file was known as evobjmv.c in Game Freak's original source
@@ -8434,12 +8433,6 @@ static void VirtualObject_UpdateAnim(struct Sprite *sprite)
 {
     switch(sprite->sAnimNum)
     {
-    case UNION_ROOM_SPAWN_IN:
-        MoveUnionRoomObjectDown(sprite);
-        break;
-    case UNION_ROOM_SPAWN_OUT:
-        MoveUnionRoomObjectUp(sprite);
-        break;
     case 0:
         break;
     default:

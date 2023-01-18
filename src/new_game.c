@@ -8,18 +8,14 @@
 #include "lottery_corner.h"
 #include "play_time.h"
 #include "match_call.h"
-#include "lilycove_lady.h"
 #include "load_save.h"
-#include "dewford_trend.h"
 #include "berry.h"
 #include "rtc.h"
-#include "easy_chat.h"
 #include "event_data.h"
 #include "money.h"
 #include "coins.h"
 #include "text.h"
 #include "overworld.h"
-#include "mail.h"
 #include "item.h"
 #include "pokedex.h"
 #include "pokedex.h"
@@ -117,7 +113,6 @@ void NewGameInitData(void)
     ZeroEnemyPartyMons();
     ResetPokedex();
     ClearSav1();
-    ClearAllMail();
     gSaveBlock2Ptr->specialSaveWarpFlags = 0;
     gSaveBlock2Ptr->gcnLinkFlags = 0;
     InitPlayerTrainerId();
@@ -140,12 +135,9 @@ void NewGameInitData(void)
     ClearBag();
     NewGameInitPCItems();
     ClearDecorationInventories();
-    InitEasyChatPhrases();
-    InitDewfordTrend();
     ResetFanClub();
     ResetLotteryCorner();
     WarpToLittleroot();
     RunScriptImmediately(EventScript_ResetAllMapFlags);
-    InitLilycoveLady();
     InitMatchCallCounters();
 }

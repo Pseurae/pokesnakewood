@@ -601,7 +601,6 @@ DewfordTown_Movement_BrineyExitBoat:
 DewfordTown_EventScript_TrendyPhraseBoy::
 	lock
 	faceplayer
-	call Common_EventScript_BufferTrendyPhrase
 	msgbox DewfordTown_Text_XIsTheBiggestHappeningThingRight, MSGBOX_YESNO
 	goto_if_eq VAR_RESULT, YES, DewfordTown_EventScript_ConfirmTrendyPhrase
 	goto_if_eq VAR_RESULT, NO, DewfordTown_EventScript_RejectTrendyPhrase
@@ -614,8 +613,6 @@ DewfordTown_EventScript_ConfirmTrendyPhrase::
 
 DewfordTown_EventScript_RejectTrendyPhrase::
 	msgbox DewfordTown_Text_TellMeWhatsNewAndIn, MSGBOX_DEFAULT
-	setvar VAR_0x8004, EASY_CHAT_TYPE_TRENDY_PHRASE
-	call Common_ShowEasyChatScreen
 	lock
 	faceplayer
 	goto_if_eq VAR_RESULT, TRUE, DewfordTown_EventScript_GiveNewTrendyPhrase

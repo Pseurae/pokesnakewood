@@ -26,7 +26,6 @@
 #include "string_util.h"
 #include "pokemon_icon.h"
 #include "m4a.h"
-#include "mail.h"
 #include "event_data.h"
 #include "pokemon_storage_system.h"
 #include "task.h"

@@ -39,7 +39,6 @@ MauvilleCity_PokemonCenter_1F_EventScript_AskToWriteLyrics::
 
 MauvilleCity_PokemonCenter_1F_EventScript_WriteLyrics::
 	setvar VAR_0x8004, EASY_CHAT_TYPE_BARD_SONG
-	call Common_ShowEasyChatScreen
 	lock
 	faceplayer
 	goto_if_eq VAR_RESULT, 0, MauvilleCity_PokemonCenter_1F_EventScript_DeclineWritingLyrics

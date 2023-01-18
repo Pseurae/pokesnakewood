@@ -3,7 +3,6 @@ EventScript_Questionnaire::
 	msgbox Questionnaire_Text_FillOut, MSGBOX_YESNO
 	goto_if_eq VAR_RESULT, NO, Questionnaire_EventScript_Release
 	setvar VAR_0x8004, EASY_CHAT_TYPE_QUESTIONNAIRE
-	call Common_ShowEasyChatScreen
 	lock
 	faceplayer
 	specialvar VAR_0x8008, GetMartEmployeeObjectEventId

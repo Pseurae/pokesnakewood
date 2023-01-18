@@ -388,7 +388,6 @@ static u8 PickWildMonNature(void)
 {
     u8 i;
     u8 j;
-    struct Pokeblock *safariPokeblock;
     u8 natures[NUM_NATURES];
 
     // check synchronize for a pokemon with the same ability

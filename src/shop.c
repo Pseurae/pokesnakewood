@@ -109,7 +109,6 @@ static EWRAM_DATA struct ShopData *sShopData = NULL;
 static EWRAM_DATA struct ListMenuItem *sListMenuItems = NULL;
 static EWRAM_DATA u8 (*sItemNames)[ITEM_NAME_LENGTH + 2] = {0};
 static EWRAM_DATA u8 sPurchaseHistoryId = 0;
-EWRAM_DATA struct ItemSlot gMartPurchaseHistory[SMARTSHOPPER_NUM_ITEMS] = {0};
 
 static void Task_ShopMenu(u8 taskId);
 static void Task_HandleShopMenuQuit(u8 taskId);
@@ -147,7 +146,6 @@ static void BuyMenuConfirmPurchase(u8 taskId);
 static void BuyMenuPrintItemQuantityAndPrice(u8 taskId);
 static void Task_BuyHowManyDialogueHandleInput(u8 taskId);
 static void BuyMenuSubtractMoney(u8 taskId);
-static void RecordItemPurchase(u8 taskId);
 static void Task_ReturnToItemListAfterItemPurchase(u8 taskId);
 static void Task_ReturnToItemListAfterDecorationPurchase(u8 taskId);
 static void Task_HandleShopMenuBuy(u8 taskId);
@@ -1084,7 +1082,6 @@ static void BuyMenuTryMakePurchase(u8 taskId)
         if (AddBagItem(tItemId, tItemCount) == TRUE)
         {
             BuyMenuDisplayMessage(taskId, gText_HereYouGoThankYou, BuyMenuSubtractMoney);
-            RecordItemPurchase(taskId);
         }
         else
         {
@@ -1187,38 +1184,6 @@ static void Task_ExitBuyMenu(u8 taskId)
     }
 }
 
-static void ClearItemPurchases(void)
-{
-    sPurchaseHistoryId = 0;
-    memset(gMartPurchaseHistory, 0, sizeof(gMartPurchaseHistory));
-}
-
-static void RecordItemPurchase(u8 taskId)
-{
-    s16 *data = gTasks[taskId].data;
-
-    u16 i;
-
-    for (i = 0; i < ARRAY_COUNT(gMartPurchaseHistory); i++)
-    {
-        if (gMartPurchaseHistory[i].itemId == tItemId && gMartPurchaseHistory[i].quantity != 0)
-        {
-            if (gMartPurchaseHistory[i].quantity + tItemCount > 255)
-                gMartPurchaseHistory[i].quantity = 255;
-            else
-                gMartPurchaseHistory[i].quantity += tItemCount;
-            return;
-        }
-    }
-
-    if (sPurchaseHistoryId < ARRAY_COUNT(gMartPurchaseHistory))
-    {
-        gMartPurchaseHistory[sPurchaseHistoryId].itemId = tItemId;
-        gMartPurchaseHistory[sPurchaseHistoryId].quantity = tItemCount;
-        sPurchaseHistoryId++;
-    }
-}
-
 #undef tItemCount
 #undef tItemId
 #undef tListTaskId
@@ -1229,7 +1194,6 @@ void CreatePokemartMenu(const u16 *itemsForSale)
 {
     CreateShopMenu(MART_TYPE_NORMAL);
     SetShopItemsForSale(itemsForSale);
-    ClearItemPurchases();
     SetShopMenuCallback(ScriptContext_Enable);
 }
 

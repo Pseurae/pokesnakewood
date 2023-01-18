@@ -37,7 +37,6 @@
 #include "constants/songs.h"
 #include "constants/map_types.h"
 #include "constants/trainers.h"
-#include "constants/trainer_hill.h"
 #include "constants/weather.h"
 
 enum {

@@ -362,7 +362,7 @@ bool8 RemoveBagItem(u16 itemId, u16 count)
 
     if (CurMapIsSecretBase() == TRUE)
     {
-        VarSet(VAR_SECRET_BASE_LOW_TV_FLAGS, VarGet(VAR_SECRET_BASE_LOW_TV_FLAGS) | SECRET_BASE_USED_BAG);
+        VarSet(VAR_SECRET_BASE_LOW_TV_FLAGS, VarGet(VAR_SECRET_BASE_LOW_TV_FLAGS));
         VarSet(VAR_SECRET_BASE_LAST_ITEM_USED, itemId);
     }
 

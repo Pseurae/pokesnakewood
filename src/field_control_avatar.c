@@ -32,7 +32,6 @@
 #include "constants/field_poison.h"
 #include "constants/map_types.h"
 #include "constants/songs.h"
-#include "constants/trainer_hill.h"
 
 static EWRAM_DATA u8 sWildEncounterImmunitySteps = 0;
 static EWRAM_DATA u16 sPrevMetatileBehavior = 0;
