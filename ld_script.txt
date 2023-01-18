@@ -133,7 +133,6 @@ SECTIONS {
         src/pokemon_icon.o(.text);
         src/script_movement.o(.text);
         src/fldeff_cut.o(.text);
-        src/mail_data.o(.text);
         src/map_name_popup.o(.text);
         src/item_menu_icons.o(.text);
         src/battle_anim_mon_movement.o(.text);
@@ -287,7 +286,6 @@ SECTIONS {
         data/battle_scripts_1.o(script_data);
         data/field_effect_scripts.o(script_data);
         data/battle_scripts_2.o(script_data);
-        data/contest_ai_scripts.o(script_data);
     } =0
 
     lib_text :
