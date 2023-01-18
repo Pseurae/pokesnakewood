@@ -3,7 +3,6 @@
 #include "rtc.h"
 #include "time_events.h"
 #include "field_specials.h"
-#include "lottery_corner.h"
 #include "field_weather.h"
 #include "berry.h"
 #include "main.h"
@@ -45,7 +44,6 @@ static void UpdatePerDay(struct Time *localTime)
         UpdateMirageRnd(daysSince);
         UpdateBirchState(daysSince);
         SetShoalItemFlag(daysSince);
-        SetRandomLotteryNumber(daysSince);
         *days = localTime->days;
     }
 }
