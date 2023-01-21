@@ -1,7 +1,6 @@
 #include "global.h"
 #include "crt0.h"
 #include "malloc.h"
-#include "librfu.h"
 #include "m4a.h"
 #include "bg.h"
 #include "rtc.h"
@@ -68,8 +67,6 @@ u32 IntrMain_Buffer[0x200];
 s8 gPcmDmaCounter;
 
 static EWRAM_DATA u16 sTrainerId = 0;
-
-//EWRAM_DATA void (**gFlashTimerIntrFunc)(void) = NULL;
 
 static void InitMainCallbacks(void);
 static void CallCallbacks(void);

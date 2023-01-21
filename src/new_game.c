@@ -5,7 +5,6 @@
 #include "roamer.h"
 #include "pokemon_size_record.h"
 #include "script.h"
-#include "lottery_corner.h"
 #include "play_time.h"
 #include "match_call.h"
 #include "load_save.h"
@@ -132,7 +131,6 @@ void NewGameInitData(void)
     ClearBag();
     NewGameInitPCItems();
     ResetFanClub();
-    ResetLotteryCorner();
     WarpToLittleroot();
     RunScriptImmediately(EventScript_ResetAllMapFlags);
     InitMatchCallCounters();
