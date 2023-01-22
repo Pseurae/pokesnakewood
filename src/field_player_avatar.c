@@ -612,11 +612,6 @@ static void PlayerNotOnBikeMoving(u8 direction, u16 heldKeys)
             PlayerJumpLedge(direction);
             return;
         }
-        else if (collision == COLLISION_OBJECT_EVENT && IsPlayerCollidingWithFarawayIslandMew(direction))
-        {
-            PlayerNotOnBikeCollideWithFarawayIslandMew(direction);
-            return;
-        }
         else
         {
             u8 adjustedCollision = collision - COLLISION_STOP_SURFING;
@@ -761,40 +756,6 @@ static void CheckAcroBikeCollision(s16 x, s16 y, u8 metatileBehavior, u8 *collis
             return;
         }
     }
-}
-
-bool8 IsPlayerCollidingWithFarawayIslandMew(u8 direction)
-{
-    u8 mewObjectId;
-    struct ObjectEvent *object;
-    s16 playerX;
-    s16 playerY;
-    s16 mewPrevX;
-
-    object = &gObjectEvents[gPlayerAvatar.objectEventId];
-    playerX = object->currentCoords.x;
-    playerY = object->currentCoords.y;
-
-    MoveCoords(direction, &playerX, &playerY);
-    mewObjectId = GetObjectEventIdByLocalIdAndMap(1, MAP_NUM(FARAWAY_ISLAND_INTERIOR), MAP_GROUP(FARAWAY_ISLAND_INTERIOR));
-    if (mewObjectId == OBJECT_EVENTS_COUNT)
-        return FALSE;
-
-    object = &gObjectEvents[mewObjectId];
-    mewPrevX = object->previousCoords.x;
-
-    if (mewPrevX == playerX)
-    {
-        if (object->previousCoords.y != playerY
-            || object->currentCoords.x != mewPrevX
-            || object->currentCoords.y != object->previousCoords.y)
-        {
-            if (object->previousCoords.x == playerX &&
-                object->previousCoords.y == playerY)
-                return TRUE;
-        }
-    }
-    return FALSE;
 }
 
 void SetPlayerAvatarTransitionFlags(u16 transitionFlags)
@@ -978,11 +939,6 @@ static void PlayerRun(u8 direction)
 void PlayerOnBikeCollide(u8 direction)
 {
     PlayCollisionSoundIfNotFacingWarp(direction);
-    PlayerSetAnimId(GetWalkInPlaceNormalMovementAction(direction), COPY_MOVE_WALK);
-}
-
-void PlayerOnBikeCollideWithFarawayIslandMew(u8 direction)
-{
     PlayerSetAnimId(GetWalkInPlaceNormalMovementAction(direction), COPY_MOVE_WALK);
 }
 

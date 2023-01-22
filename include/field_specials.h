@@ -8,7 +8,6 @@ u8 GetLeadMonIndex(void);
 u8 IsDestinationBoxFull(void);
 u16 GetPCBoxToSendMon(void);
 void UpdateTrainerFansAfterLinkBattle(void);
-void IncrementBirthIslandRockStepCount(void);
 bool8 AbnormalWeatherHasExpired(void);
 bool8 ShouldDoBrailleRegicePuzzle(void);
 bool32 ShouldDoWallyCall(void);

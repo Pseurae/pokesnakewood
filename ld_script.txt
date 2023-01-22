@@ -216,7 +216,6 @@ SECTIONS {
         src/battle_anim_throw.o(.text);
         src/hall_of_fame.o(.text);
         src/credits.o(.text);
-        src/lottery_corner.o(.text);
         src/diploma.o(.text);
         src/berry_tag_screen.o(.text);
         src/save_failed_screen.o(.text);
@@ -237,11 +236,8 @@ SECTIONS {
         src/item_icon.o(.text);
         src/party_menu.o(.text);
         src/braille.o(.text);
-        src/multiboot.o(.text);
-        src/berry_fix_graphics.o(.text);
         src/battle_controller_player_partner.o(.text);
         src/mirage_tower.o(.text);
-        src/berry_fix_program.o(.text);
         src/pokemon_summary_screen.o(.text);
         src/pokedex_area_region_map.o(.text);
         src/pokenav.o(.text);
@@ -259,7 +255,6 @@ SECTIONS {
         src/pokenav_ribbons_summary.o(.text);
         src/pokenav_match_call_data.o(.text);
         src/menu_specialized.o(.text);
-        src/faraway_island.o(.text);
         src/rayquaza_scene.o(.text);
         src/walda_phrase.o(.text);
         src/gym_leader_rematch.o(.text);
@@ -287,7 +282,6 @@ SECTIONS {
     lib_text :
     ALIGN(4)
     {
-        src/libgcnmultiboot.o(.text);
         src/m4a_1.o(.text);
         src/m4a.o(.text);
         src/agb_flash.o(.text);
@@ -508,7 +502,6 @@ SECTIONS {
         src/battle_anim_throw.o(.rodata);
         src/hall_of_fame.o(.rodata);
         src/credits.o(.rodata);
-        src/lottery_corner.o(.rodata);
         src/diploma.o(.rodata);
         src/strings.o(.rodata);
         src/berry_tag_screen.o(.rodata);
@@ -528,11 +521,8 @@ SECTIONS {
         src/item_icon.o(.rodata);
         src/party_menu.o(.rodata);
         src/braille.o(.rodata);
-        src/multiboot.o(.rodata);
-        src/berry_fix_graphics.o(.rodata);
         src/battle_controller_player_partner.o(.rodata);
         src/mirage_tower.o(.rodata);
-        src/berry_fix_program.o(.rodata);
         src/pokemon_summary_screen.o(.rodata);
         src/pokedex_area_region_map.o(.rodata);
         src/pokenav.o(.rodata);
@@ -549,7 +539,6 @@ SECTIONS {
         src/pokenav_ribbons_summary.o(.rodata);
         src/pokenav_match_call_data.o(.rodata);
         src/menu_specialized.o(.rodata);
-        src/faraway_island.o(.rodata);
         src/rayquaza_scene.o(.rodata);
         src/walda_phrase.o(.rodata);
         src/gym_leader_rematch.o(.rodata);
@@ -1152,14 +1141,6 @@ SECTIONS {
         *libc.a:lseekr.o(.rodata);
         *libc.a:readr.o(.rodata);
         src/libisagbprn.o(.rodata);
-    } =0
-
-    multiboot_data :
-    ALIGN(4)
-    {
-        data/multiboot_ereader.o(.rodata);
-        data/multiboot_berry_glitch_fix.o(.rodata);
-        data/multiboot_pokemon_colosseum.o(.rodata);
     } =0
 
     gfx_data  :

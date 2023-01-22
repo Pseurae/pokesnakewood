@@ -126,8 +126,6 @@ gSpecials::
 	def_special PlayerPC
 	def_special FieldShowRegionMap
 	def_special GetWeekCount
-	def_special RetrieveLotteryNumber
-	def_special PickLotteryCornerTicket
 	def_special ResetTrickHouseNuggetFlag
 	def_special SetTrickHouseNuggetFlag
 	def_special ScriptMenu_CreatePCMultichoice
@@ -200,7 +198,6 @@ gSpecials::
 	def_special DoesPartyHaveEnigmaBerry
 	def_special SetChampionSaveWarp
 	def_special ShowGlassWorkshopMenu
-	def_special CloseBattlePikeCurtain
 	def_special ShouldTryGetTrainerScript
 	def_special ShowMapNamePopup
 	def_special ShowMapNamePopup
@@ -227,8 +224,6 @@ gSpecials::
 	def_special ScrollableMultichoice_RedrawPersistentMenu
 	def_special ChooseMonForMoveTutor
 	def_special ScrollableMultichoice_ClosePersistentMenu
-	def_special DoDeoxysRockInteraction
-	def_special SetDeoxysRockPalette
 	def_special CreateEventLegalEnemyMon
 	def_special StartMirageTowerDisintegration
 	def_special StartMirageTowerShake
@@ -248,14 +243,11 @@ gSpecials::
 	def_special EnableNationalPokedex
 	def_special ScriptMenu_CreateLilycoveSSTidalMultichoice
 	def_special GetLilycoveSSTidalSelection
-	def_special SetMewAboveGrass
 	def_special ShouldDistributeEonTicket
 	def_special LoopWingFlapSE
-	def_special DestroyMewEmergingGrassSprite
 	def_special TryBufferWaldaPhrase
 	def_special DoWaldaNamingScreen
 	def_special TryGetWallpaperWithWaldaPhrase
-	def_special PlayerNotAtTrainerHillEntrance
 	def_special GetBattlePyramidHint
 	def_special PlayerFaceTrainerAfterBattle
 	def_special ResetHealLocationFromDewford

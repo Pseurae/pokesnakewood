@@ -4,7 +4,6 @@
 #include "coord_event_weather.h"
 #include "daycare.h"
 #include "debug.h"
-#include "faraway_island.h"
 #include "event_data.h"
 #include "event_object_movement.h"
 #include "event_scripts.h"
@@ -161,7 +160,6 @@ int ProcessPlayerFieldInput(struct FieldInput *input)
     if (input->tookStep)
     {
         IncrementGameStat(GAME_STAT_STEPS);
-        IncrementBirthIslandRockStepCount();
         if (TryStartStepBasedScript(&position, metatileBehavior, playerDirection) == TRUE)
             return TRUE;
     }
@@ -242,10 +240,6 @@ static bool8 TryStartInteractionScript(struct MapPosition *position, u16 metatil
     // Don't play interaction sound for certain scripts.
     if (script != LittlerootTown_BrendansHouse_2F_EventScript_PC
      && script != LittlerootTown_MaysHouse_2F_EventScript_PC
-    //  && script != SecretBase_EventScript_PC
-    //  && script != SecretBase_EventScript_RecordMixingPC
-    //  && script != SecretBase_EventScript_DollInteract
-    //  && script != SecretBase_EventScript_CushionInteract
      && script != EventScript_PC)
         PlaySE(SE_SELECT);
 
@@ -366,9 +360,6 @@ static const u8 *GetInteractedBackgroundEventScript(struct MapPosition *position
     case BG_EVENT_SECRET_BASE:
         if (direction == DIR_NORTH)
         {
-            gSpecialVar_0x8004 = bgEvent->bgUnion.secretBaseId;
-            // if (TrySetCurSecretBase())
-            //     return SecretBase_EventScript_CheckEntrance;
         }
         return NULL;
     }
@@ -394,8 +385,6 @@ static const u8 *GetInteractedMetatileScript(struct MapPosition *position, u8 me
         return EventScript_RegionMap;
     if (MetatileBehavior_IsRunningShoesManual(metatileBehavior) == TRUE)
         return EventScript_RunningShoesManual;
-    if (MetatileBehavior_IsPictureBookShelf(metatileBehavior) == TRUE)
-        return EventScript_PictureBookShelf;
     if (MetatileBehavior_IsBookShelf(metatileBehavior) == TRUE)
         return EventScript_BookShelf;
     if (MetatileBehavior_IsPokeCenterBookShelf(metatileBehavior) == TRUE)
@@ -499,7 +488,6 @@ static bool8 TryStartStepCountScript(u16 metatileBehavior)
 {
     IncrementRematchStepCounter();
     UpdateFriendshipStepCounter();
-    UpdateFarawayIslandStepCounter();
 
     if (!(gPlayerAvatar.flags & PLAYER_AVATAR_FLAG_FORCED_MOVE) && !MetatileBehavior_IsForcedMovementTile(metatileBehavior))
     {

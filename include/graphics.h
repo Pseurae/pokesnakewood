@@ -7292,28 +7292,6 @@ extern const u8 gTrainerBackPic_Steven[];
 extern const u32 gTrainerBackPicPalette_Red[];
 extern const u32 gTrainerBackPicPalette_Leaf[];
 
-// pokeblock
-extern const u32 gMenuPokeblock_Gfx[];
-extern const u32 gMenuPokeblock_Pal[];
-extern const u32 gMenuPokeblock_Tilemap[];
-extern const u32 gMenuPokeblockDevice_Gfx[];
-extern const u32 gMenuPokeblockDevice_Pal[];
-extern const u32 gPokeblockRed_Pal[];
-extern const u32 gPokeblockBlue_Pal[];
-extern const u32 gPokeblockPink_Pal[];
-extern const u32 gPokeblockGreen_Pal[];
-extern const u32 gPokeblockYellow_Pal[];
-extern const u32 gPokeblockPurple_Pal[];
-extern const u32 gPokeblockIndigo_Pal[];
-extern const u32 gPokeblockBrown_Pal[];
-extern const u32 gPokeblockLiteBlue_Pal[];
-extern const u32 gPokeblockOlive_Pal[];
-extern const u32 gPokeblockGray_Pal[];
-extern const u32 gPokeblockBlack_Pal[];
-extern const u32 gPokeblockWhite_Pal[];
-extern const u32 gPokeblockGold_Pal[];
-extern const u32 gPokeblock_Gfx[];
-
 extern const u32 gItemIcon_QuestionMark[];
 extern const u32 gItemIconPalette_QuestionMark[];
 
@@ -10146,13 +10124,8 @@ extern const u32 gHoennTrainerCardFrontLink_Tilemap[];
 extern const u32 gKantoTrainerCardFrontLink_Tilemap[];
 extern const u32 gHoennTrainerCardBg_Tilemap[];
 
-// Use Pokeblock
-extern const u32 gUsePokeblockCondition_Gfx[];
 extern const u8 gPokenavConditionCancel_Gfx[];
 extern const u16 gPokenavConditionCancel_Pal[];
-extern const u8 gUsePokeblockUpDown_Gfx[];
-extern const u16 gUsePokeblockUpDown_Pal[];
-extern const u16 gUsePokeblockCondition_Pal[];
 
 // Pokenav
 extern const u32 gPokenavMessageBox_Gfx[];
