@@ -6,6 +6,7 @@
 enum {
     DN_TINT_STATE_BG,
     DN_TINT_STATE_OBJ,
+    DN_TINT_STATE_SET,
     DN_TINT_STATE_RESET = 0xFF
 };
 

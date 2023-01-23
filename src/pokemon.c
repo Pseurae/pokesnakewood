@@ -4401,116 +4401,116 @@ u32 GetBoxMonData(struct BoxPokemon *boxMon, s32 field, u8 *data)
         retVal = boxMon->stats.sheen;
         break;
     case MON_DATA_POKERUS:
-        retVal = boxMon->catch_info.pokerus;
+        retVal = boxMon->catch_ribbon.pokerus;
         break;
     case MON_DATA_MET_LOCATION:
-        retVal = boxMon->catch_info.metLocation;
+        retVal = boxMon->catch_ribbon.metLocation;
         break;
     case MON_DATA_MET_LEVEL:
-        retVal = boxMon->catch_info.metLevel;
+        retVal = boxMon->catch_ribbon.metLevel;
         break;
     case MON_DATA_MET_GAME:
-        retVal = boxMon->catch_info.metGame;
+        retVal = boxMon->catch_ribbon.metGame;
         break;
     case MON_DATA_POKEBALL:
-        retVal = boxMon->info.pokeball;
+        retVal = boxMon->catch_ribbon.pokeball;
         break;
     case MON_DATA_OT_GENDER:
-        retVal = boxMon->catch_info.otGender;
+        retVal = boxMon->catch_ribbon.otGender;
         break;
     case MON_DATA_HP_IV:
-        retVal = boxMon->catch_info.hpIV;
+        retVal = boxMon->catch_ribbon.hpIV;
         break;
     case MON_DATA_ATK_IV:
-        retVal = boxMon->catch_info.attackIV;
+        retVal = boxMon->catch_ribbon.attackIV;
         break;
     case MON_DATA_DEF_IV:
-        retVal = boxMon->catch_info.defenseIV;
+        retVal = boxMon->catch_ribbon.defenseIV;
         break;
     case MON_DATA_SPEED_IV:
-        retVal = boxMon->catch_info.speedIV;
+        retVal = boxMon->catch_ribbon.speedIV;
         break;
     case MON_DATA_SPATK_IV:
-        retVal = boxMon->catch_info.spAttackIV;
+        retVal = boxMon->catch_ribbon.spAttackIV;
         break;
     case MON_DATA_SPDEF_IV:
-        retVal = boxMon->catch_info.spDefenseIV;
+        retVal = boxMon->catch_ribbon.spDefenseIV;
         break;
     case MON_DATA_IS_EGG:
-        retVal = boxMon->catch_info.isEgg;
+        retVal = boxMon->catch_ribbon.isEgg;
         break;
     case MON_DATA_ABILITY_NUM:
-        retVal = boxMon->ribbon.abilityNum;
+        retVal = boxMon->catch_ribbon.abilityNum;
         break;
     case MON_DATA_COOL_RIBBON:
-        retVal = boxMon->ribbon.coolRibbon;
+        retVal = boxMon->catch_ribbon.coolRibbon;
         break;
     case MON_DATA_BEAUTY_RIBBON:
-        retVal = boxMon->ribbon.beautyRibbon;
+        retVal = boxMon->catch_ribbon.beautyRibbon;
         break;
     case MON_DATA_CUTE_RIBBON:
-        retVal = boxMon->ribbon.cuteRibbon;
+        retVal = boxMon->catch_ribbon.cuteRibbon;
         break;
     case MON_DATA_SMART_RIBBON:
-        retVal = boxMon->ribbon.smartRibbon;
+        retVal = boxMon->catch_ribbon.smartRibbon;
         break;
     case MON_DATA_TOUGH_RIBBON:
-        retVal = boxMon->ribbon.toughRibbon;
+        retVal = boxMon->catch_ribbon.toughRibbon;
         break;
     case MON_DATA_CHAMPION_RIBBON:
-        retVal = boxMon->ribbon.championRibbon;
+        retVal = boxMon->catch_ribbon.championRibbon;
         break;
     case MON_DATA_WINNING_RIBBON:
-        retVal = boxMon->ribbon.winningRibbon;
+        retVal = boxMon->catch_ribbon.winningRibbon;
         break;
     case MON_DATA_VICTORY_RIBBON:
-        retVal = boxMon->ribbon.victoryRibbon;
+        retVal = boxMon->catch_ribbon.victoryRibbon;
         break;
     case MON_DATA_ARTIST_RIBBON:
-        retVal = boxMon->ribbon.artistRibbon;
+        retVal = boxMon->catch_ribbon.artistRibbon;
         break;
     case MON_DATA_EFFORT_RIBBON:
-        retVal = boxMon->ribbon.effortRibbon;
+        retVal = boxMon->catch_ribbon.effortRibbon;
         break;
     case MON_DATA_MARINE_RIBBON:
-        retVal = boxMon->ribbon.marineRibbon;
+        retVal = boxMon->catch_ribbon.marineRibbon;
         break;
     case MON_DATA_LAND_RIBBON:
-        retVal = boxMon->ribbon.landRibbon;
+        retVal = boxMon->catch_ribbon.landRibbon;
         break;
     case MON_DATA_SKY_RIBBON:
-        retVal = boxMon->ribbon.skyRibbon;
+        retVal = boxMon->catch_ribbon.skyRibbon;
         break;
     case MON_DATA_COUNTRY_RIBBON:
-        retVal = boxMon->ribbon.countryRibbon;
+        retVal = boxMon->catch_ribbon.countryRibbon;
         break;
     case MON_DATA_NATIONAL_RIBBON:
-        retVal = boxMon->ribbon.nationalRibbon;
+        retVal = boxMon->catch_ribbon.nationalRibbon;
         break;
     case MON_DATA_EARTH_RIBBON:
-        retVal = boxMon->ribbon.earthRibbon;
+        retVal = boxMon->catch_ribbon.earthRibbon;
         break;
     case MON_DATA_WORLD_RIBBON:
-        retVal = boxMon->ribbon.worldRibbon;
+        retVal = boxMon->catch_ribbon.worldRibbon;
         break;
     case MON_DATA_EVENT_LEGAL:
-        retVal = boxMon->ribbon.eventLegal;
+        retVal = boxMon->catch_ribbon.eventLegal;
         break;
     case MON_DATA_SPECIES2:
         retVal = boxMon->info.species;
-        if (boxMon->info.species && (boxMon->catch_info.isEgg || boxMon->isBadEgg))
+        if (boxMon->info.species && (boxMon->catch_ribbon.isEgg || boxMon->isBadEgg))
             retVal = SPECIES_EGG;
         break;
     case MON_DATA_IVS:
-        retVal = boxMon->catch_info.hpIV
-              | (boxMon->catch_info.attackIV << 5)
-              | (boxMon->catch_info.defenseIV << 10)
-              | (boxMon->catch_info.speedIV << 15)
-              | (boxMon->catch_info.spAttackIV << 20)
-              | (boxMon->catch_info.spDefenseIV << 25);
+        retVal = boxMon->catch_ribbon.hpIV
+              | (boxMon->catch_ribbon.attackIV << 5)
+              | (boxMon->catch_ribbon.defenseIV << 10)
+              | (boxMon->catch_ribbon.speedIV << 15)
+              | (boxMon->catch_ribbon.spAttackIV << 20)
+              | (boxMon->catch_ribbon.spDefenseIV << 25);
         break;
     case MON_DATA_KNOWN_MOVES:
-        if (boxMon->info.species && !boxMon->catch_info.isEgg)
+        if (boxMon->info.species && !boxMon->catch_ribbon.isEgg)
         {
             u16 *moves = (u16 *)data;
             s32 i = 0;
@@ -4529,48 +4529,48 @@ u32 GetBoxMonData(struct BoxPokemon *boxMon, s32 field, u8 *data)
         break;
     case MON_DATA_RIBBON_COUNT:
         retVal = 0;
-        if (boxMon->info.species && !boxMon->catch_info.isEgg)
+        if (boxMon->info.species && !boxMon->catch_ribbon.isEgg)
         {
-            retVal += boxMon->ribbon.coolRibbon;
-            retVal += boxMon->ribbon.beautyRibbon;
-            retVal += boxMon->ribbon.cuteRibbon;
-            retVal += boxMon->ribbon.smartRibbon;
-            retVal += boxMon->ribbon.toughRibbon;
-            retVal += boxMon->ribbon.championRibbon;
-            retVal += boxMon->ribbon.winningRibbon;
-            retVal += boxMon->ribbon.victoryRibbon;
-            retVal += boxMon->ribbon.artistRibbon;
-            retVal += boxMon->ribbon.effortRibbon;
-            retVal += boxMon->ribbon.marineRibbon;
-            retVal += boxMon->ribbon.landRibbon;
-            retVal += boxMon->ribbon.skyRibbon;
-            retVal += boxMon->ribbon.countryRibbon;
-            retVal += boxMon->ribbon.nationalRibbon;
-            retVal += boxMon->ribbon.earthRibbon;
-            retVal += boxMon->ribbon.worldRibbon;
+            retVal += boxMon->catch_ribbon.coolRibbon;
+            retVal += boxMon->catch_ribbon.beautyRibbon;
+            retVal += boxMon->catch_ribbon.cuteRibbon;
+            retVal += boxMon->catch_ribbon.smartRibbon;
+            retVal += boxMon->catch_ribbon.toughRibbon;
+            retVal += boxMon->catch_ribbon.championRibbon;
+            retVal += boxMon->catch_ribbon.winningRibbon;
+            retVal += boxMon->catch_ribbon.victoryRibbon;
+            retVal += boxMon->catch_ribbon.artistRibbon;
+            retVal += boxMon->catch_ribbon.effortRibbon;
+            retVal += boxMon->catch_ribbon.marineRibbon;
+            retVal += boxMon->catch_ribbon.landRibbon;
+            retVal += boxMon->catch_ribbon.skyRibbon;
+            retVal += boxMon->catch_ribbon.countryRibbon;
+            retVal += boxMon->catch_ribbon.nationalRibbon;
+            retVal += boxMon->catch_ribbon.earthRibbon;
+            retVal += boxMon->catch_ribbon.worldRibbon;
         }
         break;
     case MON_DATA_RIBBONS:
         retVal = 0;
-        if (boxMon->info.species && !boxMon->catch_info.isEgg)
+        if (boxMon->info.species && !boxMon->catch_ribbon.isEgg)
         {
-            retVal = boxMon->ribbon.championRibbon
-                | (boxMon->ribbon.coolRibbon << 1)
-                | (boxMon->ribbon.beautyRibbon << 4)
-                | (boxMon->ribbon.cuteRibbon << 7)
-                | (boxMon->ribbon.smartRibbon << 10)
-                | (boxMon->ribbon.toughRibbon << 13)
-                | (boxMon->ribbon.winningRibbon << 16)
-                | (boxMon->ribbon.victoryRibbon << 17)
-                | (boxMon->ribbon.artistRibbon << 18)
-                | (boxMon->ribbon.effortRibbon << 19)
-                | (boxMon->ribbon.marineRibbon << 20)
-                | (boxMon->ribbon.landRibbon << 21)
-                | (boxMon->ribbon.skyRibbon << 22)
-                | (boxMon->ribbon.countryRibbon << 23)
-                | (boxMon->ribbon.nationalRibbon << 24)
-                | (boxMon->ribbon.earthRibbon << 25)
-                | (boxMon->ribbon.worldRibbon << 26);
+            retVal = boxMon->catch_ribbon.championRibbon
+                | (boxMon->catch_ribbon.coolRibbon << 1)
+                | (boxMon->catch_ribbon.beautyRibbon << 4)
+                | (boxMon->catch_ribbon.cuteRibbon << 7)
+                | (boxMon->catch_ribbon.smartRibbon << 10)
+                | (boxMon->catch_ribbon.toughRibbon << 13)
+                | (boxMon->catch_ribbon.winningRibbon << 16)
+                | (boxMon->catch_ribbon.victoryRibbon << 17)
+                | (boxMon->catch_ribbon.artistRibbon << 18)
+                | (boxMon->catch_ribbon.effortRibbon << 19)
+                | (boxMon->catch_ribbon.marineRibbon << 20)
+                | (boxMon->catch_ribbon.landRibbon << 21)
+                | (boxMon->catch_ribbon.skyRibbon << 22)
+                | (boxMon->catch_ribbon.countryRibbon << 23)
+                | (boxMon->catch_ribbon.nationalRibbon << 24)
+                | (boxMon->catch_ribbon.earthRibbon << 25)
+                | (boxMon->catch_ribbon.worldRibbon << 26);
         }
         break;
     default:
@@ -4769,120 +4769,120 @@ void SetBoxMonData(struct BoxPokemon *boxMon, s32 field, const void *dataArg)
         SET8(boxMon->stats.sheen);
         break;
     case MON_DATA_POKERUS:
-        SET8(boxMon->catch_info.pokerus);
+        SET8(boxMon->catch_ribbon.pokerus);
         break;
     case MON_DATA_MET_LOCATION:
-        SET8(boxMon->catch_info.metLocation);
+        SET8(boxMon->catch_ribbon.metLocation);
         break;
     case MON_DATA_MET_LEVEL:
     {
         u8 metLevel = *data;
-        boxMon->catch_info.metLevel = metLevel;
+        boxMon->catch_ribbon.metLevel = metLevel;
         break;
     }
     case MON_DATA_MET_GAME:
-        SET8(boxMon->catch_info.metGame);
+        SET8(boxMon->catch_ribbon.metGame);
         break;
     case MON_DATA_POKEBALL:
     {
         u8 pokeball = *data;
-        boxMon->info.pokeball = pokeball;
+        boxMon->catch_ribbon.pokeball = pokeball;
         break;
     }
     case MON_DATA_OT_GENDER:
-        SET8(boxMon->catch_info.otGender);
+        SET8(boxMon->catch_ribbon.otGender);
         break;
     case MON_DATA_HP_IV:
-        SET8(boxMon->catch_info.hpIV);
+        SET8(boxMon->catch_ribbon.hpIV);
         break;
     case MON_DATA_ATK_IV:
-        SET8(boxMon->catch_info.attackIV);
+        SET8(boxMon->catch_ribbon.attackIV);
         break;
     case MON_DATA_DEF_IV:
-        SET8(boxMon->catch_info.defenseIV);
+        SET8(boxMon->catch_ribbon.defenseIV);
         break;
     case MON_DATA_SPEED_IV:
-        SET8(boxMon->catch_info.speedIV);
+        SET8(boxMon->catch_ribbon.speedIV);
         break;
     case MON_DATA_SPATK_IV:
-        SET8(boxMon->catch_info.spAttackIV);
+        SET8(boxMon->catch_ribbon.spAttackIV);
         break;
     case MON_DATA_SPDEF_IV:
-        SET8(boxMon->catch_info.spDefenseIV);
+        SET8(boxMon->catch_ribbon.spDefenseIV);
         break;
     case MON_DATA_IS_EGG:
-        SET8(boxMon->catch_info.isEgg);
-        if (boxMon->catch_info.isEgg)
+        SET8(boxMon->catch_ribbon.isEgg);
+        if (boxMon->catch_ribbon.isEgg)
             boxMon->isEgg = TRUE;
         else
             boxMon->isEgg = FALSE;
         break;
     case MON_DATA_ABILITY_NUM:
-        SET8(boxMon->ribbon.abilityNum);
+        SET8(boxMon->catch_ribbon.abilityNum);
         break;
     case MON_DATA_COOL_RIBBON:
-        SET8(boxMon->ribbon.coolRibbon);
+        SET8(boxMon->catch_ribbon.coolRibbon);
         break;
     case MON_DATA_BEAUTY_RIBBON:
-        SET8(boxMon->ribbon.beautyRibbon);
+        SET8(boxMon->catch_ribbon.beautyRibbon);
         break;
     case MON_DATA_CUTE_RIBBON:
-        SET8(boxMon->ribbon.cuteRibbon);
+        SET8(boxMon->catch_ribbon.cuteRibbon);
         break;
     case MON_DATA_SMART_RIBBON:
-        SET8(boxMon->ribbon.smartRibbon);
+        SET8(boxMon->catch_ribbon.smartRibbon);
         break;
     case MON_DATA_TOUGH_RIBBON:
-        SET8(boxMon->ribbon.toughRibbon);
+        SET8(boxMon->catch_ribbon.toughRibbon);
         break;
     case MON_DATA_CHAMPION_RIBBON:
-        SET8(boxMon->ribbon.championRibbon);
+        SET8(boxMon->catch_ribbon.championRibbon);
         break;
     case MON_DATA_WINNING_RIBBON:
-        SET8(boxMon->ribbon.winningRibbon);
+        SET8(boxMon->catch_ribbon.winningRibbon);
         break;
     case MON_DATA_VICTORY_RIBBON:
-        SET8(boxMon->ribbon.victoryRibbon);
+        SET8(boxMon->catch_ribbon.victoryRibbon);
         break;
     case MON_DATA_ARTIST_RIBBON:
-        SET8(boxMon->ribbon.artistRibbon);
+        SET8(boxMon->catch_ribbon.artistRibbon);
         break;
     case MON_DATA_EFFORT_RIBBON:
-        SET8(boxMon->ribbon.effortRibbon);
+        SET8(boxMon->catch_ribbon.effortRibbon);
         break;
     case MON_DATA_MARINE_RIBBON:
-        SET8(boxMon->ribbon.marineRibbon);
+        SET8(boxMon->catch_ribbon.marineRibbon);
         break;
     case MON_DATA_LAND_RIBBON:
-        SET8(boxMon->ribbon.landRibbon);
+        SET8(boxMon->catch_ribbon.landRibbon);
         break;
     case MON_DATA_SKY_RIBBON:
-        SET8(boxMon->ribbon.skyRibbon);
+        SET8(boxMon->catch_ribbon.skyRibbon);
         break;
     case MON_DATA_COUNTRY_RIBBON:
-        SET8(boxMon->ribbon.countryRibbon);
+        SET8(boxMon->catch_ribbon.countryRibbon);
         break;
     case MON_DATA_NATIONAL_RIBBON:
-        SET8(boxMon->ribbon.nationalRibbon);
+        SET8(boxMon->catch_ribbon.nationalRibbon);
         break;
     case MON_DATA_EARTH_RIBBON:
-        SET8(boxMon->ribbon.earthRibbon);
+        SET8(boxMon->catch_ribbon.earthRibbon);
         break;
     case MON_DATA_WORLD_RIBBON:
-        SET8(boxMon->ribbon.worldRibbon);
+        SET8(boxMon->catch_ribbon.worldRibbon);
         break;
     case MON_DATA_EVENT_LEGAL:
-        SET8(boxMon->ribbon.eventLegal);
+        SET8(boxMon->catch_ribbon.eventLegal);
         break;
     case MON_DATA_IVS:
     {
         u32 ivs = data[0] | (data[1] << 8) | (data[2] << 16) | (data[3] << 24);
-        boxMon->catch_info.hpIV = ivs & MAX_IV_MASK;
-        boxMon->catch_info.attackIV = (ivs >> 5) & MAX_IV_MASK;
-        boxMon->catch_info.defenseIV = (ivs >> 10) & MAX_IV_MASK;
-        boxMon->catch_info.speedIV = (ivs >> 15) & MAX_IV_MASK;
-        boxMon->catch_info.spAttackIV = (ivs >> 20) & MAX_IV_MASK;
-        boxMon->catch_info.spDefenseIV = (ivs >> 25) & MAX_IV_MASK;
+        boxMon->catch_ribbon.hpIV = ivs & MAX_IV_MASK;
+        boxMon->catch_ribbon.attackIV = (ivs >> 5) & MAX_IV_MASK;
+        boxMon->catch_ribbon.defenseIV = (ivs >> 10) & MAX_IV_MASK;
+        boxMon->catch_ribbon.speedIV = (ivs >> 15) & MAX_IV_MASK;
+        boxMon->catch_ribbon.spAttackIV = (ivs >> 20) & MAX_IV_MASK;
+        boxMon->catch_ribbon.spDefenseIV = (ivs >> 25) & MAX_IV_MASK;
         break;
     }
     default:

@@ -948,11 +948,6 @@ static void PlayerNotOnBikeCollide(u8 direction)
     PlayerSetAnimId(GetWalkInPlaceSlowMovementAction(direction), COPY_MOVE_WALK);
 }
 
-static void PlayerNotOnBikeCollideWithFarawayIslandMew(u8 direction)
-{
-    PlayerSetAnimId(GetWalkInPlaceSlowMovementAction(direction), COPY_MOVE_WALK);
-}
-
 void PlayerFaceDirection(u8 direction)
 {
     PlayerSetAnimId(GetFaceDirectionMovementAction(direction), COPY_MOVE_FACE);

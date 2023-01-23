@@ -13,8 +13,6 @@
 #include "constants/hold_effects.h"
 
 // this file's functions
-static bool8 CheckPyramidBagHasItem(u16 itemId, u16 count);
-static bool8 CheckPyramidBagHasSpace(u16 itemId, u16 count);
 static bool8 AddBagItemInternal(u16 itemId, u16 count);
 
 // EWRAM variables

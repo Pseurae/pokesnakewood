@@ -227,7 +227,6 @@ static void Task_HandleInputCantForgetHMsMoves(u8);
 static void DrawPagination(void);
 static void HandlePowerAccTilemap(u16, s16);
 static void Task_ShowPowerAccWindow(u8);
-static void Task_ShowAppealJamWindow(u8);
 static void HandleStatusTilemap(u16, s16);
 static void Task_ShowStatusWindow(u8);
 static void TilemapFiveMovesDisplay(u16 *, u16, bool8);
@@ -257,7 +256,6 @@ static void BufferNatureString(void);
 static void GetMetLevelString(u8 *);
 static bool8 DoesMonOTMatchOwner(void);
 static bool8 DidMonComeFromGBAGames(void);
-static bool8 IsInGamePartnerMon(void);
 static void PrintEggOTName(void);
 static void PrintEggOTID(void);
 static void PrintEggState(void);
@@ -1783,34 +1781,6 @@ static s8 AdvanceMonIndex(s8 delta)
     }
 }
 
-static s8 AdvanceMultiBattleMonIndex(s8 delta)
-{
-    struct Pokemon *mons = sMonSummaryScreen->monList.mons;
-    s8 index, arrId = 0;
-    u8 i;
-
-    for (i = 0; i < PARTY_SIZE; i++)
-    {
-        if (sMultiBattleOrder[i] == sMonSummaryScreen->curMonIndex)
-        {
-            arrId = i;
-            break;
-        }
-    }
-
-    while (TRUE)
-    {
-        const s8 *order = sMultiBattleOrder;
-
-        arrId += delta;
-        if (arrId < 0 || arrId >= PARTY_SIZE)
-            return -1;
-        index = order[arrId];
-        if (IsValidToViewInMulti(&mons[index]) == TRUE)
-            return index;
-    }
-}
-
 static bool8 IsValidToViewInMulti(struct Pokemon *mon)
 {
     if (GetMonData(mon, MON_DATA_SPECIES) == SPECIES_NONE)
@@ -3174,16 +3144,6 @@ bool8 DidMonComeFromRSE(void)
     return FALSE;
 }
 
-static bool8 IsInGamePartnerMon(void)
-{
-    if ((gBattleTypeFlags & BATTLE_TYPE_INGAME_PARTNER) && gMain.inBattle)
-    {
-        if (sMonSummaryScreen->curMonIndex == 1 || sMonSummaryScreen->curMonIndex == 4 || sMonSummaryScreen->curMonIndex == 5)
-            return TRUE;
-    }
-    return FALSE;
-}
-
 static void PrintEggOTName(void)
 {
     u32 windowId = AddWindowFromTemplateList(sPageInfoTemplate, PSS_DATA_WINDOW_INFO_ORIGINAL_TRAINER);
@@ -3942,15 +3902,6 @@ static void SummaryScreen_DestroyAnimDelayTask(void)
         DestroyTask(sAnimDelayTaskId);
         sAnimDelayTaskId = TASK_NONE;
     }
-}
-
-// unused
-static bool32 IsMonAnimationFinished(void)
-{
-    if (gSprites[sMonSummaryScreen->spriteIds[SPRITE_ARR_ID_MON]].callback == SpriteCallbackDummy)
-        return FALSE;
-    else
-        return TRUE;
 }
 
 static void StopPokemonAnimations(void)  // A subtle effect, this function stops pokemon animations when leaving the PSS

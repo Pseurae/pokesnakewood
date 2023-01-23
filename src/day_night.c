@@ -172,14 +172,20 @@ void UpdateDayNightPalettes(void)
         ApplyDayNightPalette(BG_PLTT_SIZE >> 1, OBJ_PLTT_SIZE >> 1);
         gDayNight.tintState++;
         break;
+    case DN_TINT_STATE_SET:
+        if (gWeatherPtr->palProcessingState == WEATHER_PAL_STATE_IDLE && !gPaletteFade.active)
+            CpuFastCopy(gPlttBufferUnfaded, gPlttBufferFaded, PLTT_SIZE);
+        gDayNight.tintState++;
+        break;
     case DN_TINT_STATE_RESET:
         ApplyNormalPalette();
         gDayNight.tintState = DN_TINT_STATE_BG;
         gDayNight.hasTinted = FALSE;
         break;
     default:
-        if (gWeatherPtr->palProcessingState == WEATHER_PAL_STATE_IDLE && !gPaletteFade.active)
-            CpuFastCopy(gPlttBufferUnfaded, gPlttBufferFaded, PLTT_SIZE);
+        gDayNight.tintState++;
+        break;
+    case 60:
         gDayNight.tintState = DN_TINT_STATE_BG;
         break;
     }

@@ -107,7 +107,6 @@ struct BoxPokemonInfo
     u32 experience;
     u8 ppBonuses;
     u8 friendship;
-    u8 pokeball:5;
 };
 
 struct BoxPokemonMoves
@@ -132,44 +131,43 @@ struct BoxPokemonStats
     u8 sheen;
 };
 
-struct BoxPokemonCatchInfo
+struct BoxPokemonCatchRibbonInfo
 {
     u8 pokerus;
     u8 metLocation;
-    u8 metLevel:7;
-    u8 metGame:4;
-    u8 otGender:1;
-    u8 hpIV:5;
-    u8 attackIV:5;
-    u8 defenseIV:5;
-    u8 speedIV:5;
-    u8 spAttackIV:5;
-    u8 spDefenseIV:5;
-    u8 isEgg:1;
-};
+    u16 pokeball:5;
+    u16 metLevel:7;
+    u16 metGame:4;
+    u16 otGender:1;
 
-struct BoxPokemonRibbon
-{
-    u8 coolRibbon:3;
-    u8 beautyRibbon:3;
-    u8 cuteRibbon:3;
-    u8 smartRibbon:3;
-    u8 toughRibbon:3;
-    u8 championRibbon:1;
-    u8 winningRibbon:1;
-    u8 victoryRibbon:1;
-    u8 artistRibbon:1;
-    u8 effortRibbon:1;
-    u8 marineRibbon:1;
-    u8 landRibbon:1;
-    u8 skyRibbon:1;
-    u8 countryRibbon:1;
-    u8 nationalRibbon:1;
-    u8 earthRibbon:1;
-    u8 worldRibbon:1;
-    u8 abilityNum:2;
-    u8 eventLegal:1;
-};
+    u32 hpIV:5;
+    u32 attackIV:5;
+    u32 defenseIV:5;
+    u32 speedIV:5;
+    u32 spAttackIV:5;
+    u32 spDefenseIV:5;
+    u32 isEgg:1;
+    u32 abilityNum:2;
+
+    u32 coolRibbon:3;
+    u32 beautyRibbon:3;
+    u32 cuteRibbon:3;
+    u32 smartRibbon:3;
+    u32 toughRibbon:3;
+    u32 championRibbon:1;
+    u32 winningRibbon:1;
+    u32 victoryRibbon:1;
+    u32 artistRibbon:1;
+    u32 effortRibbon:1;
+    u32 marineRibbon:1;
+    u32 landRibbon:1;
+    u32 skyRibbon:1;
+    u32 countryRibbon:1;
+    u32 nationalRibbon:1;
+    u32 earthRibbon:1;
+    u32 worldRibbon:1;
+    u32 eventLegal:1;
+} __attribute__((packed));
 
 struct BoxPokemon
 {
@@ -187,8 +185,7 @@ struct BoxPokemon
     struct BoxPokemonInfo info;
     struct BoxPokemonMoves moves;
     struct BoxPokemonStats stats;
-    struct BoxPokemonCatchInfo catch_info;
-    struct BoxPokemonRibbon ribbon;
+    struct BoxPokemonCatchRibbonInfo catch_ribbon;
 };
 
 struct Pokemon

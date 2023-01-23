@@ -9897,31 +9897,6 @@ static void UnkUtil_Run(void)
     }
 }
 
-// Functionally unused
-static void UnkUtil_CpuRun(struct UnkUtilData *data)
-{
-    u16 i;
-
-    for (i = 0; i < data->height; i++)
-    {
-        CpuCopy16(data->src, data->dest, data->size);
-        data->dest += 64;
-        data->src += data->unk * 2;
-    }
-}
-
-// Functionally unused
-static void UnkUtil_DmaRun(struct UnkUtilData *data)
-{
-    u16 i;
-
-    for (i = 0; i < data->height; i++)
-    {
-        Dma3FillLarge16_(0, data->dest, data->size);
-        data->dest += 64;
-    }
-}
-
 void UpdateSpeciesSpritePSS(struct BoxPokemon *boxMon)
 {
     u16 species = GetBoxMonData(boxMon, MON_DATA_SPECIES);
