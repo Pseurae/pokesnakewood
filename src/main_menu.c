@@ -12,12 +12,10 @@
 #include "graphics.h"
 #include "international_string_util.h"
 #include "intro_speech.h"
-#include "link.h"
 #include "main.h"
 #include "main_menu.h"
 #include "menu.h"
 #include "list_menu.h"
-#include "mystery_event_menu.h"
 #include "naming_screen.h"
 #include "option_menu.h"
 #include "overworld.h"
@@ -39,7 +37,6 @@
 #include "text_window.h"
 #include "title_screen.h"
 #include "window.h"
-#include "mystery_gift_menu.h"
 #include "constants/event_objects.h"
 
 /*
@@ -134,22 +131,11 @@ static void HighlightSelectedMainMenuItem(u8, u8, s16);
 static void Task_HandleMainMenuInput(u8);
 static void Task_HandleMainMenuAPressed(u8);
 static void Task_HandleMainMenuBPressed(u8);
-static void Task_NewGameGenderSelection(u8);
-static void Task_GenderSelectionMessage(u8);
-static void Task_GenderSelectionStartSpriteFadeIn(u8);
-static void Task_GenderSelection_WaitForPlayerFadeIn(u8);
 static void Task_DisplayMainMenuInvalidActionError(u8);
-static void AddBirchSpeechObjects(u8);
-static void StartFadeInTarget1OutTarget2(u8, u8);
-static void StartFadePlatformOut(u8, u8);
-static void StartFadeOutTarget1InTarget2(u8, u8);
-static void StartFadePlatformIn(u8, u8);
 static void LoadMainMenuWindowFrameTiles(u8, u16);
 static void DrawMainMenuWindowBorder(const struct WindowTemplate *, u16);
 static void Task_HighlightSelectedMainMenuItem(u8);
 void CreateYesNoMenuParameterized(u8, u8, u16, u16, u8, u8);
-static void SpriteCB_MovePlayerDownWhileShrinking(struct Sprite *);
-static void SpriteCB_Null();
 static void MainMenu_FormatSavegamePlayer(u8);
 static void MainMenu_FormatSavegamePokedex(u8);
 static void MainMenu_FormatSavegameTime(u8);
@@ -464,8 +450,6 @@ static void Task_MainMenuCheckSaveFile(u8 taskId)
         SetGpuReg(REG_OFFSET_BLDALPHA, 0);
         SetGpuReg(REG_OFFSET_BLDY, 7);
 
-        if (IsWirelessAdapterConnected())
-            tWirelessAdapterConnected = TRUE;
         switch (gSaveFileStatus)
         {
             case SAVE_STATUS_OK:
@@ -665,7 +649,6 @@ static bool8 HandleMainMenuInput(u8 taskId)
     if (JOY_NEW(A_BUTTON))
     {
         PlaySE(SE_SELECT);
-        IsWirelessAdapterConnected();   // why bother calling this here? debug? Task_HandleMainMenuAPressed will check too
         BeginNormalPaletteFade(PALETTES_ALL, 0, 0, 0x10, RGB_BLACK);
         gTasks[taskId].func = Task_HandleMainMenuAPressed;
     }
@@ -700,7 +683,6 @@ static void Task_HandleMainMenuInput(u8 taskId)
 
 static void Task_HandleMainMenuAPressed(u8 taskId)
 {
-    bool8 wirelessAdapterConnected;
     u8 action;
 
     if (!gPaletteFade.active)
@@ -713,7 +695,6 @@ static void Task_HandleMainMenuAPressed(u8 taskId)
         ClearStdWindowAndFrame(5, TRUE);
         ClearStdWindowAndFrame(6, TRUE);
         ClearStdWindowAndFrame(7, TRUE);
-        wirelessAdapterConnected = IsWirelessAdapterConnected();
         switch (gTasks[taskId].tMenuType)
         {
             case HAS_NO_SAVED_GAME:
@@ -768,18 +749,18 @@ static void Task_HandleMainMenuAPressed(u8 taskId)
                 SetMainCallback2(CB2_InitOptionMenu);
                 DestroyTask(taskId);
                 break;
-            case ACTION_MYSTERY_GIFT:
-                SetMainCallback2(CB2_InitMysteryGift);
-                DestroyTask(taskId);
-                break;
-            case ACTION_MYSTERY_EVENTS:
-                SetMainCallback2(CB2_InitMysteryEventMenu);
-                DestroyTask(taskId);
-                break;
-            case ACTION_EREADER:
-                SetMainCallback2(CB2_InitEReader);
-                DestroyTask(taskId);
-                break;
+            // case ACTION_MYSTERY_GIFT:
+            //     SetMainCallback2(CB2_InitMysteryGift);
+            //     DestroyTask(taskId);
+            //     break;
+            // case ACTION_MYSTERY_EVENTS:
+            //     SetMainCallback2(CB2_InitMysteryEventMenu);
+            //     DestroyTask(taskId);
+            //     break;
+            // case ACTION_EREADER:
+            //     SetMainCallback2(CB2_InitEReader);
+            //     DestroyTask(taskId);
+            //     break;
             case ACTION_INVALID:
                 gTasks[taskId].tCurrItem = 0;
                 gTasks[taskId].func = Task_DisplayMainMenuInvalidActionError;

@@ -242,26 +242,6 @@ static bool8 find_path(struct ObjectEvent *objEvent, u16 endx, u16 endy)
     return FALSE;
 }
 
-static bool8 DoesObjectCollideWithObjectAtZ(struct ObjectEvent *objectEvent, s16 x, s16 y)
-{
-    u8 i;
-    struct ObjectEvent *curObject;
-
-    for (i = 0; i < OBJECT_EVENTS_COUNT; i++)
-    {
-        curObject = &gObjectEvents[i];
-        if (curObject->active && curObject != objectEvent)
-        {
-            if ((curObject->currentCoords.x == x && curObject->currentCoords.y == y) || 
-                (curObject->previousCoords.x == x && curObject->previousCoords.y == y))
-            {
-                return TRUE;
-            }
-        }
-    }
-    return FALSE;
-}
-
 static u8 CheckCollisionAtCoords(struct ObjectEvent *objectEvent, s16 x, s16 y, u32 dir, u8 currentElevation)
 {
     u8 direction = dir;

@@ -41,11 +41,6 @@ Route117_EventScript_DaycareReceiveEgg::
 	release
 	end
 
-Route117_EventScript_CheckMonReceivedMail::
-	specialvar VAR_RESULT, CheckDaycareMonReceivedMail
-	call_if_eq VAR_RESULT, 1, Route117_EventScript_MonReceivedMail
-	return
-
 Route117_EventScript_MonReceivedMail::
 	msgbox Route117_Text_FriendlyWithOtherTrainersMon, MSGBOX_DEFAULT
 	return
@@ -53,8 +48,6 @@ Route117_EventScript_MonReceivedMail::
 Route117_EventScript_CheckOnOneMon::
 	special GetDaycareMonNicknames
 	msgbox Route117_Text_YourMonIsDoingFine, MSGBOX_DEFAULT
-	setvar VAR_0x8004, 0
-	call Route117_EventScript_CheckMonReceivedMail
 	release
 	end
 
@@ -65,10 +58,6 @@ Route117_EventScript_CheckOnTwoMons::
 	special ShowFieldMessageStringVar4
 	waitmessage
 	waitbuttonpress
-	setvar VAR_0x8004, 0
-	call Route117_EventScript_CheckMonReceivedMail
-	setvar VAR_0x8004, 1
-	call Route117_EventScript_CheckMonReceivedMail
 	release
 	end
 

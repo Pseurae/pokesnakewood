@@ -1,6 +1,5 @@
 
 #include "global.h"
-#include "contest.h"
 
 #define CONTEST_OPPONENT_JIMMY 0
 #define CONTEST_OPPONENT_EDITH 1

@@ -22,7 +22,6 @@
 #include "strings.h"
 #include "string_util.h"
 #include "sound.h"
-#include "link.h"
 #include "money.h"
 #include "shop.h"
 #include "menu.h"
@@ -1040,7 +1039,7 @@ static void CreateNormalContextMenu(u8 taskId)
         sContextMenuOptions = sOptions_UseToss_Exit;
         sContextMenuNumOptions = 3;
     }
-    else if (MenuHelpers_IsLinkActive() == TRUE || InUnionRoom() == TRUE)
+    else if (MenuHelpers_IsLinkActive() == TRUE)
     {
         if (!IsHoldingItemAllowed(gSpecialVar_ItemId))
         {
@@ -1478,11 +1477,6 @@ static u8 GetOrCreateVariableWindow(u8 winIdx)
         retval = sVariableWindowIds[winIdx];
     }
     return retval;
-}
-
-static void VariableWindowSetAltFrameTileAndPalette(u8 winIdx)
-{
-    DrawStdFrameWithCustomTileAndPalette(sVariableWindowIds[winIdx], FALSE, 0x001, 0xE);
 }
 
 static void DestroyVariableWindow(u8 winIdx)

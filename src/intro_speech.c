@@ -165,11 +165,11 @@ static void Task_StartGenderSelection(u8);
 static void Task_GenderSelection(u8);
 static void Task_GenderSelection_HandleInput(u8);
 static void Task_GenderSelection_WaitForYesNo(u8);
-static void Task_GenderSelection_YesNo_FadeOutSprite(u8);
+// static void Task_GenderSelection_YesNo_FadeOutSprite(u8);
 static void Task_GenderSelection_YesNo(u8);
 static void Task_GenderSelection_ProcessNameYesNoMenu(u8);
 static void Task_GenderSelection_StartReturnToSelection(u8 taskId);
-static void Task_GenderSelection_YesNo_FadeInSprite(u8);
+// static void Task_GenderSelection_YesNo_FadeInSprite(u8);
 static void Task_GenderSelection_ReturnToSelection(u8);
 static void Task_GenderSelection_Cleanup(u8);
 

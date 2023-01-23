@@ -2619,7 +2619,7 @@ const struct Item gItems[] =
         .description = sOrangeMailDesc,
         .pocket = POCKET_ITEMS,
         .type = ITEM_USE_MAIL,
-        .fieldUseFunc = ItemUseOutOfBattle_Mail,
+        .fieldUseFunc = ItemUseOutOfBattle_CannotUse,
         .secondaryId = ITEM_TO_MAIL(ITEM_ORANGE_MAIL),
     },
 
@@ -2631,7 +2631,7 @@ const struct Item gItems[] =
         .description = sHarborMailDesc,
         .pocket = POCKET_ITEMS,
         .type = ITEM_USE_MAIL,
-        .fieldUseFunc = ItemUseOutOfBattle_Mail,
+        .fieldUseFunc = ItemUseOutOfBattle_CannotUse,
         .secondaryId = ITEM_TO_MAIL(ITEM_HARBOR_MAIL),
     },
 
@@ -2643,7 +2643,7 @@ const struct Item gItems[] =
         .description = sGlitterMailDesc,
         .pocket = POCKET_ITEMS,
         .type = ITEM_USE_MAIL,
-        .fieldUseFunc = ItemUseOutOfBattle_Mail,
+        .fieldUseFunc = ItemUseOutOfBattle_CannotUse,
         .secondaryId = ITEM_TO_MAIL(ITEM_GLITTER_MAIL),
     },
 
@@ -2655,7 +2655,7 @@ const struct Item gItems[] =
         .description = sMechMailDesc,
         .pocket = POCKET_ITEMS,
         .type = ITEM_USE_MAIL,
-        .fieldUseFunc = ItemUseOutOfBattle_Mail,
+        .fieldUseFunc = ItemUseOutOfBattle_CannotUse,
         .secondaryId = ITEM_TO_MAIL(ITEM_MECH_MAIL),
     },
 
@@ -2667,7 +2667,7 @@ const struct Item gItems[] =
         .description = sWoodMailDesc,
         .pocket = POCKET_ITEMS,
         .type = ITEM_USE_MAIL,
-        .fieldUseFunc = ItemUseOutOfBattle_Mail,
+        .fieldUseFunc = ItemUseOutOfBattle_CannotUse,
         .secondaryId = ITEM_TO_MAIL(ITEM_WOOD_MAIL),
     },
 
@@ -2679,7 +2679,7 @@ const struct Item gItems[] =
         .description = sWaveMailDesc,
         .pocket = POCKET_ITEMS,
         .type = ITEM_USE_MAIL,
-        .fieldUseFunc = ItemUseOutOfBattle_Mail,
+        .fieldUseFunc = ItemUseOutOfBattle_CannotUse,
         .secondaryId = ITEM_TO_MAIL(ITEM_WAVE_MAIL),
     },
 
@@ -2691,7 +2691,7 @@ const struct Item gItems[] =
         .description = sBeadMailDesc,
         .pocket = POCKET_ITEMS,
         .type = ITEM_USE_MAIL,
-        .fieldUseFunc = ItemUseOutOfBattle_Mail,
+        .fieldUseFunc = ItemUseOutOfBattle_CannotUse,
         .secondaryId = ITEM_TO_MAIL(ITEM_BEAD_MAIL),
     },
 
@@ -2703,7 +2703,7 @@ const struct Item gItems[] =
         .description = sShadowMailDesc,
         .pocket = POCKET_ITEMS,
         .type = ITEM_USE_MAIL,
-        .fieldUseFunc = ItemUseOutOfBattle_Mail,
+        .fieldUseFunc = ItemUseOutOfBattle_CannotUse,
         .secondaryId = ITEM_TO_MAIL(ITEM_SHADOW_MAIL),
     },
 
@@ -2715,7 +2715,7 @@ const struct Item gItems[] =
         .description = sTropicMailDesc,
         .pocket = POCKET_ITEMS,
         .type = ITEM_USE_MAIL,
-        .fieldUseFunc = ItemUseOutOfBattle_Mail,
+        .fieldUseFunc = ItemUseOutOfBattle_CannotUse,
         .secondaryId = ITEM_TO_MAIL(ITEM_TROPIC_MAIL),
     },
 
@@ -2727,7 +2727,7 @@ const struct Item gItems[] =
         .description = sDreamMailDesc,
         .pocket = POCKET_ITEMS,
         .type = ITEM_USE_MAIL,
-        .fieldUseFunc = ItemUseOutOfBattle_Mail,
+        .fieldUseFunc = ItemUseOutOfBattle_CannotUse,
         .secondaryId = ITEM_TO_MAIL(ITEM_DREAM_MAIL),
     },
 
@@ -2739,7 +2739,7 @@ const struct Item gItems[] =
         .description = sFabMailDesc,
         .pocket = POCKET_ITEMS,
         .type = ITEM_USE_MAIL,
-        .fieldUseFunc = ItemUseOutOfBattle_Mail,
+        .fieldUseFunc = ItemUseOutOfBattle_CannotUse,
         .secondaryId = ITEM_TO_MAIL(ITEM_FAB_MAIL),
     },
 
@@ -2751,7 +2751,7 @@ const struct Item gItems[] =
         .description = sRetroMailDesc,
         .pocket = POCKET_ITEMS,
         .type = ITEM_USE_MAIL,
-        .fieldUseFunc = ItemUseOutOfBattle_Mail,
+        .fieldUseFunc = ItemUseOutOfBattle_CannotUse,
         .secondaryId = ITEM_TO_MAIL(ITEM_RETRO_MAIL),
     },
 
@@ -9381,7 +9381,7 @@ const struct Item gItems[] =
         .registrability = TRUE,
         .pocket = POCKET_KEY_ITEMS,
         .type = ITEM_USE_BAG_MENU,
-        .fieldUseFunc = ItemUseOutOfBattle_PowderJar,
+        .fieldUseFunc = ItemUseOutOfBattle_CannotUse,
     },
 
     [ITEM_WAILMER_PAIL] =

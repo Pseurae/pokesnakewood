@@ -21,7 +21,6 @@
 #include "item.h"
 #include "item_menu.h"
 #include "menu_helpers.h"
-#include "link.h"
 #include "money.h"
 #include "shop.h"
 #include "pokemon_storage_system.h"
@@ -94,8 +93,6 @@ static void Task_QuantitySelect_HandleInput(u8 taskId);
 static void Task_PrintSaleConfirmedText(u8 taskId);
 static void Task_DoSaleOfTMs(u8 taskId);
 static void Task_AfterSale_ReturnToList(u8 taskId);
-static void Task_TMCaseDude1(u8 taskId);
-static void Task_TMCaseDude_Playback(u8 taskId);
 static void InitTMCaseWindows(void);
 static void AddTextPrinterParameterized_ColorByIndex(u8 windowId, u8 fontId, const u8 * str, u8 x, u8 y, u8 letterSpacing, u8 lineSpacing, u8 speed, u8 colorIdx);
 static void TMCase_SetWindowBorder1(u8 windowId);
@@ -157,24 +154,20 @@ static void (*const sSelectTMActionTasks[])(u8 taskId) = {
 enum
 {
     ACTION_USE,
-    // ACTION_GIVE,
     ACTION_EXIT
 };
 
 static const struct MenuAction sMenuActions_UseGiveExit[] = {
     [ACTION_USE] =  { gMenuText_Use,  TMHMContextMenuAction_Use  },
-    // [ACTION_GIVE] = { gMenuText_Give, TMHMContextMenuAction_Give },
     [ACTION_EXIT] = { gText_MenuExit, TMHMContextMenuAction_Exit },
 };
 
 static const u8 sMenuActionIndices_Field[] = {
     ACTION_USE, 
-    // ACTION_GIVE, 
     ACTION_EXIT
 };
 
 static const u8 sMenuActionIndices_UnionRoom[] = {
-    // ACTION_GIVE, 
     ACTION_EXIT
 };
 
@@ -903,7 +896,7 @@ static void Task_ContextMenu_FromFieldBag(u8 taskId)
     TMCase_SetWindowBorder2(2);
     AddTMContextMenu(&sTMCaseDynamicResources->contextMenuWindowId);
 
-    if (!MenuHelpers_IsLinkActive() && InUnionRoom() != TRUE)
+    if (!MenuHelpers_IsLinkActive() != TRUE)
     {
         sTMCaseDynamicResources->menuActionIndices = sMenuActionIndices_Field;
         sTMCaseDynamicResources->numMenuActions = NELEMS(sMenuActionIndices_Field);
@@ -968,36 +961,6 @@ static void TMHMContextMenuAction_Use(u8 taskId)
         gItemUseCB = ItemUseCB_TMHM;
         sTMCaseDynamicResources->savedCallback = CB2_ShowPartyMenuForItemUse;
         Task_TMCaseStartFadeOut(taskId);
-    }
-}
-
-static void TMHMContextMenuAction_Give(u8 taskId)
-{
-    s16 * data = gTasks[taskId].data;
-    u16 itemId = BagGetItemIdByPocketPosition(POCKET_TM_HM, data[1]);
-    RemoveTMContextMenu(&sTMCaseDynamicResources->contextMenuWindowId);
-    ClearStdWindowAndFrameToTransparent(WIN_MSG, FALSE);
-    ClearWindowTilemap(2);
-    PutWindowTilemap(1);
-    PutWindowTilemap(4);
-    PutWindowTilemap(5);
-    ScheduleBgCopyTilemapToVram(0);
-    ScheduleBgCopyTilemapToVram(1);
-    if (!ItemId_GetImportance(itemId))
-    {
-        if (CalculatePlayerPartyCount() == 0)
-        {
-            PrintError_ThereIsNoPokemon(taskId);
-        }
-        else
-        {
-            sTMCaseDynamicResources->savedCallback = CB2_ChooseMonToGiveItem;
-            Task_TMCaseStartFadeOut(taskId);
-        }
-    }
-    else
-    {
-        PrintError_ItemCantBeHeld(taskId);
     }
 }
 

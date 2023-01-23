@@ -1,7 +1,6 @@
 #include "global.h"
 #include "data.h"
 #include "pokemon_icon.h"
-#include "decoration.h"
 #include "battle_main.h"
 #include "item.h"
 #include "pokeball.h"
@@ -64,8 +63,8 @@ struct GFRomHeader
     u32 trainerIdOffset;
     u32 playerNameOffset;
     u32 playerGenderOffset;
-    u32 frontierStatusOffset;
-    u32 frontierStatusOffset2;
+    u32 unused1;
+    u32 unused2;
     u32 externalEventFlagsOffset;
     u32 externalEventDataOffset;
     u32 unk18;
@@ -86,7 +85,7 @@ struct GFRomHeader
     u8 bagCountBerries;
     u8 pcItemsCount;
     u32 pcItemsOffset;
-    u32 giftRibbonsOffset;
+    u32 unused3;
     u32 enigmaBerryOffset;
     u32 enigmaBerrySize;
     const u8 *moveDescriptions;
@@ -109,7 +108,7 @@ static const struct GFRomHeader sGFRomHeader = {
     .monIconPalettes = gMonIconPaletteTable,
     .monSpeciesNames = gSpeciesNames,
     .moveNames = gMoveNames,
-    .decorations = gDecorations,
+    .decorations = NULL,
     .flagsOffset = offsetof(struct SaveBlock1, flags),
     .varsOffset = offsetof(struct SaveBlock1, vars),
     .pokedexOffset = offsetof(struct SaveBlock2, pokedex),
@@ -145,10 +144,10 @@ static const struct GFRomHeader sGFRomHeader = {
     .trainerIdOffset = offsetof(struct SaveBlock2, playerTrainerId),
     .playerNameOffset = offsetof(struct SaveBlock2, playerName),
     .playerGenderOffset = offsetof(struct SaveBlock2, playerGender),
-    .frontierStatusOffset = offsetof(struct SaveBlock2, frontier.challengeStatus),
-    .frontierStatusOffset2 = offsetof(struct SaveBlock2, frontier.challengeStatus),
-    .externalEventFlagsOffset = offsetof(struct SaveBlock1, externalEventFlags),
-    .externalEventDataOffset = offsetof(struct SaveBlock1, externalEventData),
+    .unused1 = 0,
+    .unused2 = 0,
+    .externalEventFlagsOffset = 0,
+    .externalEventDataOffset = 0,
     .unk18 = 0x00000000,
     .speciesInfo = gSpeciesInfo,
     .abilityNames = gAbilityNames,
@@ -167,7 +166,7 @@ static const struct GFRomHeader sGFRomHeader = {
     .bagCountBerries = BAG_BERRIES_COUNT,
     .pcItemsCount = PC_ITEMS_COUNT,
     .pcItemsOffset = offsetof(struct SaveBlock1, pcItems),
-    .giftRibbonsOffset = offsetof(struct SaveBlock1, giftRibbons),
+    .unused3 = 0,
     .enigmaBerryOffset = offsetof(struct SaveBlock1, enigmaBerry),
     .enigmaBerrySize = sizeof(struct EnigmaBerry),
     .moveDescriptions = NULL,

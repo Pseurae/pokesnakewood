@@ -1,5 +1,4 @@
 #include "global.h"
-#include "battle_pyramid.h"
 #include "bg.h"
 #include "event_data.h"
 #include "gpu_regs.h"
@@ -12,7 +11,6 @@
 #include "string_util.h"
 #include "task.h"
 #include "text.h"
-#include "constants/battle_frontier.h"
 #include "constants/layouts.h"
 #include "constants/region_map_sections.h"
 #include "constants/weather.h"
@@ -177,35 +175,6 @@ static const u8 sRegionMapSectionId_To_PopUpThemeIdMapping[] =
     [MAPSEC_TRAINER_HILL - KANTO_MAPSEC_COUNT] = MAPPOPUP_THEME_MARBLE
 };
 
-static const u8 sText_PyramidFloor1[] = _("Pyramid Floor 1");
-static const u8 sText_PyramidFloor2[] = _("Pyramid Floor 2");
-static const u8 sText_PyramidFloor3[] = _("Pyramid Floor 3");
-static const u8 sText_PyramidFloor4[] = _("Pyramid Floor 4");
-static const u8 sText_PyramidFloor5[] = _("Pyramid Floor 5");
-static const u8 sText_PyramidFloor6[] = _("Pyramid Floor 6");
-static const u8 sText_PyramidFloor7[] = _("Pyramid Floor 7");
-static const u8 sText_Pyramid[] = _("Pyramid");
-
-static const u8 *const sBattlePyramid_MapHeaderStrings[FRONTIER_STAGES_PER_CHALLENGE + 1] =
-{
-    sText_PyramidFloor1,
-    sText_PyramidFloor2,
-    sText_PyramidFloor3,
-    sText_PyramidFloor4,
-    sText_PyramidFloor5,
-    sText_PyramidFloor6,
-    sText_PyramidFloor7,
-    sText_Pyramid,
-};
-
-// Unused
-static bool8 StartMenu_ShowMapNamePopup(void)
-{
-    HideStartMenu();
-    ShowMapNamePopup();
-    return TRUE;
-}
-
 void ShowMapNamePopup(void)
 {
     if (FlagGet(FLAG_HIDE_MAP_NAME_POPUP) != TRUE)
@@ -304,26 +273,8 @@ static void ShowMapNamePopUpWindow(void)
     u8 *withoutPrefixPtr;
     u8 x;
     const u8 *mapDisplayHeaderSource;
-
-    if (InBattlePyramid())
-    {
-        if (gMapHeader.mapLayoutId == LAYOUT_BATTLE_FRONTIER_BATTLE_PYRAMID_TOP)
-        {
-            withoutPrefixPtr = &(mapDisplayHeader[3]);
-            mapDisplayHeaderSource = sBattlePyramid_MapHeaderStrings[FRONTIER_STAGES_PER_CHALLENGE];
-        }
-        else
-        {
-            withoutPrefixPtr = &(mapDisplayHeader[3]);
-            mapDisplayHeaderSource = sBattlePyramid_MapHeaderStrings[gSaveBlock2Ptr->frontier.curChallengeBattleNum];
-        }
-        StringCopy(withoutPrefixPtr, mapDisplayHeaderSource);
-    }
-    else
-    {
-        withoutPrefixPtr = &(mapDisplayHeader[3]);
-        GetMapName(withoutPrefixPtr, gMapHeader.regionMapSectionId, 0);
-    }
+    withoutPrefixPtr = &(mapDisplayHeader[3]);
+    GetMapName(withoutPrefixPtr, gMapHeader.regionMapSectionId, 0);
     AddMapNamePopUpWindow();
     LoadMapNamePopUpWindowBg();
     x = GetStringCenterAlignXOffset(FONT_NARROW, withoutPrefixPtr, 80);

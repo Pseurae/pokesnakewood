@@ -199,12 +199,9 @@ enum
 extern struct UnusedControllerStruct gUnusedControllerStruct;
 
 // general functions
-void HandleLinkBattleSetup(void);
 void SetUpBattleVarsAndBirchZigzagoon(void);
 void InitBattleControllers(void);
 bool32 IsValidForBattle(struct Pokemon *mon);
-void TryReceiveLinkBattleData(void);
-void PrepareBufferDataTransferLink(u8 bufferId, u16 size, u8 *data);
 
 // emitters
 void BtlController_EmitGetMonData(u8 bufferId, u8 requestId, u8 monToCheck);
@@ -266,8 +263,7 @@ void InitMoveSelectionsVarsAndStrings(void);
 void MoveSelectionCreateCursorAt(u8 cursorPos, u8 arg1);
 void MoveSelectionDestroyCursorAt(u8 cursorPosition);
 
-// recorded player controller
-void SetControllerToRecordedPlayer(void);
+
 
 // opponent controller
 void SetControllerToOpponent(void);
@@ -275,19 +271,7 @@ void SetControllerToOpponent(void);
 // player partner controller
 void SetControllerToPlayerPartner(void);
 
-// safari controller
-void SetControllerToSafari(void);
-
 // wally controller
 void SetControllerToWally(void);
-
-// recorded opponent controller
-void SetControllerToRecordedOpponent(void);
-
-// link opponent
-void SetControllerToLinkOpponent(void);
-
-// link partner
-void SetControllerToLinkPartner(void);
 
 #endif // GUARD_BATTLE_CONTROLLERS_H

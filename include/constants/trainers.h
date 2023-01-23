@@ -2,7 +2,6 @@
 #define GUARD_TRAINERS_H
 
 #include "constants/opponents.h"
-#include "constants/battle_frontier_trainers.h"
 
 // Special Trainer Ids.
 //      0-299 are frontier trainers

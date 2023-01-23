@@ -33,7 +33,7 @@ void GetAIPartyIndexes(u32 battlerId, s32 *firstId, s32 *lastId)
     {
         *firstId = 0, *lastId = PARTY_SIZE;
     }
-    else if (gBattleTypeFlags & (BATTLE_TYPE_TWO_OPPONENTS | BATTLE_TYPE_INGAME_PARTNER | BATTLE_TYPE_TOWER_LINK_MULTI))
+    else if (gBattleTypeFlags & (BATTLE_TYPE_TWO_OPPONENTS | BATTLE_TYPE_INGAME_PARTNER))
     {
         if ((battlerId & BIT_FLANK) == B_FLANK_LEFT)
             *firstId = 0, *lastId = PARTY_SIZE / 2;
@@ -400,7 +400,6 @@ static bool8 ShouldSwitchIfGameStatePrompt(void)
 
 static bool8 ShouldSwitchIfAbilityBenefit(void)
 {
-    s32 monToSwitchId;
     s32 moduloChance = 4; //25% Chance Default
     s32 chanceReducer = 1; //No Reduce default. Increase to reduce
     u8 battlerId = GetBattlerPosition(gActiveBattler);
@@ -625,8 +624,6 @@ bool32 ShouldSwitch(void)
     if (gStatuses3[gActiveBattler] & STATUS3_ROOTED)
         return FALSE;
     if (IsAbilityPreventingEscape(gActiveBattler))
-        return FALSE;
-    if (gBattleTypeFlags & BATTLE_TYPE_ARENA)
         return FALSE;
 
     availableToSwitch = 0;
@@ -915,13 +912,11 @@ u8 GetMostSuitableMonToSwitchInto(void)
     s32 firstId = 0;
     s32 lastId = 0; // + 1
     struct Pokemon *party;
-    s32 i, j, aliveCount = 0;
+    s32 i, aliveCount = 0;
     u8 invalidMons = 0;
 
     if (*(gBattleStruct->monToSwitchIntoId + gActiveBattler) != PARTY_SIZE)
         return *(gBattleStruct->monToSwitchIntoId + gActiveBattler);
-    if (gBattleTypeFlags & BATTLE_TYPE_ARENA)
-        return gBattlerPartyIndexes[gActiveBattler] + 1;
 
     if (gBattleTypeFlags & BATTLE_TYPE_DOUBLE)
     {
@@ -999,8 +994,6 @@ static u8 GetAI_ItemType(u16 itemId, const u8 *itemEffect)
 
 static bool32 AiExpectsToFaintPlayer(void)
 {
-    bool32 canFaintPlayer;
-    u32 i;
     u8 target = gBattleStruct->aiChosenTarget[gActiveBattler];
 
     if (gBattleStruct->aiMoveOrAction[gActiveBattler] > 3)
@@ -1053,7 +1046,6 @@ static bool8 ShouldUseItem(void)
     {
         u16 item;
         const u8 *itemEffects;
-        u8 paramOffset;
         u8 battlerSide;
 
         if (i != 0 && validMons > (gBattleResources->battleHistory->itemsNo - i) + 1)

@@ -19,7 +19,6 @@
 #include "pokedex.h"
 #include "palette.h"
 #include "international_string_util.h"
-#include "safari_zone.h"
 #include "battle_anim.h"
 #include "data.h"
 #include "pokemon_summary_screen.h"
@@ -771,18 +770,11 @@ u8 GetMegaIndicatorSpriteId(u32 healthboxSpriteId)
     return gSprites[spriteId].hOther_IndicatorSpriteId;
 }
 
-static void InitLastUsedBallAssets(void)
-{
-    gBattleStruct->ballSpriteIds[0] = MAX_SPRITES;
-    gBattleStruct->ballSpriteIds[1] = MAX_SPRITES;
-}
-
 // This function is here to cover a specific case - one player's mon in a 2 vs 1 double battle. In this scenario - display singles layout.
 u32 WhichBattleCoords(u32 battlerId) // 0 - singles, 1 - doubles
 {
     if (GetBattlerPosition(battlerId) == B_POSITION_PLAYER_LEFT
-        && gPlayerPartyCount == 1
-        && !(gBattleTypeFlags & BATTLE_TYPE_MULTI))
+        && gPlayerPartyCount == 1)
         return 0;
     else
         return IsDoubleBattle();
@@ -1371,8 +1363,6 @@ void SwapHpBarsWithHpText(void)
             {
                 if (!WhichBattleCoords(i))
                     continue;
-                if (gBattleTypeFlags & BATTLE_TYPE_SAFARI)
-                    continue;
 
                 if (noBars == TRUE) // bars to text
                 {
@@ -1392,25 +1382,15 @@ void SwapHpBarsWithHpText(void)
             {
                 if (noBars == TRUE) // bars to text
                 {
-                    if (gBattleTypeFlags & BATTLE_TYPE_SAFARI)
-                    {
-                        // Most likely a debug function.
-                        PrintSafariMonInfo(gHealthboxSpriteIds[i], &gEnemyParty[gBattlerPartyIndexes[i]]);
-                    }
-                    else
-                    {
-                        healthBarSpriteId = gSprites[gHealthboxSpriteIds[i]].hMain_HealthBarSpriteId;
+                    healthBarSpriteId = gSprites[gHealthboxSpriteIds[i]].hMain_HealthBarSpriteId;
 
-                        CpuFill32(0, (void *)(OBJ_VRAM0 + gSprites[healthBarSpriteId].oam.tileNum * 32), 0x100);
-                        UpdateHpTextInHealthboxInDoubles(gHealthboxSpriteIds[i], HP_BOTH, currHp, maxHp);
-                    }
+                    CpuFill32(0, (void *)(OBJ_VRAM0 + gSprites[healthBarSpriteId].oam.tileNum * 32), 0x100);
+                    UpdateHpTextInHealthboxInDoubles(gHealthboxSpriteIds[i], HP_BOTH, currHp, maxHp);
                 }
                 else // text to bars
                 {
                     UpdateStatusIconInHealthbox(gHealthboxSpriteIds[i]);
                     UpdateHealthboxAttribute(gHealthboxSpriteIds[i], &gEnemyParty[gBattlerPartyIndexes[i]], HEALTHBOX_HEALTH_BAR);
-                    if (gBattleTypeFlags & BATTLE_TYPE_SAFARI)
-                        UpdateHealthboxAttribute(gHealthboxSpriteIds[i], &gEnemyParty[gBattlerPartyIndexes[i]], HEALTHBOX_NICK);
                 }
             }
             gSprites[gHealthboxSpriteIds[i]].hMain_Data7 ^= 1;
@@ -1733,62 +1713,33 @@ u8 CreatePartyStatusSummarySprites(u8 battlerId, struct HpAndStatus *partyInfo, 
 
     if (GetBattlerSide(battlerId) == B_SIDE_PLAYER)
     {
-        if (gBattleTypeFlags & BATTLE_TYPE_MULTI)
+
+        for (i = 0, var = PARTY_SIZE - 1, j = 0; j < PARTY_SIZE; j++)
         {
-            for (i = 0; i < PARTY_SIZE; i++)
+            if (partyInfo[j].hp == HP_EMPTY_SLOT)
             {
-                if (partyInfo[i].hp == HP_EMPTY_SLOT)
-                {
                     // empty slot or an egg
-                    gSprites[ballIconSpritesIds[i]].oam.tileNum += 1;
-                    gSprites[ballIconSpritesIds[i]].data[7] = 1;
-                }
-                else if (partyInfo[i].hp == 0)
-                {
-                    // fainted mon
-                    gSprites[ballIconSpritesIds[i]].oam.tileNum += 3;
-                }
-                else if (partyInfo[i].status != 0)
-                {
-                    // mon with major status
-                    gSprites[ballIconSpritesIds[i]].oam.tileNum += 2;
-                }
+                gSprites[ballIconSpritesIds[var]].oam.tileNum += 1;
+                gSprites[ballIconSpritesIds[var]].data[7] = 1;
+                var--;
+                continue;
             }
-        }
-        else
-        {
-            for (i = 0, var = PARTY_SIZE - 1, j = 0; j < PARTY_SIZE; j++)
+            else if (partyInfo[j].hp == 0)
             {
-                if (partyInfo[j].hp == HP_EMPTY_SLOT)
-                {
-                     // empty slot or an egg
-                    gSprites[ballIconSpritesIds[var]].oam.tileNum += 1;
-                    gSprites[ballIconSpritesIds[var]].data[7] = 1;
-                    var--;
-                    continue;
-                }
-                else if (partyInfo[j].hp == 0)
-                {
-                    // fainted mon
-                    gSprites[ballIconSpritesIds[i]].oam.tileNum += 3;
-                }
-                else if (gBattleTypeFlags & BATTLE_TYPE_ARENA && gBattleStruct->arenaLostPlayerMons & gBitTable[j])
-                {
-                    // fainted arena mon
-                    gSprites[ballIconSpritesIds[i]].oam.tileNum += 3;
-                }
-                else if (partyInfo[j].status != 0)
-                {
-                    // mon with primary status
-                    gSprites[ballIconSpritesIds[i]].oam.tileNum += 2;
-                }
-                i++;
+                // fainted mon
+                gSprites[ballIconSpritesIds[i]].oam.tileNum += 3;
             }
+            else if (partyInfo[j].status != 0)
+            {
+                // mon with primary status
+                gSprites[ballIconSpritesIds[i]].oam.tileNum += 2;
+            }
+            i++;
         }
     }
     else
     {
-        if (gBattleTypeFlags & (BATTLE_TYPE_MULTI | BATTLE_TYPE_TWO_OPPONENTS))
+        if (gBattleTypeFlags & BATTLE_TYPE_TWO_OPPONENTS)
         {
             for (var = PARTY_SIZE - 1, i = 0; i < PARTY_SIZE; i++)
             {
@@ -1826,11 +1777,6 @@ u8 CreatePartyStatusSummarySprites(u8 battlerId, struct HpAndStatus *partyInfo, 
                 else if (partyInfo[j].hp == 0)
                 {
                      // fainted mon
-                    gSprites[ballIconSpritesIds[PARTY_SIZE - 1 - var]].oam.tileNum += 3;
-                }
-                else if (gBattleTypeFlags & BATTLE_TYPE_ARENA && gBattleStruct->arenaLostOpponentMons & gBitTable[j])
-                {
-                     // fainted arena mon
                     gSprites[ballIconSpritesIds[PARTY_SIZE - 1 - var]].oam.tileNum += 3;
                 }
                 else if (partyInfo[j].status != 0)
@@ -2347,7 +2293,7 @@ static void UpdateLeftNoOfBallsTextOnHealthbox(u8 healthboxSpriteId)
     u8 *windowTileData;
 
     txtPtr = StringCopy(text, gText_SafariBallLeft);
-    ConvertIntToDecimalStringN(txtPtr, gNumSafariBalls, STR_CONV_MODE_LEFT_ALIGN, 2);
+    // ConvertIntToDecimalStringN(txtPtr, gNumSafariBalls, STR_CONV_MODE_LEFT_ALIGN, 2);
 
     windowTileData = AddTextPrinterAndCreateWindowOnHealthbox(text, GetStringRightAlignXOffset(FONT_SMALL, text, 0x2F), 3, 2, &windowId);
     spriteTileNum = gSprites[healthboxSpriteId].oam.tileNum * TILE_SIZE_4BPP;
@@ -3330,7 +3276,7 @@ bool32 CanThrowLastUsedBall(void)
 #else
     if (!CanThrowBall())
         return FALSE;
-    if (gBattleTypeFlags & (BATTLE_TYPE_TRAINER | BATTLE_TYPE_FRONTIER))
+    if (gBattleTypeFlags & BATTLE_TYPE_TRAINER)
         return FALSE;
     if (!CheckBagHasItem(gLastThrownBall, 1))
         return FALSE;

@@ -8,10 +8,8 @@
 #include "main.h"
 #include "text.h"
 #include "graphics.h"
-#include "link.h"
 #include "string_util.h"
 #include "sound.h"
-#include "mail.h"
 #include "overworld.h"
 #include "decompress.h"
 #include "constants/songs.h"
@@ -280,15 +278,7 @@ bool8 IsHoldingItemAllowed(u16 itemId)
     if (itemId == ITEM_ENIGMA_BERRY_E_READER
      && ((gSaveBlock1Ptr->location.mapGroup == MAP_GROUP(TRADE_CENTER)
        && gSaveBlock1Ptr->location.mapNum == MAP_NUM(TRADE_CENTER))
-       || InUnionRoom() == TRUE))
-        return FALSE;
-    else
-        return TRUE;
-}
-
-bool8 IsWritingMailAllowed(u16 itemId)
-{
-    if ((IsOverworldLinkActive() == TRUE || InUnionRoom() == TRUE) && ItemIsMail(itemId) == TRUE)
+      ))
         return FALSE;
     else
         return TRUE;
@@ -296,7 +286,7 @@ bool8 IsWritingMailAllowed(u16 itemId)
 
 bool8 MenuHelpers_IsLinkActive(void)
 {
-    if (IsOverworldLinkActive() == TRUE || gReceivedRemoteLinkPlayers == 1)
+    if (IsOverworldLinkActive() == TRUE)
         return TRUE;
     else
         return FALSE;
@@ -306,13 +296,12 @@ static bool8 IsActiveOverworldLinkBusy(void)
 {
     if (!MenuHelpers_IsLinkActive())
         return FALSE;
-    else
-        return Overworld_IsRecvQueueAtMax();
+    return FALSE;
 }
 
 bool8 MenuHelpers_ShouldWaitForLinkRecv(void)
 {
-    if (IsActiveOverworldLinkBusy() == TRUE || IsLinkRecvQueueAtOverworldMax() == TRUE )
+    if (IsActiveOverworldLinkBusy() == TRUE)
         return TRUE;
     else
         return FALSE;

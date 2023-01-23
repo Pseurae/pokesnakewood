@@ -110,14 +110,6 @@ void HandleIntroSlide(u8 terrain)
     {
         taskId = CreateTask(BattleIntroSlidePartner, 0);
     }
-    else if (gBattleTypeFlags & BATTLE_TYPE_LINK)
-    {
-        taskId = CreateTask(BattleIntroSlideLink, 0);
-    }
-    else if (gBattleTypeFlags & BATTLE_TYPE_FRONTIER)
-    {
-        taskId = CreateTask(BattleIntroSlide3, 0);
-    }
     else if ((gBattleTypeFlags & BATTLE_TYPE_KYOGRE_GROUDON) && gGameVersion != VERSION_RUBY)
     {
         terrain = BATTLE_TERRAIN_UNDERWATER;
@@ -159,16 +151,8 @@ static void BattleIntroSlide1(u8 taskId)
     switch (gTasks[taskId].tState)
     {
     case 0:
-        if (gBattleTypeFlags & BATTLE_TYPE_LINK)
-        {
-            gTasks[taskId].data[2] = 16;
-            gTasks[taskId].tState++;
-        }
-        else
-        {
-            gTasks[taskId].data[2] = 1;
-            gTasks[taskId].tState++;
-        }
+        gTasks[taskId].data[2] = 1;
+        gTasks[taskId].tState++;
         break;
     case 1:
         if (--gTasks[taskId].data[2] == 0)
@@ -267,16 +251,8 @@ static void BattleIntroSlide2(u8 taskId)
     {
     case 0:
         gTasks[taskId].data[4] = 16;
-        if (gBattleTypeFlags & BATTLE_TYPE_LINK)
-        {
-            gTasks[taskId].data[2] = 16;
-            gTasks[taskId].tState++;
-        }
-        else
-        {
-            gTasks[taskId].data[2] = 1;
-            gTasks[taskId].tState++;
-        }
+        gTasks[taskId].data[2] = 1;
+        gTasks[taskId].tState++;
         break;
     case 1:
         if (--gTasks[taskId].data[2] == 0)
@@ -360,16 +336,8 @@ static void BattleIntroSlide3(u8 taskId)
         SetGpuReg(REG_OFFSET_BLDALPHA, BLDALPHA_BLEND(8, 8));
         SetGpuReg(REG_OFFSET_BLDY, 0);
         gTasks[taskId].data[4] = BLDALPHA_BLEND(8, 8);
-        if (gBattleTypeFlags & (BATTLE_TYPE_LINK | BATTLE_TYPE_RECORDED_LINK))
-        {
-            gTasks[taskId].data[2] = 16;
-            gTasks[taskId].tState++;
-        }
-        else
-        {
-            gTasks[taskId].data[2] = 1;
-            gTasks[taskId].tState++;
-        }
+        gTasks[taskId].data[2] = 1;
+        gTasks[taskId].tState++;
         break;
     case 1:
         if (--gTasks[taskId].data[2] == 0)
@@ -600,20 +568,4 @@ void DrawBattlerOnBg(int bgId, u8 x, u8 y, u8 battlerPosition, u8 paletteId, u8 
         }
     }
     LoadBgTilemap(bgId, tilemap, BG_SCREEN_SIZE, 0);
-}
-
-static void DrawBattlerOnBgDMA(u8 x, u8 y, u8 battlerPosition, u8 arg3, u8 paletteId, u16 arg5, u8 arg6, u8 arg7)
-{
-    int i, j, offset;
-
-    DmaCopy16(3, gMonSpritesGfxPtr->sprites.ptr[battlerPosition] + BG_SCREEN_SIZE * arg3, (void *)BG_SCREEN_ADDR(0) + arg5, BG_SCREEN_SIZE);
-    offset = (arg5 >> 5) - (arg7 << 9);
-    for (i = y; i < y + 8; i++)
-    {
-        for (j = x; j < x + 8; j++)
-        {
-            *((u16 *)(BG_VRAM) + (i * 32) + (j + (arg6 << 10))) = offset | (paletteId << 12);
-            offset++;
-        }
-    }
 }

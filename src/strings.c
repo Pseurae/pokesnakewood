@@ -1,6 +1,5 @@
 #include "global.h"
 #include "strings.h"
-#include "battle_pyramid_bag.h"
 #include "item_menu.h"
 
 ALIGNED(4)
@@ -271,14 +270,6 @@ const u8 *const gBagMenu_ReturnToStrings[] =
     [ITEMMENULOCATION_APPRENTICE]          = gText_TheField,
     [ITEMMENULOCATION_WALLY]               = gText_TheBattle,
     [ITEMMENULOCATION_PCBOX]               = gText_ThePC
-};
-
-const u8 *const gPyramidBagMenu_ReturnToStrings[] =
-{
-    [PYRAMIDBAG_LOC_FIELD]       = gText_TheField,
-    [PYRAMIDBAG_LOC_BATTLE]      = gText_TheBattle,
-    [PYRAMIDBAG_LOC_PARTY]       = gText_ThePokemonList,
-    [PYRAMIDBAG_LOC_CHOOSE_TOSS] = gText_TheField
 };
 
 const u8 gText_ReturnToVar1[] = _("Return to\n{STR_VAR_1}.");
@@ -1557,30 +1548,6 @@ const u8 gText_XWillBeSentToY[] = _("{STR_VAR_2} will be\nsent to {STR_VAR_1}.")
 const u8 gText_ByeByeVar1[] = _("Bye-bye, {STR_VAR_2}!");
 const u8 gText_XSentOverY[] = _("{STR_VAR_1} sent over {STR_VAR_3}.");
 const u8 gText_TakeGoodCareOfX[] = _("Take good care of {STR_VAR_3}!");
-
-// Easy chat group names
-const u8 gEasyChatGroupName_Pokemon[] = _("Pokémon");
-const u8 gEasyChatGroupName_Trainer[] = _("Trainer");
-const u8 gEasyChatGroupName_Status[] = _("Status");
-const u8 gEasyChatGroupName_Battle[] = _("Battle");
-const u8 gEasyChatGroupName_Greetings[] = _("Greetings");
-const u8 gEasyChatGroupName_People[] = _("People");
-const u8 gEasyChatGroupName_Voices[] = _("Voices");
-const u8 gEasyChatGroupName_Speech[] = _("Speech");
-const u8 gEasyChatGroupName_Endings[] = _("Endings");
-const u8 gEasyChatGroupName_Feelings[] = _("Feelings");
-const u8 gEasyChatGroupName_Conditions[] = _("Conditions");
-const u8 gEasyChatGroupName_Actions[] = _("Actions");
-const u8 gEasyChatGroupName_Lifestyle[] = _("Lifestyle");
-const u8 gEasyChatGroupName_Hobbies[] = _("Hobbies");
-const u8 gEasyChatGroupName_Time[] = _("Time");
-const u8 gEasyChatGroupName_Misc[] = _("Misc.");
-const u8 gEasyChatGroupName_Adjectives[] = _("Adjectives");
-const u8 gEasyChatGroupName_Events[] = _("Events");
-const u8 gEasyChatGroupName_Move1[] = _("Move 1");
-const u8 gEasyChatGroupName_Move2[] = _("Move 2");
-const u8 gEasyChatGroupName_TrendySaying[] = _("Trendy Saying");
-const u8 gEasyChatGroupName_Pokemon2[] = _("POKéMON2");
 
 const u8 gText_ThreeQuestionMarks[] = _("???");
 const u8 gText_MaxHP[] = _("Max. HP");

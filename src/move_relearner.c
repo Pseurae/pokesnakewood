@@ -2,7 +2,6 @@
 #include "main.h"
 #include "battle.h"
 #include "bg.h"
-#include "contest_effect.h"
 #include "data.h"
 #include "event_data.h"
 #include "field_screen_effect.h"
@@ -799,7 +798,6 @@ static void HandleInput(bool8 showContest)
         }
 
         ScheduleBgCopyTilemapToVram(1);
-        MoveRelearnerShowHideHearts(GetCurrentSelectedMove());
         break;
     case LIST_CANCEL:
         PlaySE(SE_SELECT);
@@ -919,58 +917,3 @@ static void CreateLearnableMovesList(void)
     sMoveRelearnerStruct->numToShowAtOnce = LoadMoveRelearnerMovesList(sMoveRelearnerStruct->menuItems, sMoveRelearnerStruct->numMenuChoices);
 }
 
-void MoveRelearnerShowHideHearts(s32 moveId)
-{
-    u16 numHearts;
-    u16 i;
-
-    if (!sMoveRelearnerMenuSate.showContestInfo || moveId == LIST_CANCEL)
-    {
-        for (i = 0; i < 16; i++)
-        {
-            gSprites[sMoveRelearnerStruct->heartSpriteIds[i]].invisible = TRUE;
-        }
-    }
-    else
-    {
-        numHearts = (u8)(gContestEffects[gContestMoves[moveId].effect].appeal / 10);
-
-        if (numHearts == 0xFF)
-        {
-            numHearts = 0;
-        }
-
-        for (i = 0; i < 8; i++)
-        {
-            if (i < numHearts)
-            {
-                StartSpriteAnim(&gSprites[sMoveRelearnerStruct->heartSpriteIds[i]], 1);
-            }
-            else
-            {
-                StartSpriteAnim(&gSprites[sMoveRelearnerStruct->heartSpriteIds[i]], 0);
-            }
-            gSprites[sMoveRelearnerStruct->heartSpriteIds[i]].invisible = FALSE;
-        }
-
-        numHearts = (u8)(gContestEffects[gContestMoves[moveId].effect].jam / 10);
-
-        if (numHearts == 0xFF)
-        {
-            numHearts = 0;
-        }
-
-        for (i = 0; i < 8; i++)
-        {
-            if (i < numHearts)
-            {
-                StartSpriteAnim(&gSprites[sMoveRelearnerStruct->heartSpriteIds[i + 8]], 3);
-            }
-            else
-            {
-                StartSpriteAnim(&gSprites[sMoveRelearnerStruct->heartSpriteIds[i + 8]], 2);
-            }
-            gSprites[sMoveRelearnerStruct->heartSpriteIds[i + 8]].invisible = FALSE;
-        }
-    }
-}

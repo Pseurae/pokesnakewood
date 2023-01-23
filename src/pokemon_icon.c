@@ -1,6 +1,5 @@
 #include "global.h"
 #include "graphics.h"
-#include "mail.h"
 #include "palette.h"
 #include "pokemon_debug.h"
 #include "pokemon_icon.h"
@@ -2759,18 +2758,18 @@ u16 GetIconSpeciesNoPersonality(u16 species)
 {
     u16 value;
 
-    if (MailSpeciesToSpecies(species, &value) == SPECIES_UNOWN)
-    {
-        value += SPECIES_UNOWN_B; // TODO
-        return value;
-    }
-    else
-    {
-        if (species > NUM_SPECIES)
-            species = INVALID_ICON_SPECIES;
+    // if (MailSpeciesToSpecies(species, &value) == SPECIES_UNOWN)
+    // {
+    //     value += SPECIES_UNOWN_B; // TODO
+    //     return value;
+    // }
+    // else
+    // {
+    //     if (species > NUM_SPECIES)
+    //         species = INVALID_ICON_SPECIES;
 
-        return GetIconSpecies(species, 0);
-    }
+    //     return GetIconSpecies(species, 0);
+    // }
 }
 
 const u8 *GetMonIconPtr(u16 species, u32 personality)

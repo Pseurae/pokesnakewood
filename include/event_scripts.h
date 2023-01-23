@@ -360,16 +360,6 @@ extern const u8 gPokeNewsTextLilycove_Ending[];
 extern const u8 gPokeNewsTextBlendMaster_Upcoming[];
 extern const u8 gPokeNewsTextBlendMaster_Ongoing[];
 extern const u8 gPokeNewsTextBlendMaster_Ending[];
-extern const u8 SecretBase_Text_Trainer0Defeated[];
-extern const u8 SecretBase_Text_Trainer1Defeated[];
-extern const u8 SecretBase_Text_Trainer2Defeated[];
-extern const u8 SecretBase_Text_Trainer3Defeated[];
-extern const u8 SecretBase_Text_Trainer4Defeated[];
-extern const u8 SecretBase_Text_Trainer5Defeated[];
-extern const u8 SecretBase_Text_Trainer6Defeated[];
-extern const u8 SecretBase_Text_Trainer7Defeated[];
-extern const u8 SecretBase_Text_Trainer8Defeated[];
-extern const u8 SecretBase_Text_Trainer9Defeated[];
 
 //field effects
 extern const u8 EventScript_UseStrength[];
@@ -554,35 +544,6 @@ extern const u8 MossdeepCity_SpaceCenter_2F_EventScript_RivalRayquazaCall[];
 extern const u8 SSTidalCorridor_EventScript_ReachedStepCount[];
 extern const u8 EventScript_FallDownHoleMtPyre[];
 
-// Secret Base
-extern const u8 SecretBase_EventScript_PC[];
-extern const u8 SecretBase_EventScript_RecordMixingPC[];
-extern const u8 SecretBase_EventScript_PCCancel[];
-extern const u8 SecretBase_EventScript_ShowRegisterMenu[];
-extern const u8 SecretBase_EventScript_SandOrnament[];
-extern const u8 SecretBase_EventScript_ShieldOrToyTV[];
-extern const u8 SecretBase_EventScript_DollInteract[];
-extern const u8 SecretBase_EventScript_CushionInteract[];
-extern const u8 SecretBase_EventScript_CheckEntrance[];
-extern const u8 SecretBase_EventScript_Enter[];
-extern const u8 SecretBase_EventScript_InitDecorations[];
-extern const u8 SecretBase_EventScript_PutAwayDecoration[];
-extern const u8 SecretBase_EventScript_SetDecoration[];
-
-// Battle Pyramid.
-extern const u8 BattlePyramid_Retire[];
-extern const u8 BattlePyramid_WarpToNextFloor[];
-extern const u8 BattlePyramid_TrainerBattle[];
-extern const u8 BattlePyramid_FindItemBall[];
-
-// fldeff misc
-extern const u8 SecretBase_EventScript_CaveUseSecretPower[];
-extern const u8 SecretBase_EventScript_TreeUseSecretPower[];
-extern const u8 SecretBase_EventScript_ShrubUseSecretPower[];
-
-// trainer hill
-extern const u8 TrainerHill_EventScript_TrainerBattle[];
-
 // Item Use
 extern const u8 BerryTree_EventScript_ItemUsePlantBerry[];
 extern const u8 BerryTree_EventScript_ItemUseWailmerPail[];
@@ -593,23 +554,5 @@ extern const u8 EventScript_SelectWithoutRegisteredItem[];
 // overworld
 extern const u8 EventScript_WhiteOut[];
 extern const u8 EventScript_ResetMrBriney[];
-extern const u8 EventScript_DoLinkRoomExit[];
-extern const u8 CableClub_EventScript_TooBusyToNotice[];
-extern const u8 CableClub_EventScript_ReadTrainerCard[];
-extern const u8 CableClub_EventScript_ReadTrainerCardColored[];
-extern const u8 EventScript_BattleColosseum_4P_PlayerSpot0[];
-extern const u8 EventScript_BattleColosseum_4P_PlayerSpot1[];
-extern const u8 EventScript_BattleColosseum_4P_PlayerSpot2[];
-extern const u8 EventScript_BattleColosseum_4P_PlayerSpot3[];
-extern const u8 EventScript_RecordCenter_Spot0[];
-extern const u8 EventScript_RecordCenter_Spot1[];
-extern const u8 EventScript_RecordCenter_Spot2[];
-extern const u8 EventScript_RecordCenter_Spot3[];
-extern const u8 EventScript_BattleColosseum_2P_PlayerSpot0[];
-extern const u8 EventScript_BattleColosseum_2P_PlayerSpot1[];
-extern const u8 EventScript_TradeCenter_Chair1[];
-extern const u8 EventScript_TradeCenter_Chair0[];
-extern const u8 EventScript_ConfirmLeaveCableClubRoom[];
-extern const u8 EventScript_TerminateLink[];
 
 #endif // GUARD_EVENT_SCRIPTS_H

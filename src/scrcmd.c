@@ -1,15 +1,9 @@
 #include "global.h"
-#include "frontier_util.h"
 #include "battle_setup.h"
 #include "berry.h"
 #include "clock.h"
 #include "coins.h"
-#include "contest.h"
-#include "contest_util.h"
-#include "contest_painting.h"
 #include "data.h"
-#include "decoration.h"
-#include "decoration_inventory.h"
 #include "event_data.h"
 #include "field_door.h"
 #include "field_effect.h"
@@ -24,11 +18,9 @@
 #include "fieldmap.h"
 #include "gpu_regs.h"
 #include "item.h"
-#include "lilycove_lady.h"
 #include "main.h"
 #include "menu.h"
 #include "money.h"
-#include "mystery_event_script.h"
 #include "number_input.h"
 #include "palette.h"
 #include "party_menu.h"
@@ -43,13 +35,11 @@
 #include "script_movement.h"
 #include "script_pokemon_util.h"
 #include "shop.h"
-#include "slot_machine.h"
 #include "sound.h"
 #include "string_util.h"
 #include "text.h"
 #include "text_window.h"
 #include "trainer_see.h"
-#include "tv.h"
 #include "window.h"
 #include "constants/event_objects.h"
 
@@ -299,9 +289,6 @@ bool8 ScrCmd_endram(struct ScriptContext *ctx)
 
 bool8 ScrCmd_setmysteryeventstatus(struct ScriptContext *ctx)
 {
-    u8 status = ScriptReadByte(ctx);
-
-    SetMysteryEventScriptStatus(status);
     return FALSE;
 }
 
@@ -552,33 +539,21 @@ bool8 ScrCmd_checkpcitem(struct ScriptContext *ctx)
 
 bool8 ScrCmd_adddecoration(struct ScriptContext *ctx)
 {
-    u32 decorId = VarGet(ScriptReadHalfword(ctx));
-
-    gSpecialVar_Result = DecorationAdd(decorId);
     return FALSE;
 }
 
 bool8 ScrCmd_removedecoration(struct ScriptContext *ctx)
 {
-    u32 decorId = VarGet(ScriptReadHalfword(ctx));
-
-    gSpecialVar_Result = DecorationRemove(decorId);
     return FALSE;
 }
 
 bool8 ScrCmd_checkdecorspace(struct ScriptContext *ctx)
 {
-    u32 decorId = VarGet(ScriptReadHalfword(ctx));
-
-    gSpecialVar_Result = DecorationCheckSpace(decorId);
     return FALSE;
 }
 
 bool8 ScrCmd_checkdecor(struct ScriptContext *ctx)
 {
-    u32 decorId = VarGet(ScriptReadHalfword(ctx));
-
-    gSpecialVar_Result = CheckHasDecoration(decorId);
     return FALSE;
 }
 
@@ -1472,13 +1447,6 @@ bool8 ScrCmd_hidemonpic(struct ScriptContext *ctx)
 bool8 ScrCmd_showcontestpainting(struct ScriptContext *ctx)
 {
     u8 contestWinnerId = ScriptReadByte(ctx);
-
-    // Artist's painting is temporary and already has its data loaded
-    if (contestWinnerId != CONTEST_WINNER_ARTIST)
-        SetContestWinnerForPainting(contestWinnerId);
-
-    ShowContestPainting();
-    ScriptContext_Stop();
     return TRUE;
 }
 
@@ -1601,10 +1569,6 @@ bool8 ScrCmd_bufferitemnameplural(struct ScriptContext *ctx)
 
 bool8 ScrCmd_bufferdecorationname(struct ScriptContext *ctx)
 {
-    u8 stringVarIndex = ScriptReadByte(ctx);
-    u16 decorId = VarGet(ScriptReadHalfword(ctx));
-
-    StringCopy(sScriptStringVars[stringVarIndex], gDecorations[decorId].name);
     return FALSE;
 }
 
@@ -1638,10 +1602,6 @@ bool8 ScrCmd_bufferstdstring(struct ScriptContext *ctx)
 
 bool8 ScrCmd_buffercontestname(struct ScriptContext *ctx)
 {
-    u8 stringVarIndex = ScriptReadByte(ctx);
-    u16 category = VarGet(ScriptReadHalfword(ctx));
-
-    BufferContestName(sScriptStringVars[stringVarIndex], category);
     return FALSE;
 }
 
@@ -1935,10 +1895,6 @@ bool8 ScrCmd_pokemartdecoration2(struct ScriptContext *ctx)
 
 bool8 ScrCmd_playslotmachine(struct ScriptContext *ctx)
 {
-    u8 machineId = VarGet(ScriptReadHalfword(ctx));
-
-    PlaySlotMachine(machineId, CB2_ReturnToFieldContinueScriptPlayMapMusic);
-    ScriptContext_Stop();
     return TRUE;
 }
 
@@ -1957,38 +1913,27 @@ bool8 ScrCmd_setberrytree(struct ScriptContext *ctx)
 
 bool8 ScrCmd_getpokenewsactive(struct ScriptContext *ctx)
 {
-    u16 newsKind = VarGet(ScriptReadHalfword(ctx));
-
-    gSpecialVar_Result = IsPokeNewsActive(newsKind);
     return FALSE;
 }
 
 bool8 ScrCmd_choosecontestmon(struct ScriptContext *ctx)
 {
-    ChooseContestMon();
-    ScriptContext_Stop();
     return TRUE;
 }
 
 
 bool8 ScrCmd_startcontest(struct ScriptContext *ctx)
 {
-    StartContest();
-    ScriptContext_Stop();
     return TRUE;
 }
 
 bool8 ScrCmd_showcontestresults(struct ScriptContext *ctx)
 {
-    ShowContestResults();
-    ScriptContext_Stop();
     return TRUE;
 }
 
 bool8 ScrCmd_contestlinktransfer(struct ScriptContext *ctx)
 {
-    ContestLinkTransfer(gSpecialVar_ContestCategory);
-    ScriptContext_Stop();
     return TRUE;
 }
 
