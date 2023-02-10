@@ -202,11 +202,21 @@ u8 CreateWarpArrowSprite(void)
     u8 spriteId, paletteSlot;
     struct Sprite *sprite;
 
-    paletteSlot = GetObjectPaletteSlot(0x1100);
-    PatchObjectPalette(0x1100, paletteSlot);
     spriteId = CreateSpriteAtEnd(gFieldEffectObjectTemplatePointers[FLDEFFOBJ_ARROW], 0, 0, 0x95);
+
     if (spriteId != MAX_SPRITES)
     {
+        if (gSaveBlock2Ptr->playerGender == MALE)
+        {
+            paletteSlot = GetObjectPaletteSlot(0x1100);
+            PatchObjectPalette(0x1100, paletteSlot);
+        }
+        else
+        {
+            paletteSlot = GetObjectPaletteSlot(0x1110);
+            PatchObjectPalette(0x1110, paletteSlot);
+        }
+
         sprite = &gSprites[spriteId];
         sprite->oam.priority = 2;
         sprite->oam.paletteNum = paletteSlot;

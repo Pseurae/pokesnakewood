@@ -8302,6 +8302,7 @@ void TurnVirtualObject(u8 virtualObjId, u8 direction)
 
 void SetVirtualObjectGraphics(u8 virtualObjId, u16 graphicsId)
 {
+    u16 paletteSlot;
     int spriteId = GetVirtualObjectSpriteId(virtualObjId);
 
     if (spriteId != MAX_SPRITES)
@@ -8312,7 +8313,10 @@ void SetVirtualObjectGraphics(u8 virtualObjId, u16 graphicsId)
 
         sprite->oam = *graphicsInfo->oam;
         sprite->oam.tileNum = tileNum;
-        sprite->oam.paletteNum = graphicsInfo->paletteSlot;
+        paletteSlot = GetObjectPaletteSlot(graphicsInfo->paletteTag);
+        IncrementSpritePaletteReferenceCount(paletteSlot);
+        PatchObjectPalette(graphicsInfo->paletteTag, paletteSlot);
+        sprite->oam.paletteNum = paletteSlot;
         sprite->images = graphicsInfo->images;
 
         if (graphicsInfo->subspriteTables == NULL)
