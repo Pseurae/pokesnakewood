@@ -1767,7 +1767,7 @@ static u8 LoadSpritePaletteIfTagExists(const struct SpritePalette *spritePalette
 void PatchObjectPalette(u16 paletteTag, u8 paletteSlot)
 {
     u8 paletteIndex = FindObjectEventPaletteIndexByTag(paletteTag);
-    LoadDNPalette(sObjectEventSpritePalettes[paletteIndex].data, 16 * paletteSlot + 0x100, 0x20);
+    LoadPalette(sObjectEventSpritePalettes[paletteIndex].data, 16 * paletteSlot + 0x100, 0x20);
 }
 
 static u8 FindObjectEventPaletteIndexByTag(u16 tag)

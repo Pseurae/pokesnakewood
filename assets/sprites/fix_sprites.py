@@ -9,10 +9,7 @@ from glob import glob
 import png
 
 palettes = [
-    "graphics/object_events/pics/people/lass.png",
-    "graphics/object_events/pics/people/nurse.png",
-    "graphics/object_events/pics/people/camper.png",
-    "graphics/object_events/pics/people/gentleman.png",
+    "brendan/191.png"
 ]
 
 def closest_color(c, palette):
@@ -40,31 +37,15 @@ def remap_to_palette(palette_file, input_file, output_file):  # Apply one file's
         w = png.Writer(width=w, height=h, bitdepth=4, palette=target_palette)
         w.write(f, new_rows)
 
-def change_palette(palette_file, input_file, output_file):  # Apply one file's palette to another
-    plt = png.Reader(palette_file)
-    plt.read()
-    target_palette = tuple(c[:3] for c in plt.palette())
-    inp = png.Reader(input_file)
-    w, h, rows, info = inp.read()
+def format_input_output_fn(basefn):
+    if not basefn.startswith(".png"):
+        basefn += ".png"
 
-    with open(output_file, 'wb') as f:
-        w = png.Writer(width=w, height=h, bitdepth=4, palette=target_palette)
-        w.write(f, rows)
+    output_file = basefn[:-4] + f"_remapped.png"
 
-def format_input_output_fn(basefn, out_n):
-    input_file = joinp("graphics", "object_events", "pics", basefn)
-    if not input_file.startswith(".png"):
-        input_file += ".png"
-
-    output_file = input_file[:-4] + f"{out_n}.png"
-
-    return input_file, output_file
+    return basefn, output_file
 
 if __name__ == '__main__':
-    is_remap = sys.argv[2] == "1"
-    for i, pal_file in enumerate(palettes):
-        input_file, output_file = format_input_output_fn(sys.argv[1], i)
-        if is_remap:
-            remap_to_palette(pal_file, input_file, output_file)
-        else:
-            change_palette(pal_file, input_file, output_file)
+    for pal_file in palettes:
+        input_file, output_file = format_input_output_fn(sys.argv[1])
+        remap_to_palette(pal_file, input_file, output_file)

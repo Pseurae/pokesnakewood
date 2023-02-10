@@ -802,15 +802,15 @@ void LoadTilesetPalette(struct Tileset const *tileset, u16 destOffset, u16 size)
         if (tileset->isSecondary == FALSE)
         {
             LoadPalette(&black, destOffset, 2);
-            LoadDNPalette(tileset->palettes[0] + 1, destOffset + 1, size - 2);
+            LoadPalette(tileset->palettes[0] + 1, destOffset + 1, size - 2);
         }
         else if (tileset->isSecondary == TRUE)
         {
-            LoadDNPalette(tileset->palettes[NUM_PALS_IN_PRIMARY], destOffset, size);
+            LoadPalette(tileset->palettes[NUM_PALS_IN_PRIMARY], destOffset, size);
         }
         else
         {
-            LoadCompressedDNPalette((const u32 *)tileset->palettes, destOffset, size);
+            LoadCompressedPalette((const u32 *)tileset->palettes, destOffset, size);
         }
     }
 }

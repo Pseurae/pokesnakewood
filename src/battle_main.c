@@ -762,7 +762,6 @@ void BattleMainCB2(void)
     BuildOamBuffer();
     RunTextPrinters();
     UpdatePaletteFade();
-    UpdateDayNightPalettes();
     RunTasks();
 }
 
@@ -983,7 +982,6 @@ void VBlankCB_Battle(void)
     ProcessSpriteCopyRequests();
     TransferPlttBuffer();
     ScanlineEffect_InitHBlankDmaTransfer();
-    UpdateDayNightPalettes();
 }
 
 void SpriteCB_VsLetterDummy(struct Sprite *sprite)

@@ -653,7 +653,10 @@ static void CB2_ReturnFromNamingScreen(void)
     u8 taskId;
     SetupReturnCB();
     taskId = CreateTask(Task_NamingScreen_WaitForYesNo, 0);
-    gTasks[taskId].tPlayerSpriteId = CreateTrainerSprite(TRAINER_PIC_BRENDAN, 120, 60, 0, &gDecompressionBuffer[0]);
+    if (gSaveBlock2Ptr->playerGender == MALE)
+        gTasks[taskId].tPlayerSpriteId = CreateTrainerSprite(TRAINER_PIC_BRENDAN, 120, 60, 0, &gDecompressionBuffer[0]);
+    else
+        gTasks[taskId].tPlayerSpriteId = CreateTrainerSprite(TRAINER_PIC_MAY, 120, 60, 0, &gDecompressionBuffer[0]);
 }
 
 static void Task_NamingScreen_WaitForYesNo(u8 taskId)
