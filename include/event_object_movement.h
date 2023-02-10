@@ -90,19 +90,6 @@ struct LockedAnimObjectEvents
     u8 count;
 };
 
-struct SpritePaletteReference
-{
-    u8 type;
-    u8 count;
-    u16 tag;
-};
-
-enum {
-    PAL_UNUSED,
-    PAL_NPC,
-    PAL_REFLECTION
-};
-
 extern const struct OamData gObjectEventBaseOam_32x8;
 extern const struct OamData gObjectEventBaseOam_32x32;
 extern const struct SpriteTemplate *const gFieldEffectObjectTemplatePointers[];
@@ -454,13 +441,5 @@ void SetVirtualObjectInvisibility(u8 virtualObjId, bool32 invisible);
 bool32 IsVirtualObjectInvisible(u8 virtualObjId);
 void SetVirtualObjectSpriteAnim(u8 virtualObjId, u8 animNum);
 bool32 IsVirtualObjectAnimating(u8 virtualObjId);
-
-u8 FindSpritePaletteReference(u8 type, u16 tag);
-u8 AddSpritePaletteReference(u8 type, u16 tag);
-u8 IncrementSpritePaletteReferenceCount(u8 idx);
-void DecrementSpritePaletteReferenceCount(u8 idx);
-void ClearSpritePaletteReferences(void);
-
-u8 GetObjectPaletteSlot(u16 tag);
 
 #endif //GUARD_EVENT_OBJECT_MOVEMENT_H

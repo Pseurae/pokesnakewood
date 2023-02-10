@@ -21,6 +21,7 @@
 #include "palette.h"
 #include "random.h"
 #include "sprite.h"
+#include "sprite_palette.h"
 #include "task.h"
 #include "trainer_see.h"
 #include "trainer_hill.h"
@@ -82,8 +83,6 @@ static u8 setup##_callback(struct ObjectEvent *objectEvent, struct Sprite *sprit
 static EWRAM_DATA u8 sCurrentReflectionType = 0;
 static EWRAM_DATA u16 sCurrentSpecialObjectPaletteTag = 0;
 static EWRAM_DATA struct LockedAnimObjectEvents *sLockedAnimObjectEvents = {0};
-
-EWRAM_DATA struct SpritePaletteReference sSpritePaletteReferences[16] = { 0 };
 
 static void MoveCoordsInDirection(u32, s16 *, s16 *, s16, s16);
 static bool8 ObjectEventExecSingleMovementAction(struct ObjectEvent *, struct Sprite *);
@@ -1810,7 +1809,7 @@ static u8 LoadSpritePaletteIfTagExists(const struct SpritePalette *spritePalette
 void PatchObjectPalette(u16 paletteTag, u8 paletteSlot)
 {
     u8 paletteIndex = FindObjectEventPaletteIndexByTag(paletteTag);
-    LoadDNPalette(sObjectEventSpritePalettes[paletteIndex].data, 16 * paletteSlot + 0x100, 0x20);
+    LoadPalette(sObjectEventSpritePalettes[paletteIndex].data, 16 * paletteSlot + 0x100, 0x20);
 }
 
 static u8 FindObjectEventPaletteIndexByTag(u16 tag)
@@ -8371,11 +8370,11 @@ void SetVirtualObjectGraphics(u8 virtualObjId, u8 graphicsId)
     {
         struct Sprite *sprite = &gSprites[spriteId];
         const struct ObjectEventGraphicsInfo *graphicsInfo = GetObjectEventGraphicsInfo(graphicsId);
+        u8 paletteSlot = GetSpritePaletteSlot(PAL_OBJEVENT, graphicsInfo->paletteTag);
         u16 tileNum = sprite->oam.tileNum;
 
         sprite->oam = *graphicsInfo->oam;
         sprite->oam.tileNum = tileNum;
-        paletteSlot = GetSpritePaletteSlot(PAL_OBJEVENT, graphicsInfo->paletteTag);
         PatchObjectPalette(graphicsInfo->paletteTag, paletteSlot);
         sprite->oam.paletteNum = IncrementSpritePaletteReferenceCount(paletteSlot);
         sprite->images = graphicsInfo->images;
@@ -8715,72 +8714,4 @@ u8 MovementAction_FlyDown_Step1(struct ObjectEvent *objectEvent, struct Sprite *
 u8 MovementAction_Fly_Finish(struct ObjectEvent *objectEvent, struct Sprite *sprite)
 {
     return TRUE;
-}
-
-u8 FindSpritePaletteReference(u8 type, u16 tag)
-{
-    u8 i;
-    for (i = 0; i < 16; i++)
-    {
-        if (sSpritePaletteReferences[i].type == type && sSpritePaletteReferences[i].tag == tag)
-            return i;
-    }
-    return 0xFF;
-}
-
-u8 AddSpritePaletteReference(u8 type, u16 tag)
-{
-    u8 i;
-    for (i = 0; i < 16; i++)
-    {
-        if (sSpritePaletteReferences[i].type == PAL_UNUSED)
-        {
-            sSpritePaletteReferences[i].type = type;
-            sSpritePaletteReferences[i].tag = tag;
-            sSpritePaletteReferences[i].count = 0;
-            return i;
-        }
-    }
-
-    return 0xFF;
-}
-
-u8 IncrementSpritePaletteReferenceCount(u8 idx)
-{
-    sSpritePaletteReferences[idx].count++;
-    return idx;
-}
-
-void DecrementSpritePaletteReferenceCount(u8 idx)
-{
-    if (sSpritePaletteReferences[idx].type == PAL_UNUSED)
-    {
-        FillPalette(0, 0x100 + (idx << 4), 0x20);
-        return;
-    }
-
-    if (sSpritePaletteReferences[idx].count > 0)
-        sSpritePaletteReferences[idx].count--;
-
-    if (sSpritePaletteReferences[idx].count == 0)
-    {
-        FillPalette(0, 0x100 + (idx << 4), 0x20);
-        sSpritePaletteReferences[idx].type = PAL_UNUSED;
-    }
-}
-
-void ClearSpritePaletteReferences(void)
-{
-    FillPalette(0, 0x100, 0x20 * 16);
-    memset(sSpritePaletteReferences, 0, sizeof(sSpritePaletteReferences));
-}
-
-u8 GetObjectPaletteSlot(u16 tag)
-{
-    u8 slot;
-    slot = FindSpritePaletteReference(PAL_NPC, tag);
-    if (slot != 0xFF)
-        return slot;
-
-    return AddSpritePaletteReference(PAL_NPC, tag);
 }

@@ -1851,7 +1851,6 @@ void BattleMainCB2(void)
     BuildOamBuffer();
     RunTextPrinters();
     UpdatePaletteFade();
-    UpdateDayNightPalettes();
     RunTasks();
 
     if (JOY_HELD(B_BUTTON) && gBattleTypeFlags & BATTLE_TYPE_RECORDED && RecordedBattle_CanStopPlayback())
@@ -2090,7 +2089,6 @@ void VBlankCB_Battle(void)
     ProcessSpriteCopyRequests();
     TransferPlttBuffer();
     ScanlineEffect_InitHBlankDmaTransfer();
-    UpdateDayNightPalettes();
 }
 
 void SpriteCB_VsLetterDummy(struct Sprite *sprite)

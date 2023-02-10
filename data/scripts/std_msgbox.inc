@@ -9,6 +9,8 @@ Std_MsgboxNPC:
 
 Std_MsgboxSign:
 	lockall
+	specialvar VAR_RESULT, GetPlayerFacingDirection
+	goto_if_ne VAR_RESULT, DIR_NORTH, Common_EventScript_NopReturn
 	signmsg
 	message NULL
 	waitmessage

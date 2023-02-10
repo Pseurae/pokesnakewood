@@ -84,22 +84,18 @@ static const u8 sRoundedDownGrayscaleMap[] = {
 
 void LoadCompressedPalette(const u32 *src, u16 offset, u16 size)
 {
-    FillDNPalette(offset, size);
     LZDecompressWram(src, gPaletteDecompressionBuffer);
-    CpuCopy16(gPaletteDecompressionBuffer, &gPlttBufferUnfaded[offset], size);
-    CpuCopy16(gPaletteDecompressionBuffer, &gPlttBufferFaded[offset], size);
+    LoadPalette(gPaletteDecompressionBuffer, offset, size);
 }
 
 void LoadPalette(const void *src, u16 offset, u16 size)
 {
-    FillDNPalette(offset, size);
     CpuCopy16(src, &gPlttBufferUnfaded[offset], size);
     CpuCopy16(src, &gPlttBufferFaded[offset], size);
 }
 
 void FillPalette(u16 value, u16 offset, u16 size)
 {
-    FillDNPalette(offset, size);
     CpuFill16(value, &gPlttBufferUnfaded[offset], size);
     CpuFill16(value, &gPlttBufferFaded[offset], size);
 }

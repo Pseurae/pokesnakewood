@@ -9,6 +9,7 @@
 #include "script.h"
 #include "script_movement.h"
 #include "sprite.h"
+#include "sprite_palette.h"
 #include "task.h"
 #include "trainer_see.h"
 #include "trainer_hill.h"
@@ -696,19 +697,16 @@ void TryPrepareSecondApproachingTrainer(void)
 
 u8 FldEff_ExclamationMarkIcon(void)
 {
-    u8 paletteSlot = GetObjectPaletteSlot(0x1100);
+    u8 paletteSlot = GetSpritePaletteSlot(PAL_OBJEVENT, 0x1100);
     u8 spriteId = CreateSpriteAtEnd(&sSpriteTemplate_ExclamationQuestionMark, 0, 0, 0x53);
 
     PatchObjectPalette(0x1100, paletteSlot);
 
     if (spriteId != MAX_SPRITES)
     {
-<<<<<<< HEAD
-=======
         paletteSlot = GetSpritePaletteSlot(PAL_OBJEVENT, 0x1104);
         PatchObjectPalette(0x1104, paletteSlot);
 
->>>>>>> 950c1c694 (Fix fog blending for sprites)
         SetIconSpriteData(&gSprites[spriteId], FLDEFF_EXCLAMATION_MARK_ICON, 0);
         gSprites[spriteId].oam.paletteNum = paletteSlot;
     }
@@ -718,19 +716,16 @@ u8 FldEff_ExclamationMarkIcon(void)
 
 u8 FldEff_QuestionMarkIcon(void)
 {
-    u8 paletteSlot = GetObjectPaletteSlot(0x1100);
+    u8 paletteSlot = GetSpritePaletteSlot(PAL_OBJEVENT, 0x1100);
     u8 spriteId = CreateSpriteAtEnd(&sSpriteTemplate_ExclamationQuestionMark, 0, 0, 0x52);
 
     PatchObjectPalette(0x1100, paletteSlot);
 
     if (spriteId != MAX_SPRITES)
     {
-<<<<<<< HEAD
-=======
         paletteSlot = GetSpritePaletteSlot(PAL_OBJEVENT, 0x1104);
         PatchObjectPalette(0x1104, paletteSlot);
 
->>>>>>> 950c1c694 (Fix fog blending for sprites)
         SetIconSpriteData(&gSprites[spriteId], FLDEFF_EXCLAMATION_MARK_ICON, 0);
         gSprites[spriteId].oam.paletteNum = paletteSlot;
     }
@@ -742,7 +737,7 @@ extern const u16 gObjectEventPal_Npc2[];
 
 u8 FldEff_HeartIcon(void)
 {
-    u8 paletteSlot = GetObjectPaletteSlot(0x1103);
+    u8 paletteSlot = GetSpritePaletteSlot(PAL_OBJEVENT, 0x1103);
     u8 spriteId = CreateSpriteAtEnd(&sSpriteTemplate_HeartIcon, 0, 0, 0x52);
 
     LoadPalette(gObjectEventPal_Npc2, 0x100 + (paletteSlot << 4), 0x20);
@@ -750,12 +745,9 @@ u8 FldEff_HeartIcon(void)
 
     if (spriteId != MAX_SPRITES)
     {
-<<<<<<< HEAD
         struct Sprite *sprite = &gSprites[spriteId];
-=======
         paletteSlot = GetSpritePaletteSlot(PAL_OBJEVENT, 0x1104);
         PatchObjectPalette(0x1104, paletteSlot);
->>>>>>> 950c1c694 (Fix fog blending for sprites)
 
         SetIconSpriteData(sprite, FLDEFF_HEART_ICON, 0);
         sprite->oam.paletteNum = paletteSlot;

@@ -1463,7 +1463,6 @@ static void OverworldBasic(void)
     BuildOamBuffer();
     UpdatePaletteFade();
     UpdateTilesetAnimations();
-    UpdateDayNightPalettes();
     DoScheduledBgTilemapCopiesToVram();
     RemoveObjectEventsOutsideView();
 }

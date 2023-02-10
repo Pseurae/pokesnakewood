@@ -1337,7 +1337,7 @@ void LoadBallDNGfx(u8 ballId)
     if (GetSpriteTileStartByTag(gBallSpriteSheets[ballId].tag) == 0xFFFF)
     {
         LoadCompressedSpriteSheetUsingHeap(&gBallSpriteSheets[ballId]);
-        LoadCompressedSpriteDNPalette(&gBallSpritePalettes[ballId]);
+        LoadCompressedSpritePalette(&gBallSpritePalettes[ballId]);
     }
 
     switch (ballId)

@@ -1,10 +1,13 @@
 #include "global.h"
 #include "decompress.h"
 #include "event_data.h"
+#include "field_weather.h"
 #include "graphics.h"
 #include "item_icon.h"
 #include "malloc.h"
+#include "palette.h"
 #include "sprite.h"
+#include "sprite_palette.h"
 #include "constants/items.h"
 
 // EWRAM vars

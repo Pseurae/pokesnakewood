@@ -19,6 +19,13 @@ enum {
     PALTAG_WEATHER_2
 };
 
+enum
+{
+    COLOR_MAP_NONE,
+    COLOR_MAP_DARK_CONTRAST,
+    COLOR_MAP_CONTRAST,
+};
+
 #define NUM_WEATHER_COLOR_MAPS 19
 
 struct Weather

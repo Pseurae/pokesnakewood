@@ -680,7 +680,7 @@ const struct Tileset gTileset_BattleDome =
     .palettes = gTilesetPalettes_BattleDome,
     .metatiles = gMetatiles_BattleDome,
     .metatileAttributes = gMetatileAttributes_BattleDome,
-    .callback = InitTilesetAnim_BattleDome,
+    .callback = NULL,
 };
 
 const struct Tileset gTileset_BattleFactory =
@@ -724,7 +724,7 @@ const struct Tileset gTileset_BattlePyramid =
     .palettes = gTilesetPalettes_BattlePyramid,
     .metatiles = gMetatiles_BattlePyramid,
     .metatileAttributes = gMetatileAttributes_BattlePyramid,
-    .callback = InitTilesetAnim_BattlePyramid,
+    .callback = NULL,
 };
 
 const struct Tileset gTileset_MirageTower =

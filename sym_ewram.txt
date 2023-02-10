@@ -153,3 +153,4 @@
 	.include "src/day_night.o"
 	.include "src/intro_speech.o"
 	.include "src/pathfinding.o"
+	.include "src/sprite_palette.o"

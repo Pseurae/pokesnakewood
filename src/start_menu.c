@@ -90,6 +90,8 @@ EWRAM_DATA static u8 (*sSaveDialogCallback)(void) = NULL;
 EWRAM_DATA static u8 sSaveDialogTimer = 0;
 EWRAM_DATA static bool8 sSavingComplete = FALSE;
 EWRAM_DATA static u8 sSaveInfoWindowId = 0;
+EWRAM_DATA static u8 sSafariBallsWindowId = 0;
+EWRAM_DATA static u8 sBattlePyramidFloorWindowId = 0;
 
 EWRAM_DATA static u8 sClockUpdateTaskId = 0;
 
@@ -232,7 +234,6 @@ static void BuildBattlePyramidStartMenu(void);
 static void BuildMultiPartnerRoomStartMenu(void);
 static void ShowSafariBallsWindow(void);
 static void ShowPyramidFloorWindow(void);
-static void ShowClockWindow(void);
 static void RemoveExtraStartMenuWindows(void);
 static bool32 PrintStartMenuActions(s8 *pIndex, u32 count);
 static bool32 InitStartMenuStep(void);
@@ -419,66 +420,6 @@ static void ShowPyramidFloorWindow(void)
     CopyWindowToVram(sBattlePyramidFloorWindowId, COPYWIN_GFX);
 }
 
-static const u8 sTimeFormat1[] = _("{STR_VAR_1}:{STR_VAR_2} {STR_VAR_3}");
-static const u8 sTimeFormat2[] = _("{STR_VAR_1}{COLOR TRANSPARENT}{SHADOW TRANSPARENT}:{COLOR DARK_GRAY}{SHADOW LIGHT_GRAY}{STR_VAR_2} {STR_VAR_3}");
-static const u8 sTimeAM[] = _("AM");
-static const u8 sTimePM[] = _("PM");
-
-#define tUpdateTimer data[0]
-#define tFlickerTimer data[1]
-
-static void Task_UpdateClockWindow(u8 taskId)
-{
-    s16 *data = gTasks[taskId].data;
-
-    switch (tUpdateTimer)
-    {
-    default:
-        tUpdateTimer++;
-        break;
-    case 10:
-        RtcCalcLocalTime();
-        tUpdateTimer++;
-        break;
-    case 20:
-        FillWindowPixelBuffer(sClockWindowId, PIXEL_FILL(1));
-        ConvertIntToDecimalStringN(gStringVar1, gLocalTime.hours % 12, STR_CONV_MODE_LEADING_ZEROS, 2);
-        ConvertIntToDecimalStringN(gStringVar2, gLocalTime.minutes, STR_CONV_MODE_LEADING_ZEROS, 2);
-        StringExpandPlaceholders(gStringVar3, (gLocalTime.hours < 12) ? sTimeAM : sTimePM);
-        StringExpandPlaceholders(gStringVar4, tFlickerTimer ? sTimeFormat1 : sTimeFormat2);
-        AddTextPrinterParameterized(sClockWindowId, FONT_SHORT, gStringVar4, 1, 1, TEXT_SKIP_DRAW, NULL);
-        CopyWindowToVram(sClockWindowId, COPYWIN_GFX);
-        tUpdateTimer++;
-        break;
-    case 40:
-        tFlickerTimer++;
-        tFlickerTimer %= 2;
-        tUpdateTimer = 0;
-        break;
-    }
-}
-
-#undef tUpdateTimer
-#undef tFlickerTimer
-
-static void ShowClockWindow(void)
-{
-    sClockWindowId = AddWindow(&sClockWindowTemplate);
-    PutWindowTilemap(sClockWindowId);
-    LoadStdBoxGfx(sClockWindowId, 0x21F, 0xD0);
-    DrawStdFrameWithCustomTileAndPalette(sClockWindowId, FALSE, 0x21F, 13);
-
-    ConvertIntToDecimalStringN(gStringVar1, gLocalTime.hours % 12, STR_CONV_MODE_LEADING_ZEROS, 2);
-    ConvertIntToDecimalStringN(gStringVar2, gLocalTime.minutes, STR_CONV_MODE_LEADING_ZEROS, 2);
-    StringExpandPlaceholders(gStringVar3, (gLocalTime.hours < 12) ? sTimeAM : sTimePM);
-
-    StringExpandPlaceholders(gStringVar4, sTimeFormat1);
-
-    AddTextPrinterParameterized(sClockWindowId, FONT_SHORT, gStringVar4, 1, 1, TEXT_SKIP_DRAW, NULL);
-    CopyWindowToVram(sClockWindowId, COPYWIN_GFX);
-    sClockUpdateTaskId = CreateTask(Task_UpdateClockWindow, 0);
-}
-
 static void RemoveExtraStartMenuWindows(void)
 {
     if (GetSafariZoneFlag())
@@ -491,12 +432,6 @@ static void RemoveExtraStartMenuWindows(void)
     {
         ClearStdWindowAndFrameToTransparent(sBattlePyramidFloorWindowId, FALSE);
         RemoveWindow(sBattlePyramidFloorWindowId);
-    }
-    else
-    {
-        ClearStdWindowAndFrameToTransparent(sClockWindowId, FALSE);
-        RemoveWindow(sClockWindowId);
-        DestroyTask(sClockUpdateTaskId);
     }
 }
 

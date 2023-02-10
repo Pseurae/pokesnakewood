@@ -11,6 +11,7 @@
 #include "palette.h"
 #include "sound.h"
 #include "sprite.h"
+#include "sprite_palette.h"
 #include "trig.h"
 #include "util.h"
 #include "constants/field_effects.h"
@@ -123,7 +124,6 @@ static void LoadObjectRegularReflectionPalette(struct ObjectEvent *objectEvent, 
     PatchObjectPalette(graphicsInfo->paletteTag, paletteIndex);
 	BlendPalettes(gBitTable[(paletteIndex + 16)], 10, RGB(12, 20, 27)); //Make it blueish
     LoadPalette(&gPlttBufferFaded[(paletteIndex + 16) << 4], (paletteIndex + 16) << 4, 0x20);
-    UpdatePaletteColorMap(paletteIndex, COLOR_MAP_DARK_CONTRAST);
 }
 
 // When walking on a bridge high above water (Route 120), the reflection is a solid dark blue color.
@@ -137,7 +137,6 @@ static void LoadObjectHighBridgeReflectionPalette(struct ObjectEvent *objectEven
     PatchObjectPalette(graphicsInfo->paletteTag, paletteIndex);
 	BlendPalettes(gBitTable[(paletteIndex + 16)], 10, RGB(6, 10, 27)); //Make it blueish
     LoadPalette(&gPlttBufferFaded[(paletteIndex + 16) << 4], (paletteIndex + 16) << 4, 0x20);
-    UpdatePaletteColorMap(paletteIndex, COLOR_MAP_DARK_CONTRAST);
 }
 
 static void UpdateObjectReflectionSprite(struct Sprite *reflectionSprite)
@@ -202,7 +201,7 @@ u8 CreateWarpArrowSprite(void)
     u8 spriteId, paletteSlot;
     struct Sprite *sprite;
 
-    paletteSlot = GetObjectPaletteSlot(0x1100);
+    paletteSlot = GetSpritePaletteSlot(PAL_OBJEVENT, 0x1100);
     PatchObjectPalette(0x1100, paletteSlot);
     spriteId = CreateSpriteAtEnd(gFieldEffectObjectTemplatePointers[FLDEFFOBJ_ARROW], 0, 0, 0x95);
     if (spriteId != MAX_SPRITES)

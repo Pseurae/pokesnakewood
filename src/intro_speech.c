@@ -651,13 +651,10 @@ static void CB2_ReturnFromNamingScreen(void)
     SetupReturnCB();
 
     taskId = CreateTask(Task_NamingScreen_WaitForYesNo, 0);
-
     if (gSaveBlock2Ptr->playerGender == MALE)
         gTasks[taskId].tPlayerSpriteId = CreateTrainerSprite(TRAINER_PIC_BRENDAN, 120, 60, 0, &gDecompressionBuffer[0]);
     else
         gTasks[taskId].tPlayerSpriteId = CreateTrainerSprite(TRAINER_PIC_MAY, 120, 60, 0, &gDecompressionBuffer[0]);
-
-    BeginNormalPaletteFade(PALETTES_ALL, 0, 16, 0, RGB_BLACK);
 }
 
 static void Task_NamingScreen_WaitForYesNo(u8 taskId)
