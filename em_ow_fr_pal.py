@@ -21,7 +21,10 @@ def closest_color(c, palette):
     r1, g1, b1 = c
     for i, (r2, g2, b2) in enumerate(palette[1:], 1):
         # Color diff from https://stackoverflow.com/questions/1847092/given-an-rgb-value-what-would-be-the-best-way-to-find-the-closest-match-in-the-d
-        d = ((r2-r1)*0.30)**2 + ((g2-g1)*0.59)**2 + ((b2-b1)*0.11)**2
+        if (r2 - r1) < 128:
+            d = (2 * (r2-r1))**2 + 4 * ((g2-g1))**2 + 3 * ((b2-b1))**2
+        else:
+            d = (3 * (r2-r1))**2 + 4 * ((g2-g1))**2 + 2 * ((b2-b1))**2
         if d < min_d:
             min_d = d
             best = i

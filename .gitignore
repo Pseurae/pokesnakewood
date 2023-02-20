@@ -38,3 +38,5 @@ porymap.*.cfg
 *.diff
 *.sym
 data/maps/*/scripts.inc
+
+assets/pokeicons/formatted

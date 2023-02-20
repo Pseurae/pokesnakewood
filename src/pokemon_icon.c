@@ -6,8 +6,6 @@
 #include "sprite.h"
 #include "data.h"
 
-#define POKE_ICON_BASE_PAL_TAG 56000
-
 #define INVALID_ICON_SPECIES SPECIES_NONE // Oddly specific, used when an icon should be a ?. Any of the 'old unown' would work
 
 struct MonIconSpriteTemplate
@@ -2784,9 +2782,6 @@ void FreeAndDestroyMonIconSprite(struct Sprite *sprite)
 
 void LoadMonIconPalettes(void)
 {
-    u8 i;
-    for (i = 0; i < ARRAY_COUNT(gMonIconPaletteTable); i++)
-        LoadSpritePalette(&gMonIconPaletteTable[i]);
 }
 
 // unused
@@ -2802,9 +2797,20 @@ void SafeLoadMonIconPalette(u16 species)
 
 void LoadMonIconPalette(u16 species)
 {
-    u8 palIndex = gMonIconPaletteIndices[species];
-    if (IndexOfSpritePaletteTag(gMonIconPaletteTable[palIndex].tag) == 0xFF)
-        LoadSpritePalette(&gMonIconPaletteTable[palIndex]);
+}
+
+void SetMonIconPalette(struct Pokemon *mon, struct Sprite *sprite, u8 paletteNum)
+{
+    if (paletteNum >= 16)
+        return;
+
+    if (GetMonData(mon, MON_DATA_IS_EGG, NULL))
+        LoadCompressedPalette(gMonPalette_Egg, 0x100 + (paletteNum << 4), 32);
+    else
+        LoadCompressedPalette(GetMonFrontSpritePal(mon), 0x100 + (paletteNum << 4), 32);
+
+    if (sprite)
+        sprite->oam.paletteNum = paletteNum;
 }
 
 void LoadMonIconPalettePersonality(u16 species, u32 personality)

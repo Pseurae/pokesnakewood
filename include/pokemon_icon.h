@@ -1,6 +1,8 @@
 #ifndef GUARD_POKEMON_ICON_H
 #define GUARD_POKEMON_ICON_H
 
+#define POKE_ICON_BASE_PAL_TAG 56000
+
 extern const u8 gMonIconPaletteIndices[];
 extern const u8 gMonIconPaletteIndicesFemale[];
 extern const u8 *const gMonIconTable[];
@@ -23,6 +25,7 @@ void FreeAndDestroyMonIconSprite(struct Sprite *sprite);
 u8 CreateMonIcon(u16 species, void (*callback)(struct Sprite *), s16 x, s16 y, u8 subpriority, u32 personality);
 u8 UpdateMonIconFrame(struct Sprite *sprite);
 void LoadMonIconPalette(u16 species);
+void SetMonIconPalette(struct Pokemon *mon, struct Sprite *sprite, u8 paletteNum);
 void LoadMonIconPalettePersonality(u16 species, u32 personality);
 void SpriteCB_MonIcon(struct Sprite *sprite);
 void SetPartyHPBarSprite(struct Sprite *sprite, u8 animNum);

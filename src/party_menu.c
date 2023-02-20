@@ -3515,9 +3515,11 @@ static bool8 SetUpFieldMove_Dive(void)
 static void CreatePartyMonIconSprite(struct Pokemon *mon, struct PartyMenuBox *menuBox, u32 slot)
 {
     u16 species2;
+    u8 index = slot < PARTY_SIZE ? AllocSpritePalette(POKE_ICON_BASE_PAL_TAG + slot) : 0xFF;
 
     species2 = GetMonData(mon, MON_DATA_SPECIES2);
     CreatePartyMonIconSpriteParameterized(species2, GetMonData(mon, MON_DATA_PERSONALITY), menuBox, 1);
+    SetMonIconPalette(mon, &gSprites[menuBox->monSpriteId], index);
     UpdatePartyMonHPBar(menuBox->monSpriteId, mon);
 }
 

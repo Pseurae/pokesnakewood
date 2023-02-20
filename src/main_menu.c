@@ -339,7 +339,7 @@ enum
     ACTION_INVALID
 };
 
-EWRAM_DATA static u8 sContinueMonIconSpriteIds[PARTY_SIZE] = { MAX_SPRITES };
+EWRAM_DATA static u8 sContinueMonIconSpriteIds[PARTY_SIZE] = { SPRITE_NONE };
 
 #define MAIN_MENU_BORDER_TILE 0x23D
 
@@ -842,20 +842,24 @@ static void Task_DisplayMainMenuInvalidActionError(u8 taskId)
 
 #undef tArrowTaskIsScrolled
 
-static void SetMonIconsAnim(u8 animNum)
+static void SetMonIconsAnim(bool8 onContinue)
 {
     u8 i;
     for (i = 0; i < gPlayerPartyCount; i++)
     {
-        if (sContinueMonIconSpriteIds[i] != MAX_SPRITES)
-            StartSpriteAnim(&gSprites[sContinueMonIconSpriteIds[i]], animNum);
+        if (sContinueMonIconSpriteIds[i] != SPRITE_NONE)
+            StartSpriteAnim(&gSprites[sContinueMonIconSpriteIds[i]], (onContinue ? 0 : 4));
     }
+
+    if (onContinue)
+        SetGpuReg(REG_OFFSET_BLDALPHA, BLDALPHA_BLEND(7, 11));
+    else
+        SetGpuReg(REG_OFFSET_BLDALPHA, BLDALPHA_BLEND(11, 7));
 }
 
 static void HighlightSelectedMainMenuItem(u8 menuType, u8 selectedMenuItem, s16 isScrolled)
 {
     SetGpuReg(REG_OFFSET_WIN0H, MENU_WIN_HCOORDS);
-    SetMonIconsAnim(4);
 
     switch (menuType)
     {
@@ -871,19 +875,22 @@ static void HighlightSelectedMainMenuItem(u8 menuType, u8 selectedMenuItem, s16 
                     SetGpuReg(REG_OFFSET_WIN0V, MENU_WIN_VCOORDS(1));
                     break;
             }
+            SetMonIconsAnim(FALSE);
             break;
         case HAS_SAVED_GAME:
             switch (selectedMenuItem)
             {
                 case 0:
                 default:
-                    SetMonIconsAnim(0);
+                    SetMonIconsAnim(TRUE);
                     SetGpuReg(REG_OFFSET_WIN0V, MENU_WIN_VCOORDS(2));
                     break;
                 case 1:
+                    SetMonIconsAnim(FALSE);
                     SetGpuReg(REG_OFFSET_WIN0V, MENU_WIN_VCOORDS(3));
                     break;
                 case 2:
+                    SetMonIconsAnim(FALSE);
                     SetGpuReg(REG_OFFSET_WIN0V, MENU_WIN_VCOORDS(4));
                     break;
             }
@@ -893,13 +900,15 @@ static void HighlightSelectedMainMenuItem(u8 menuType, u8 selectedMenuItem, s16 
             {
                 case 0:
                 default:
-                    SetMonIconsAnim(0);
+                    SetMonIconsAnim(TRUE);
                     SetGpuReg(REG_OFFSET_WIN0V, MENU_WIN_VCOORDS(5));
                     break;
                 case 1:
+                    SetMonIconsAnim(FALSE);
                     SetGpuReg(REG_OFFSET_WIN0V, MENU_WIN_VCOORDS(6));
                     break;
                 case 2:
+                    SetMonIconsAnim(FALSE);
                     SetGpuReg(REG_OFFSET_WIN0V, MENU_WIN_VCOORDS(7));
                     break;
             }
@@ -1015,11 +1024,14 @@ static void MainMenu_CreatePokeIcons(u8 windowId)
         species = GetMonData(&gPlayerParty[i], MON_DATA_SPECIES);
         if (species != SPECIES_NONE)
         {
+            u8 index = AllocSpritePalette(POKE_ICON_BASE_PAL_TAG + i);
+
             if (GetMonData(&gPlayerParty[i], MON_DATA_IS_EGG))
                 species = SPECIES_EGG;
 
-            LoadMonIconPalette(species);
-            spriteId = CreateMonIcon(species, SpriteCB_MonIcon, x, 70, 1, GetMonData(&gPlayerParty[i], MON_DATA_PERSONALITY));
+            spriteId = CreateMonIcon(species, SpriteCB_MonIcon, x, 74, 1, GetMonData(&gPlayerParty[i], MON_DATA_PERSONALITY));
+            SetMonIconPalette(&gPlayerParty[i], &gSprites[spriteId], index);
+
             gSprites[spriteId].oam.priority = 0;
             sContinueMonIconSpriteIds[i] = spriteId;
         }
