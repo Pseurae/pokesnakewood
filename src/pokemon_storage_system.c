@@ -457,6 +457,7 @@ struct PokemonStorageSystemData
     u16 movingMonPalette[16];
     struct Sprite *partySprites[PARTY_SIZE];
     u16 partyPalettes[PARTY_SIZE][16];
+    s16 partySpriteOffset;
     struct Sprite *boxMonsSprites[IN_BOX_COUNT];
     u16 boxMonsPalettes[IN_BOX_COUNT][16];
     struct Sprite **shiftMonSpritePtr;
@@ -1961,15 +1962,28 @@ static void HBlankCB_PokeStorage(void)
         }
     }
 
-    for (i = 1; i < PARTY_SIZE - 1; ++i)
+    if (sStorage->partySprites[1])
     {
-        u8 y = (i - 1) * 26;
+        s16 starty = sStorage->partySprites[1]->y - 16;
 
-        if (vcount == y)
+        for (i = 1; i < PARTY_SIZE; ++i)
         {
-            dst = (u16 *)(OBJ_PLTT + (13 << 5));
-            CpuFastCopy(sStorage->partyPalettes[i], dst, (16 << 1));
-            break;
+            s16 y;
+
+            if (!sStorage->partySprites[i])
+                break;
+            if (sStorage->partySprites[i]->invisible)
+                continue;
+
+            y = starty + (i - 1) * 26;
+
+            if ((y < 0 && y + 32 >= 0 && vcount == 0) || 
+                (vcount == y))
+            {
+                dst = (u16 *)(OBJ_PLTT + (13 << 5));
+                CpuFastCopy(sStorage->partyPalettes[i], dst, (16 << 1));
+                break;
+            }
         }
     }
 }
@@ -4873,6 +4887,9 @@ static void DestroyMovingMonIcon(void)
 static void MovePartySprites(s16 yDelta)
 {
     u16 i, posY;
+
+    sStorage->partySpriteOffset += yDelta;
+    DebugPrintf("partySpriteOffset: %d", sStorage->partySpriteOffset);
 
     for (i = 0; i < PARTY_SIZE; i++)
     {
