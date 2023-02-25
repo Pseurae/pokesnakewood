@@ -3942,6 +3942,7 @@ static void CreateIntroTask(s16 fadeToGrayDelay, s16 fadeFromGrayDelay, s16 numF
     gTasks[taskId].tFadeToGrayIncrement = fadeToGrayIncrement;
     gTasks[taskId].tFadeFromGrayIncrement = fadeFromGrayIncrement;
     gTasks[taskId].tDelayTimer = fadeToGrayDelay;
+    SetGpuReg(REG_OFFSET_BLDALPHA, BLDALPHA_BLEND(0, 13));
 }
 
 static bool8 IsIntroTaskDone(void)
