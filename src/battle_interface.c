@@ -2867,10 +2867,12 @@ static void PrintOnAbilityPopUp(const u8 *str, u8 *spriteTileData1, u8 *spriteTi
     for (i = 0; i < MAX_CHARS_PRINTED; i++)
     {
         text1[i] = str[i];
-        if (text1[i] == EOS)
-            break;
+        if (text1[i] != EOS)
+            continue;
+
+        text1[i] = EOS;
+        break;
     }
-    text1[i] = EOS;
 
     // Because there are two Windows, we need to align the strings, so that the first char in the second window starts right after the last char in the first window.
     // Windows are 64 pixels in width.

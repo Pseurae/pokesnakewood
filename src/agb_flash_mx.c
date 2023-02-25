@@ -78,7 +78,7 @@ u16 EraseFlashSector_MX(u16 sectorNum)
 {
     u16 numTries;
     u16 result;
-    u8 *addr;
+    vu8 *addr;
     u16 readFlash1Buffer[0x20];
 
     if (sectorNum >= gFlash->sector.count)
@@ -92,7 +92,7 @@ u16 EraseFlashSector_MX(u16 sectorNum)
 try_erase:
     REG_WAITCNT = (REG_WAITCNT & ~WAITCNT_SRAM_MASK) | gFlash->wait[0];
 
-    addr = FLASH_BASE + (sectorNum << gFlash->sector.shift);
+    addr = (vu8 *)FLASH_BASE + (sectorNum << gFlash->sector.shift);
 
     FLASH_WRITE(0x5555, 0xAA);
     FLASH_WRITE(0x2AAA, 0x55);
@@ -103,7 +103,7 @@ try_erase:
 
     SetReadFlash1(readFlash1Buffer);
 
-    result = WaitForFlashWrite(2, addr, 0xFF);
+    result = WaitForFlashWrite(2, (u8 *)addr, 0xFF);
 
     if (!(result & 0xA000) || numTries > 3)
         goto done;
