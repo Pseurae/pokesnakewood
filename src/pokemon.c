@@ -4496,7 +4496,7 @@ u32 GetBoxMonData(struct BoxPokemon *boxMon, s32 field, u8 *data)
     case MON_DATA_EVENT_LEGAL:
         retVal = boxMon->catch_ribbon.eventLegal;
         break;
-    case MON_DATA_SPECIES2:
+    case MON_DATA_SPECIES_OR_EGG:
         retVal = boxMon->info.species;
         if (boxMon->info.species && (boxMon->catch_ribbon.isEgg || boxMon->isBadEgg))
             retVal = SPECIES_EGG;
@@ -4647,7 +4647,7 @@ void SetMonData(struct Pokemon *mon, s32 field, const void *dataArg)
     case MON_DATA_MAIL:
         SET8(mon->mail);
         break;
-    case MON_DATA_SPECIES2:
+    case MON_DATA_SPECIES_OR_EGG:
         break;
     default:
         SetBoxMonData(&mon->box, field, data);
@@ -4988,9 +4988,9 @@ u8 GetMonsStateToDoubles(void)
 
     for (i = 0; i < gPlayerPartyCount; i++)
     {
-        if (GetMonData(&gPlayerParty[i], MON_DATA_SPECIES2, NULL) != SPECIES_EGG
+        if (GetMonData(&gPlayerParty[i], MON_DATA_SPECIES_OR_EGG, NULL) != SPECIES_EGG
          && GetMonData(&gPlayerParty[i], MON_DATA_HP, NULL) != 0
-         && GetMonData(&gPlayerParty[i], MON_DATA_SPECIES2, NULL) != SPECIES_NONE)
+         && GetMonData(&gPlayerParty[i], MON_DATA_SPECIES_OR_EGG, NULL) != SPECIES_NONE)
             aliveCount++;
     }
 
@@ -5004,7 +5004,7 @@ u8 GetMonsStateToDoubles_2(void)
 
     for (i = 0; i < PARTY_SIZE; i++)
     {
-        u32 species = GetMonData(&gPlayerParty[i], MON_DATA_SPECIES2, NULL);
+        u32 species = GetMonData(&gPlayerParty[i], MON_DATA_SPECIES_OR_EGG, NULL);
         if (species != SPECIES_EGG && species != SPECIES_NONE
          && GetMonData(&gPlayerParty[i], MON_DATA_HP, NULL) != 0)
             aliveCount++;
@@ -6640,7 +6640,7 @@ void AdjustFriendship(struct Pokemon *mon, u8 event)
     u16 species, heldItem;
     u8 holdEffect;
 
-    species = GetMonData(mon, MON_DATA_SPECIES2, 0);
+    species = GetMonData(mon, MON_DATA_SPECIES_OR_EGG, 0);
     heldItem = GetMonData(mon, MON_DATA_HELD_ITEM, 0);
 
     if (heldItem == ITEM_ENIGMA_BERRY_E_READER)
@@ -7077,7 +7077,7 @@ u8 GetNumberOfRelearnableMoves(struct Pokemon *mon)
     u16 learnedMoves[MAX_MON_MOVES];
     u16 moves[MAX_LEVEL_UP_MOVES];
     u8 numMoves = 0;
-    u16 species = GetMonData(mon, MON_DATA_SPECIES2, 0);
+    u16 species = GetMonData(mon, MON_DATA_SPECIES_OR_EGG, 0);
     u8 level = GetMonData(mon, MON_DATA_LEVEL, 0);
     int i, j, k;
 
@@ -7236,7 +7236,7 @@ static void Task_PlayMapChosenOrBattleBGM(u8 taskId)
 
 const u32 *GetMonFrontSpritePal(struct Pokemon *mon)
 {
-    u16 species = GetMonData(mon, MON_DATA_SPECIES2, 0);
+    u16 species = GetMonData(mon, MON_DATA_SPECIES_OR_EGG, 0);
     u32 otId = GetMonData(mon, MON_DATA_OT_ID, 0);
     u32 personality = GetMonData(mon, MON_DATA_PERSONALITY, 0);
     return GetMonSpritePalFromSpeciesAndPersonality(species, otId, personality);
@@ -7268,7 +7268,7 @@ const u32 *GetMonSpritePalFromSpeciesAndPersonality(u16 species, u32 otId, u32 p
 
 const struct CompressedSpritePalette *GetMonSpritePalStruct(struct Pokemon *mon)
 {
-    u16 species = GetMonData(mon, MON_DATA_SPECIES2, 0);
+    u16 species = GetMonData(mon, MON_DATA_SPECIES_OR_EGG, 0);
     u32 otId = GetMonData(mon, MON_DATA_OT_ID, 0);
     u32 personality = GetMonData(mon, MON_DATA_PERSONALITY, 0);
     return GetMonSpritePalStructFromOtIdPersonality(species, otId, personality);

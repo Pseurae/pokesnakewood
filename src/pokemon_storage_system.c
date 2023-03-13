@@ -4411,7 +4411,7 @@ static u8 GetMonIconPriorityByCursorPos(void)
 static void CreateMovingMonIcon(void)
 {
     u32 personality = GetMonData(&sStorage->movingMon, MON_DATA_PERSONALITY);
-    u16 species = GetMonData(&sStorage->movingMon, MON_DATA_SPECIES2);
+    u16 species = GetMonData(&sStorage->movingMon, MON_DATA_SPECIES_OR_EGG);
     u8 priority = GetMonIconPriorityByCursorPos();
 
     sStorage->movingMonSprite = CreateMonIconSprite(species, personality, 0, 0, priority, 7);
@@ -4433,7 +4433,7 @@ static void InitBoxMonSprites(u8 boxId)
     {
         for (j = 0; j < IN_BOX_COLUMNS; j++)
         {
-            species = GetBoxMonDataAt(boxId, boxPosition, MON_DATA_SPECIES2);
+            species = GetBoxMonDataAt(boxId, boxPosition, MON_DATA_SPECIES_OR_EGG);
             if (species != SPECIES_NONE)
             {
                 personality = GetBoxMonDataAt(boxId, boxPosition, MON_DATA_PERSONALITY);
@@ -4469,7 +4469,7 @@ static void InitBoxMonSprites(u8 boxId)
 
 static void CreateBoxMonIconAtPos(u8 boxPosition)
 {
-    u16 species = GetCurrentBoxMonData(boxPosition, MON_DATA_SPECIES2);
+    u16 species = GetCurrentBoxMonData(boxPosition, MON_DATA_SPECIES_OR_EGG);
 
     if (species != SPECIES_NONE)
     {
@@ -4579,7 +4579,7 @@ static u8 CreateBoxMonIconsInColumn(u8 column, u16 distance, s16 speed)
     {
         for (i = 0; i < IN_BOX_ROWS; i++)
         {
-            u16 species = GetBoxMonDataAt(sStorage->scrollToBoxId, boxPosition, MON_DATA_SPECIES2);
+            u16 species = GetBoxMonDataAt(sStorage->scrollToBoxId, boxPosition, MON_DATA_SPECIES_OR_EGG);
             u32 personality = GetBoxMonDataAt(sStorage->scrollToBoxId, boxPosition, MON_DATA_PERSONALITY);
             u32 otid = GetBoxMonDataAt(sStorage->scrollToBoxId, boxPosition, MON_DATA_OT_ID);
 
@@ -4610,7 +4610,7 @@ static u8 CreateBoxMonIconsInColumn(u8 column, u16 distance, s16 speed)
         // to create the icons with the proper blend
         for (i = 0; i < IN_BOX_ROWS; i++)
         {
-            u16 species = GetBoxMonDataAt(sStorage->scrollToBoxId, boxPosition, MON_DATA_SPECIES2);
+            u16 species = GetBoxMonDataAt(sStorage->scrollToBoxId, boxPosition, MON_DATA_SPECIES_OR_EGG);
             u32 personality = GetBoxMonDataAt(sStorage->scrollToBoxId, boxPosition, MON_DATA_PERSONALITY);
             u32 otid = GetBoxMonDataAt(sStorage->scrollToBoxId, boxPosition, MON_DATA_OT_ID);
 
@@ -4732,7 +4732,7 @@ static void SetBoxMonIconObjMode(u8 boxPosition, u8 objMode)
 static void CreatePartyMonsSprites(bool8 visible)
 {
     u16 i, count;
-    u16 species = GetMonData(&gPlayerParty[0], MON_DATA_SPECIES2);
+    u16 species = GetMonData(&gPlayerParty[0], MON_DATA_SPECIES_OR_EGG);
     u32 personality = GetMonData(&gPlayerParty[0], MON_DATA_PERSONALITY);
     u32 otid = GetMonData(&gPlayerParty[0], MON_DATA_OT_ID);
 
@@ -4746,7 +4746,7 @@ static void CreatePartyMonsSprites(bool8 visible)
 
     for (i = 1; i < PARTY_SIZE; i++)
     {
-        species = GetMonData(&gPlayerParty[i], MON_DATA_SPECIES2);
+        species = GetMonData(&gPlayerParty[i], MON_DATA_SPECIES_OR_EGG);
         if (species != SPECIES_NONE)
         {
             personality = GetMonData(&gPlayerParty[i], MON_DATA_PERSONALITY);
@@ -6950,7 +6950,7 @@ static void SetDisplayMonData(void *pokemon, u8 mode)
     {
         struct Pokemon *mon = (struct Pokemon *)pokemon;
 
-        sStorage->displayMonSpecies = GetMonData(mon, MON_DATA_SPECIES2);
+        sStorage->displayMonSpecies = GetMonData(mon, MON_DATA_SPECIES_OR_EGG);
         if (sStorage->displayMonSpecies != SPECIES_NONE)
         {
             sanityIsBadEgg = GetMonData(mon, MON_DATA_SANITY_IS_BAD_EGG);
@@ -6973,7 +6973,7 @@ static void SetDisplayMonData(void *pokemon, u8 mode)
     {
         struct BoxPokemon *boxMon = (struct BoxPokemon *)pokemon;
 
-        sStorage->displayMonSpecies = GetBoxMonData(pokemon, MON_DATA_SPECIES2);
+        sStorage->displayMonSpecies = GetBoxMonData(pokemon, MON_DATA_SPECIES_OR_EGG);
         if (sStorage->displayMonSpecies != SPECIES_NONE)
         {
             u32 otId = GetBoxMonData(boxMon, MON_DATA_OT_ID);
@@ -8507,7 +8507,7 @@ static void MultiMove_DeselectRow(u8 row, u8 minColumn, u8 maxColumn)
 static void MultiMove_SetIconToBg(u8 x, u8 y)
 {
     u8 position = x + (IN_BOX_COLUMNS * y);
-    u16 species = GetCurrentBoxMonData(position, MON_DATA_SPECIES2);
+    u16 species = GetCurrentBoxMonData(position, MON_DATA_SPECIES_OR_EGG);
     u32 personality = GetCurrentBoxMonData(position, MON_DATA_PERSONALITY);
 
     if (species != SPECIES_NONE)
@@ -8532,7 +8532,7 @@ static void MultiMove_SetIconToBg(u8 x, u8 y)
 static void MultiMove_ClearIconFromBg(u8 x, u8 y)
 {
     u8 position = x + (IN_BOX_COLUMNS * y);
-    u16 species = GetCurrentBoxMonData(position, MON_DATA_SPECIES2);
+    u16 species = GetCurrentBoxMonData(position, MON_DATA_SPECIES_OR_EGG);
 
     if (species != SPECIES_NONE)
     {

@@ -5,6 +5,7 @@
 #include "util.h"
 #include "event_object_movement.h"
 #include "field_weather.h"
+#include "fieldmap.h"
 #include "main.h"
 #include "menu.h"
 #include "palette.h"
@@ -18,13 +19,6 @@
 #include "gpu_regs.h"
 
 #define DROUGHT_COLOR_INDEX(color) ((((color) >> 1) & 0xF) | (((color) >> 2) & 0xF0) | (((color) >> 3) & 0xF00))
-
-enum
-{
-    COLOR_MAP_NONE,
-    COLOR_MAP_DARK_CONTRAST,
-    COLOR_MAP_CONTRAST,
-};
 
 struct RGBColor
 {
@@ -111,7 +105,7 @@ void (*const gWeatherPalStateFuncs[])(void) =
 
 // This table specifies which of the color maps should be
 // applied to each of the background and sprite palettes.
-static const u8 sBasePaletteColorMapTypes[32] =
+EWRAM_DATA u8 sBasePaletteColorMapTypes[32] =
 {
     // background palettes
     COLOR_MAP_DARK_CONTRAST,
@@ -131,22 +125,22 @@ static const u8 sBasePaletteColorMapTypes[32] =
     COLOR_MAP_NONE,
     COLOR_MAP_NONE,
     // sprite palettes
-    COLOR_MAP_CONTRAST,
-    COLOR_MAP_DARK_CONTRAST,
-    COLOR_MAP_CONTRAST,
-    COLOR_MAP_CONTRAST,
-    COLOR_MAP_CONTRAST,
-    COLOR_MAP_CONTRAST,
-    COLOR_MAP_DARK_CONTRAST,
-    COLOR_MAP_DARK_CONTRAST,
-    COLOR_MAP_DARK_CONTRAST,
-    COLOR_MAP_DARK_CONTRAST,
-    COLOR_MAP_CONTRAST,
-    COLOR_MAP_DARK_CONTRAST,
-    COLOR_MAP_DARK_CONTRAST,
-    COLOR_MAP_DARK_CONTRAST,
-    COLOR_MAP_DARK_CONTRAST,
-    COLOR_MAP_DARK_CONTRAST,
+    COLOR_MAP_NONE,
+    COLOR_MAP_NONE,
+    COLOR_MAP_NONE,
+    COLOR_MAP_NONE,
+    COLOR_MAP_NONE,
+    COLOR_MAP_NONE,
+    COLOR_MAP_NONE,
+    COLOR_MAP_NONE,
+    COLOR_MAP_NONE,
+    COLOR_MAP_NONE,
+    COLOR_MAP_NONE,
+    COLOR_MAP_NONE,
+    COLOR_MAP_NONE,
+    COLOR_MAP_NONE,
+    COLOR_MAP_NONE,
+    COLOR_MAP_NONE,
 };
 
 const u16 gFogPalette[] = INCBIN_U16("graphics/weather/fog.gbapal");
@@ -155,7 +149,7 @@ void StartWeather(void)
 {
     if (!FuncIsActiveTask(Task_WeatherMain))
     {
-        u8 index = AllocSpritePalette(PALTAG_WEATHER);
+        u8 index = 15;
         CpuCopy32(gFogPalette, &gPlttBufferUnfaded[0x100 + index * 16], 32);
         BuildColorMaps();
         gWeatherPtr->contrastColorMapSpritePalIndex = index;
@@ -280,6 +274,9 @@ static void BuildColorMaps(void)
     u16 baseBrightness;
     u32 remainingBrightness;
     s16 diff;
+
+    for (i = 0; i <= 12; i++)
+        sBasePaletteColorMapTypes[i] = COLOR_MAP_DARK_CONTRAST;
 
     sPaletteColorMapTypes = sBasePaletteColorMapTypes;
     for (i = 0; i < 2; i++)
@@ -796,9 +793,15 @@ void FadeScreen(u8 mode, s8 delay)
     {
         gWeatherPtr->fadeDestColor = fadeColor;
         if (useWeatherPal)
+        {
+            LoadMapTilesetPalettes(gMapHeader.mapLayout);
+            CpuFastFill(0x0, gPlttBufferFaded, PLTT_SIZE);
             gWeatherPtr->fadeScreenCounter = 0;
+        }
         else
+        {
             BeginNormalPaletteFade(PALETTES_ALL, delay, 16, 0, fadeColor);
+        }
 
         gWeatherPtr->palProcessingState = WEATHER_PAL_STATE_SCREEN_FADING_IN;
         gWeatherPtr->fadeInFirstFrame = TRUE;
@@ -856,10 +859,10 @@ void ApplyWeatherColorMapToPal(u8 paletteIndex)
     ApplyColorMap(paletteIndex, 1, gWeatherPtr->colorMapIndex);
 }
 
-void LoadCustomWeatherSpritePalette(const u16 *palette)
+void LoadCustomWeatherSpritePalette(const struct SpritePalette *palette)
 {
-    LoadPalette(palette, 0x100 + gWeatherPtr->weatherPicSpritePalIndex * 16, 32);
-    UpdateSpritePaletteWithWeather(gWeatherPtr->weatherPicSpritePalIndex);
+    LoadSpritePalette(palette);
+    UpdateSpritePaletteWithWeather(IndexOfSpritePaletteTag(palette->tag));
 }
 
 static void LoadDroughtWeatherPalette(u8 *palsIndex, u8 *palsOffset)
@@ -1062,4 +1065,10 @@ void PreservePaletteInWeather(u8 preservedPalIndex)
 void ResetPreservedPalettesInWeather(void)
 {
     sPaletteColorMapTypes = sBasePaletteColorMapTypes;
+}
+
+void UpdatePaletteColorMap(u8 index, u8 gammaType)
+{
+    if (index != 0xFF)
+        sBasePaletteColorMapTypes[index + 16] = gammaType;
 }

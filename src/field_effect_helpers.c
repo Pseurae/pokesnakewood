@@ -11,6 +11,7 @@
 #include "palette.h"
 #include "sound.h"
 #include "sprite.h"
+#include "sprite_palette.h"
 #include "trig.h"
 #include "util.h"
 #include "constants/field_effects.h"
@@ -43,23 +44,6 @@ static u32 ShowDisguiseFieldEffect(u8, u8, u8);
 #define sReflectionObjEventLocalId  data[1]
 #define sReflectionVerticalOffset   data[2]
 #define sIsStillReflection          data[7]
-
-static u8 GetReflectionPaletteSlot(u16 tag)
-{
-    u8 slot;
-    slot = FindSpritePaletteReference(PAL_REFLECTION, tag);
-    if (slot != 0xFF)
-    {
-        return IncrementSpritePaletteReferenceCount(slot);
-    }
-
-    slot = AddSpritePaletteReference(PAL_REFLECTION, tag);
-    if (slot == 0xFF)
-        return 0xFF;
-
-    IncrementSpritePaletteReferenceCount(slot);
-    return slot;
-}
 
 void SetUpReflection(struct ObjectEvent *objectEvent, struct Sprite *sprite, bool8 stillReflection)
 {
@@ -123,6 +107,7 @@ static void LoadObjectRegularReflectionPalette(struct ObjectEvent *objectEvent, 
     PatchObjectPalette(graphicsInfo->paletteTag, paletteIndex);
 	BlendPalettes(gBitTable[(paletteIndex + 16)], 10, RGB(12, 20, 27)); //Make it blueish
     LoadPalette(&gPlttBufferFaded[(paletteIndex + 16) << 4], (paletteIndex + 16) << 4, 0x20);
+    UpdatePaletteColorMap(paletteIndex, COLOR_MAP_DARK_CONTRAST);
     UpdateSpritePaletteWithWeather(paletteIndex);
 }
 
@@ -137,6 +122,7 @@ static void LoadObjectHighBridgeReflectionPalette(struct ObjectEvent *objectEven
     PatchObjectPalette(graphicsInfo->paletteTag, paletteIndex);
 	BlendPalettes(gBitTable[(paletteIndex + 16)], 10, RGB(6, 10, 27)); //Make it blueish
     LoadPalette(&gPlttBufferFaded[(paletteIndex + 16) << 4], (paletteIndex + 16) << 4, 0x20);
+    UpdatePaletteColorMap(paletteIndex, COLOR_MAP_DARK_CONTRAST);
     UpdateSpritePaletteWithWeather(paletteIndex);
 }
 

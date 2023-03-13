@@ -166,7 +166,7 @@ static const struct WindowTemplate sStandardBattleWindowTemplates[] =
 {
     [B_WIN_MSG] = {
         .bg = 0,
-        .tilemapLeft = 2,
+        .tilemapLeft = 1,
         .tilemapTop = 15,
         .width = 26,
         .height = 4,

@@ -1905,7 +1905,7 @@ static u8 CanTeachMove(struct Pokemon *mon, u16 move)
 {
     if (GetMonData(mon, MON_DATA_IS_EGG))
         return CANNOT_LEARN_MOVE_IS_EGG;
-    else if (!CanLearnTeachableMove(GetMonData(mon, MON_DATA_SPECIES2), move))
+    else if (!CanLearnTeachableMove(GetMonData(mon, MON_DATA_SPECIES_OR_EGG), move))
         return CANNOT_LEARN_MOVE;
     else if (MonKnowsMove(mon, move) == TRUE)
         return ALREADY_KNOWS_MOVE;
@@ -3517,7 +3517,7 @@ static void CreatePartyMonIconSprite(struct Pokemon *mon, struct PartyMenuBox *m
     u16 species2;
     u8 index = slot < PARTY_SIZE ? AllocSpritePalette(POKE_ICON_BASE_PAL_TAG + slot) : 0xFF;
 
-    species2 = GetMonData(mon, MON_DATA_SPECIES2);
+    species2 = GetMonData(mon, MON_DATA_SPECIES_OR_EGG);
     CreatePartyMonIconSpriteParameterized(species2, GetMonData(mon, MON_DATA_PERSONALITY), menuBox, 1);
     SetMonIconPalette(mon, &gSprites[menuBox->monSpriteId], index);
     UpdatePartyMonHPBar(menuBox->monSpriteId, mon);

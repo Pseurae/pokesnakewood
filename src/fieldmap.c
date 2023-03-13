@@ -793,8 +793,16 @@ void ApplyGlobalTintToPaletteEntries(u16 *palette, u16 size)
     }
 }
 
+struct RGBColor
+{
+    u16 r:5;
+    u16 g:5;
+    u16 b:5;
+};
+
 void LoadTilesetPalette(struct Tileset const *tileset, u16 destOffset, u16 size)
 {
+    u16 i;
     u16 black = RGB_BLACK;
 
     if (tileset)

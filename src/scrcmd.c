@@ -1681,10 +1681,10 @@ bool8 ScrCmd_checkpartymove(struct ScriptContext *ctx)
     gSpecialVar_Result = PARTY_SIZE;
     for (i = 0; i < PARTY_SIZE; i++)
     {
-        u16 species = GetMonData(&gPlayerParty[i], MON_DATA_SPECIES, NULL);
-        if (!species)
+        u16 species = GetMonData(&gPlayerParty[i], MON_DATA_SPECIES_OR_EGG, NULL);
+        if (species == SPECIES_NONE || species == SPECIES_EGG)
             break;
-        if (!GetMonData(&gPlayerParty[i], MON_DATA_IS_EGG) && MonKnowsMove(&gPlayerParty[i], moveId) == TRUE)
+        if (MonKnowsMove(&gPlayerParty[i], moveId) == TRUE)
         {
             gSpecialVar_Result = i;
             gSpecialVar_0x8004 = species;

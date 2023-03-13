@@ -1,5 +1,6 @@
 #include "global.h"
 #include "decompress.h"
+#include "field_weather.h"
 #include "event_data.h"
 #include "graphics.h"
 #include "item_icon.h"
@@ -94,6 +95,7 @@ void AddObtainedItemIconSprite(void)
 
     if (sObtainedItemIconSpriteId != MAX_SPRITES)
     {
+        PreservePaletteInWeather(gSprites[sObtainedItemIconSpriteId].oam.paletteNum + 0x10);
         gSprites[sObtainedItemIconSpriteId].x2 = 214;
         gSprites[sObtainedItemIconSpriteId].y2 = 140;
         gSprites[sObtainedItemIconSpriteId].oam.priority = 0;
@@ -104,6 +106,7 @@ void RemoveObtainedItemIconSprite(void)
 {
     if (sObtainedItemIconSpriteId != MAX_SPRITES)
     {
+        ResetPreservedPalettesInWeather();
         FreeSpriteTilesByTag(3);
         FreeSpritePaletteByTag(3);
         DestroySprite(&gSprites[sObtainedItemIconSpriteId]);

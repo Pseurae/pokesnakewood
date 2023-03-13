@@ -40,10 +40,10 @@ TITLE       := POKEMON EMER
 GAME_CODE   := BPEE
 MAKER_CODE  := 01
 REVISION    := 0
-MODERN      ?= 0
+MODERN      ?= 1
 
-ifeq (modern,$(MAKECMDGOALS))
-  MODERN := 1
+ifeq (nonmodern,$(MAKECMDGOALS))
+  MODERN := 0
 endif
 
 # use arm-none-eabi-cpp for macOS
@@ -63,15 +63,15 @@ else
   CPP := $(PREFIX)cpp
 endif
 
-ROM_NAME := pokesnakewood.gba
+ROM_NAME := pokesnakewood_nonmodern.gba
 ELF_NAME := $(ROM_NAME:.gba=.elf)
 MAP_NAME := $(ROM_NAME:.gba=.map)
-OBJ_DIR_NAME := build/emerald
+OBJ_DIR_NAME := build/nonmodern
 
-MODERN_ROM_NAME := pokesnakewood_modern.gba
+MODERN_ROM_NAME := pokesnakewood.gba
 MODERN_ELF_NAME := $(MODERN_ROM_NAME:.gba=.elf)
 MODERN_MAP_NAME := $(MODERN_ROM_NAME:.gba=.map)
-MODERN_OBJ_DIR_NAME := build/modern
+MODERN_OBJ_DIR_NAME := build/emerald
 
 SHELL := /bin/bash -o pipefail
 

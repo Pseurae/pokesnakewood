@@ -144,6 +144,13 @@ extern const u16 gFogPalette[];
 // field_weather_effect.c
 extern const u8 gWeatherFogHorizontalTiles[];
 
+enum
+{
+    COLOR_MAP_NONE,
+    COLOR_MAP_DARK_CONTRAST,
+    COLOR_MAP_CONTRAST,
+};
+
 void StartWeather(void);
 void SetNextWeather(u8 weather);
 void SetCurrentAndNextWeather(u8 weather);
@@ -154,7 +161,7 @@ void FadeScreen(u8 mode, s8 delay);
 bool8 IsWeatherNotFadingIn(void);
 void UpdateSpritePaletteWithWeather(u8 spritePaletteIndex);
 void ApplyWeatherColorMapToPal(u8 paletteIndex);
-void LoadCustomWeatherSpritePalette(const u16 *palette);
+void LoadCustomWeatherSpritePalette(const struct SpritePalette *palette);
 void ResetDroughtWeatherPaletteLoading(void);
 bool8 LoadDroughtWeatherPalettes(void);
 void DroughtStateInit(void);
@@ -170,6 +177,7 @@ void SetWeatherScreenFadeOut(void);
 void SetWeatherPalStateIdle(void);
 void PreservePaletteInWeather(u8 preservedPalIndex);
 void ResetPreservedPalettesInWeather(void);
+void UpdatePaletteColorMap(u8 index, u8 mapType);
 
 // field_weather_effect.c
 void Clouds_InitVars(void);

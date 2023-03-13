@@ -105,3 +105,4 @@
 	.include "src/intro_speech.o"
 	.include "src/pathfinding.o"
 	.include "src/debug.o"
+	.include "src/sprite_palette.o"

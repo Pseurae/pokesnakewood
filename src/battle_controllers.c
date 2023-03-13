@@ -148,7 +148,7 @@ static void InitSinglePlayerBtlControllers(void)
 
 bool32 IsValidForBattle(struct Pokemon *mon)
 {
-    u32 species = GetMonData(mon, MON_DATA_SPECIES2);
+    u32 species = GetMonData(mon, MON_DATA_SPECIES_OR_EGG);
     return (species != SPECIES_NONE && species != SPECIES_EGG
              && GetMonData(mon, MON_DATA_HP) != 0
              && GetMonData(mon, MON_DATA_IS_EGG) == 0);

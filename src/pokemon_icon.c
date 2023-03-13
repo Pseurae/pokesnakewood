@@ -2804,10 +2804,7 @@ void SetMonIconPalette(struct Pokemon *mon, struct Sprite *sprite, u8 paletteNum
     if (paletteNum >= 16)
         return;
 
-    if (GetMonData(mon, MON_DATA_IS_EGG, NULL))
-        LoadCompressedPalette(gMonPalette_Egg, 0x100 + (paletteNum << 4), 32);
-    else
-        LoadCompressedPalette(GetMonFrontSpritePal(mon), 0x100 + (paletteNum << 4), 32);
+    LoadCompressedPalette(GetMonFrontSpritePal(mon), 0x100 + (paletteNum << 4), 32);
 
     if (sprite)
         sprite->oam.paletteNum = paletteNum;

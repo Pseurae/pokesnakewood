@@ -783,15 +783,26 @@ void FieldEffectScript_LoadTiles(u8 **script)
 void FieldEffectScript_LoadFadedPalette(u8 **script)
 {
     struct SpritePalette *palette = (struct SpritePalette *)FieldEffectScript_ReadWord(script);
+    u8 paletteSlot;
+
     LoadSpritePalette(palette);
-    UpdateSpritePaletteWithWeather(IndexOfSpritePaletteTag(palette->tag));
+
+    paletteSlot = IndexOfSpritePaletteTag(palette->tag);
+    UpdatePaletteColorMap(paletteSlot, COLOR_MAP_DARK_CONTRAST);
+    UpdateSpritePaletteWithWeather(paletteSlot);
     (*script) += 4;
 }
 
 void FieldEffectScript_LoadPalette(u8 **script)
 {
     struct SpritePalette *palette = (struct SpritePalette *)FieldEffectScript_ReadWord(script);
+    u8 paletteSlot;
+
     LoadSpritePalette(palette);
+
+    paletteSlot = IndexOfSpritePaletteTag(palette->tag);
+    UpdatePaletteColorMap(paletteSlot, COLOR_MAP_DARK_CONTRAST);
+    UpdateSpritePaletteWithWeather(paletteSlot);
     (*script) += 4;
 }
 

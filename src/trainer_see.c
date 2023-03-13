@@ -9,6 +9,7 @@
 #include "script.h"
 #include "script_movement.h"
 #include "sprite.h"
+#include "sprite_palette.h"
 #include "task.h"
 #include "trainer_see.h"
 #include "util.h"
