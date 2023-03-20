@@ -227,11 +227,15 @@ gScriptCmdTable::
 	.4byte ScrCmd_warpwhitefade             @ 0xe0
 	.4byte ScrCmd_buffercontestname         @ 0xe1
 	.4byte ScrCmd_bufferitemnameplural      @ 0xe2
-	.4byte ScrCmd_shownuminput
-	.4byte ScrCmd_setfieldtint
-	.4byte ScrCmd_canpartyusehm
-	.4byte ScrCmd_applypath
-	.4byte ScrCmd_applypathat
+	.4byte ScrCmd_shownuminput				@ 0xe3
+	.4byte ScrCmd_setfieldtint				@ 0xe4
+	.4byte ScrCmd_canpartyusehm				@ 0xe5
+	.4byte ScrCmd_applypath					@ 0xe6
+	.4byte ScrCmd_applypathat				@ 0xe7
+    .4byte ScrCmd_setfollower				@ 0xe8
+    .4byte ScrCmd_destroyfollower			@ 0xe9
+    .4byte ScrCmd_facefollower				@ 0xea
+    .4byte ScrCmd_checkfollower				@ 0xeb
 
 gScriptCmdTableEnd::
 	.4byte ScrCmd_nop

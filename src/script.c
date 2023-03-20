@@ -471,3 +471,9 @@ void GetObjectEventTrainerRangeFromTemplate(void)
     gSpecialVar_0x800A = gMapHeader.events->objectEvents[gSpecialVar_LastTalked - 1].trainerRange_berryTreeId;
     gSpecialVar_0x800B = max(gMapHeader.events->objectEvents[gSpecialVar_LastTalked - 1].movementRangeX, 1);
 }
+
+u8* ReadWord(u8 index)
+{
+    struct ScriptContext *ctx = &sGlobalScriptContext;
+    return (T1_READ_PTR(&ctx->data[index]));
+}
