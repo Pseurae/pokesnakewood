@@ -135,10 +135,6 @@ SCRIPT := tools/poryscript/poryscript$(EXE)
 
 PERL := perl
 
-TOOLDIRS := $(filter-out tools/agbcc tools/binutils,$(wildcard tools/*))
-TOOLBASE = $(TOOLDIRS:tools/%=%)
-TOOLS = $(foreach tool,$(TOOLBASE),tools/$(tool)/$(tool)$(EXE))
-
 MAKEFLAGS += --no-print-directory
 
 # Clear the default suffixes
@@ -151,7 +147,7 @@ MAKEFLAGS += --no-print-directory
 # Secondary expansion is required for dependency variables in object rules.
 .SECONDEXPANSION:
 
-.PHONY: all rom clean compare tidy tools mostlyclean clean-tools $(TOOLDIRS) libagbsyscall modern tidymodern tidynonmodern
+.PHONY: all rom clean compare tidy tools mostlyclean clean-tools libagbsyscall modern tidymodern tidynonmodern
 
 infoshell = $(foreach line, $(shell $1 | sed "s/ /__SPACE__/g"), $(info $(subst __SPACE__, ,$(line))))
 
@@ -169,9 +165,9 @@ endif
 ifeq (,$(MAKECMDGOALS))
   SCAN_DEPS ?= 1
 else
-  # clean, tidy, tools, mostlyclean, clean-tools, $(TOOLDIRS), tidymodern, tidynonmodern don't even build the ROM
+  # clean, tidy, tools, mostlyclean, clean-tools, tidymodern, tidynonmodern don't even build the ROM
   # libagbsyscall does its own thing
-  ifeq (,$(filter-out clean tidy tools mostlyclean clean-tools $(TOOLDIRS) tidymodern tidynonmodern libagbsyscall,$(MAKECMDGOALS)))
+  ifeq (,$(filter-out clean tidy tools mostlyclean clean-tools tidymodern tidynonmodern libagbsyscall,$(MAKECMDGOALS)))
     SCAN_DEPS ?= 0
   else
     SCAN_DEPS ?= 1
@@ -215,12 +211,10 @@ AUTO_GEN_TARGETS :=
 
 all: rom
 
-tools: $(TOOLDIRS)
+tools:
+	@$(MAKE) -C tools
 
 syms: $(SYM)
-
-$(TOOLDIRS):
-	@$(MAKE) -C $@
 
 rom: $(ROM)
 ifeq ($(COMPARE),1)
