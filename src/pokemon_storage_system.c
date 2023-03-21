@@ -446,13 +446,13 @@ struct PokemonStorageSystemData
     u16 scrollUnused4; // Never read
     u16 scrollUnused5; // Never read
     u16 scrollUnused6; // Never read
-    u8 filler1[22];
+    u8 filler1[50];
     u8 boxTitleTiles[1024];
     u8 boxTitleCycleId;
     u8 wallpaperLoadState; // Written to, but never read.
     u8 wallpaperLoadBoxId;
     s8 wallpaperLoadDir;
-    u16 boxTitlePal[16];
+    u16 boxTitlePal[2];
     u16 boxTitlePalOffset;
     u16 boxTitleAltPalOffset;
     struct Sprite *curBoxTitleSprites[2];
@@ -2061,51 +2061,75 @@ static void SetPokeStorageTask(TaskFunc newFunc)
     sStorage->state = 0;
 }
 
+static inline __attribute__((always_inline)) bool8 IsHardwarePaletteFadeActive(void)
+{
+    return (gPaletteFade.active && gPaletteFade.y == 16 && gPaletteFade.mode == 2);
+}
+
 // Manages swapping palettes mid draw to make all icon palettes appear
 static void HBlankCB_PokeStorage(void) {
-  u8 vCount = REG_VCOUNT;
-  u32 i;
-  if (vCount >= DISPLAY_HEIGHT || !sPaletteSwapBuffer || (gPaletteFade.active && gPaletteFade.y == 16 && gPaletteFade.mode == 2)) // HARDWARE_FADE
-    return;
-  // For each row in the pc box
-  for (i = 0; i < IN_BOX_ROWS; i++) {
-    if (vCount == 28-8+24*i) { // -8 is to keep the right palette when being switched
-      u32 position = IN_BOX_COLUMNS*16*i;
-      u16* dst = (u16*) (OBJ_PLTT + (i & 1 ? 7 : 1)*16*2); // Points into Palette RAM directly
-      u32 j;
-      for (j = 0; j < IN_BOX_COLUMNS; j++, position += 16, dst += 16) {
-        // If palette color is empty, skip
-        if (!(sPaletteSwapBuffer[position] & 0x7FFF))
-          continue;
-        CpuFastCopy(&sPaletteSwapBuffer[position], dst, 32);
-      }
-      break;
+    u8 vCount = REG_VCOUNT;
+    u32 i;
+    if (vCount >= DISPLAY_HEIGHT || !sPaletteSwapBuffer || IsHardwarePaletteFadeActive()) // HARDWARE_FADE
+        return;
+    // For each row in the pc box
+    for (i = 0; i < IN_BOX_ROWS; i++) 
+    {
+        // -8 is to keep the right palette when being switched
+        if (vCount == 28 - 8 + 24 * i) 
+        { 
+            u32 position = IN_BOX_COLUMNS * 16 *i;
+            u16* dst = (u16*) (OBJ_PLTT + (i & 1 ? 7 : 1) * 16 * 2);
+            u32 j;
+
+            for (j = 0; j < IN_BOX_COLUMNS; j++, position += 16, dst += 16) 
+            {
+                // If palette color is empty, skip
+                if (!(sPaletteSwapBuffer[position] & 0x7FFF))
+                    continue;
+                CpuFastCopy(&sPaletteSwapBuffer[position], dst, 32);
+            }
+            break;
+        }
     }
-  }
-  if (vCount == 146 && sStorage && sStorage->markingsSwapPal[0]) { // copy markings palette
-    u16 *dst = (u16*) (OBJ_PLTT + (11+1)*16*2);
-    CpuFastCopy(&sStorage->markingsSwapPal[0], dst, 32);
-  }
-  if (vCount == 63 && sStorage && sStorage->chooseBoxSwapPal[0]) { // copy choose box palette
-    u16 *dst = (u16*) (OBJ_PLTT + (0)*16*2);
-    CpuFastCopy(sStorage->chooseBoxSwapPal, dst, 32);
-  }
+
+    // copy markings palette
+    if (vCount == 146 && sStorage && sStorage->markingsSwapPal[0])
+    {
+        u16 *dst = (u16*) (OBJ_PLTT + (11 + 1) * 16 *2);
+        CpuFastCopy(&sStorage->markingsSwapPal[0], dst, 32);
+    }
+
+    // copy choose box palette
+    if (vCount == 63 && sStorage && sStorage->chooseBoxSwapPal[0]) 
+    {
+        u16 *dst = (u16*) (OBJ_PLTT + (0) * 16 *2);
+        CpuFastCopy(sStorage->chooseBoxSwapPal, dst, 32);
+    }
+
+    if (vCount == 20 && sStorage)
+    {
+        u16 *dst = (u16*)(PLTT + (sStorage->boxTitlePalOffset << 1));
+        CpuFastCopy(sStorage->boxTitlePal, dst, 4);
+    }
 }
 
 static void DisableBoxMonDynamicPalette(u8 position, u8 count) {
-  u8 i;
-  for (i = position; i < position+count && i < IN_BOX_COUNT; i++) {
-    if (sPaletteSwapBuffer[i*16] & 0x7FFF)
-      sPaletteSwapBuffer[i*16] = 0x8000;
-  }
+    u8 i;
+    for (i = position; i < position+count && i < IN_BOX_COUNT; i++) 
+    {
+        if (sPaletteSwapBuffer[i*16] & 0x7FFF)
+            sPaletteSwapBuffer[i*16] = 0x8000;
+    }
 }
 
 static void EnableBoxMonDynamicPalette(u8 position, u8 count) {
-  u8 i;
-  for (i = position; i < position+count && i < IN_BOX_COUNT; i++) {
-    if (sPaletteSwapBuffer[i*16] == 0x8000)
-      sPaletteSwapBuffer[i*16] = 0x7FFF;
-  }
+    u8 i;
+    for (i = position; i < position+count && i < IN_BOX_COUNT; i++) 
+    {
+        if (sPaletteSwapBuffer[i*16] == 0x8000)
+            sPaletteSwapBuffer[i*16] = 0x7FFF;
+    }
 }
 
 static void Task_InitPokeStorage(u8 taskId)
@@ -5626,16 +5650,12 @@ static void InitBoxTitle(u8 boxId)
     u16 i;
 
     struct SpriteSheet spriteSheet = {sStorage->boxTitleTiles, 0x200, GFXTAG_BOX_TITLE};
-    struct SpritePalette palettes[] = {
-        {sStorage->boxTitlePal, PALTAG_BOX_TITLE},
-        {}
-    };
 
     u16 wallpaperId = GetBoxWallpaper(boxId);
 
-    sStorage->boxTitlePal[14] = sBoxTitleColors[wallpaperId][0]; // Shadow color
-    sStorage->boxTitlePal[15] = sBoxTitleColors[wallpaperId][1]; // Text Color
-    LoadSpritePalettes(palettes);
+    CpuFastCopy(sBoxTitleColors[wallpaperId], sStorage->boxTitlePal, 4);
+
+    AllocSpritePalette(PALTAG_BOX_TITLE);
     sStorage->wallpaperPalBits = 0x3f0;
 
     tagIndex = IndexOfSpritePaletteTag(PALTAG_BOX_TITLE);
@@ -5675,6 +5695,7 @@ static void InitBoxTitle(u8 boxId)
 
 static void CreateIncomingBoxTitle(u8 boxId, s8 direction)
 {
+    u8 wallpaperId;
     u16 palOffset;
     s16 x, adjustedX;
     u16 i;
@@ -5698,6 +5719,10 @@ static void CreateIncomingBoxTitle(u8 boxId, s8 direction)
     StringCopyPadded(sStorage->boxTitleText, GetBoxNamePtr(boxId), 0, BOX_NAME_LENGTH);
     DrawTextWindowAndBufferTiles(sStorage->boxTitleText, sStorage->boxTitleTiles, 0, 0, 2);
     LoadSpriteSheet(&spriteSheet);
+
+    wallpaperId = GetBoxWallpaper(boxId);
+
+    CpuFastCopy(sBoxTitleColors[wallpaperId], sStorage->boxTitlePal, 4);
     // LoadPalette(sBoxTitleColors[GetBoxWallpaper(boxId)], palOffset, sizeof(sBoxTitleColors[0]));
     x = GetBoxTitleBaseX(GetBoxNamePtr(boxId));
     adjustedX = x;
@@ -5765,6 +5790,9 @@ static void CycleBoxTitleColor(void)
 {
     u8 boxId = StorageGetCurrentBox();
     u8 wallpaperId = GetBoxWallpaper(boxId);
+
+    CpuFastCopy(sBoxTitleColors[wallpaperId], sStorage->boxTitlePal, 4);
+
     // if (sStorage->boxTitleCycleId == 0)
     //     CpuCopy16(sBoxTitleColors[wallpaperId], gPlttBufferUnfaded + sStorage->boxTitlePalOffset, 4);
     // else
