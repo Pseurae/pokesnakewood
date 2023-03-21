@@ -2402,8 +2402,9 @@ bool8 ScrCmd_setfollower(struct ScriptContext *ctx)
 {
     u8 localId = ScriptReadByte(ctx);
     u16 flags = ScriptReadHalfword(ctx);
+    const u8 *script = (const u8 *)ScriptReadWord(ctx);
     
-    SetUpFollowerSprite(localId, flags);
+    SetUpFollowerSprite(localId, flags, script);
     return FALSE;
 }
 

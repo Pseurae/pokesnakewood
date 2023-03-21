@@ -211,7 +211,7 @@ static bool8 find_path(struct ObjectEvent *objEvent, u16 endx, u16 endy)
             {
                 child = node_create_child(node, &endnode, i);
 
-                if (CheckCollisionAtCoords(objEvent, child.x + MAP_OFFSET, child.y + MAP_OFFSET, i + 1, objEvent->currentElevation))
+                if (GetCollisionAtCoords(objEvent, child.x + MAP_OFFSET, child.y + MAP_OFFSET, i + 1))
                     continue;
 
                 index = child.x + child.y * width;
@@ -240,20 +240,6 @@ static bool8 find_path(struct ObjectEvent *objEvent, u16 endx, u16 endy)
     Free(map.nodes);
     Free(heap.nodes);
     return FALSE;
-}
-
-static u8 CheckCollisionAtCoords(struct ObjectEvent *objectEvent, s16 x, s16 y, u32 dir, u8 currentElevation)
-{
-    u8 direction = dir;
-    if (MapGridGetCollisionAt(x, y) || GetMapBorderIdAt(x, y) == CONNECTION_INVALID || IsMetatileDirectionallyImpassable(objectEvent, x, y, direction))
-        return COLLISION_IMPASSABLE;
-    else if (objectEvent->trackedByCamera && !CanCameraMoveInDirection(direction))
-        return COLLISION_IMPASSABLE;
-    else if (IsElevationMismatchAt(objectEvent->currentElevation, x, y))
-        return COLLISION_ELEVATION_MISMATCH;
-    else if (DoesObjectCollideWithObjectAt(objectEvent, x, y))
-        return COLLISION_OBJECT_EVENT;
-    return COLLISION_NONE;
 }
 
 // End of pathfinding functions
