@@ -7917,6 +7917,8 @@ static bool8 SetMenuTexts_Item(void)
         }
         else
         {
+            SetMenuText(MENU_TAKE);
+            SetMenuText(MENU_BAG);
             SetMenuText(MENU_INFO);
         }
     }
@@ -9429,17 +9431,56 @@ static const u32 *GetItemIconPalette(u16 itemId)
     return GetItemIconPicOrPalette(itemId, 1);
 }
 
+static u8 ReformatItemDescription(u16 item, u8 *dest)
+{
+    u8 count = 0;
+    u8 numLines = 1;
+    u8 maxChars = 28;
+    u8 *desc = (u8 *)gItems[item].description;
+
+    while (*desc != EOS)
+    {
+        if (count >= maxChars)
+        {
+            while (*desc != CHAR_SPACE && *desc != CHAR_NEWLINE)
+            {
+                *dest = *desc;  //finish word
+                dest++;
+                desc++;
+            }
+
+            *dest = CHAR_NEWLINE;
+            count = 0;
+            numLines++;
+            dest++;
+            desc++;
+            continue;
+        }
+
+        *dest = *desc;
+        if (*desc == CHAR_NEWLINE)
+        {
+            *dest = CHAR_SPACE;
+        }
+
+        dest++;
+        desc++;
+        count++;
+    }
+
+    // finish string
+    *dest = EOS;
+    return numLines;
+}
+
 static void PrintItemDescription(void)
 {
     const u8 *description;
-
-    if (IsMovingItem())
-        description = ItemId_GetDescription(sStorage->movingItemId);
-    else
-        description = ItemId_GetDescription(sStorage->displayMonItemId);
+    u16 itemId = (IsMovingItem() ? sStorage->movingItemId : sStorage->displayMonItemId);
 
     FillWindowPixelBuffer(WIN_ITEM_DESC, PIXEL_FILL(1));
-    AddTextPrinterParameterized5(WIN_ITEM_DESC, FONT_NORMAL, description, 4, 0, 0, NULL, 0, 1);
+    ReformatItemDescription(itemId, gStringVar4);
+    AddTextPrinterParameterized5(WIN_ITEM_DESC, FONT_NORMAL, gStringVar4, 4, 0, 0, NULL, 0, 1);
 }
 
 static void InitItemInfoWindow(void)
