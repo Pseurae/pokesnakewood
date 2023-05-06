@@ -63,7 +63,7 @@ void SetUpReflection(struct ObjectEvent *objectEvent, struct Sprite *sprite, boo
     reflectionSprite->sReflectionObjEventLocalId = objectEvent->localId;
     reflectionSprite->sIsStillReflection = stillReflection;
     paletteSlot = GetReflectionPaletteSlot(GetObjectEventGraphicsInfo(objectEvent->graphicsId)->paletteTag);
-    reflectionSprite->oam.paletteNum = paletteSlot;
+    reflectionSprite->oam.paletteNum = IncrementSpritePaletteReferenceCount(paletteSlot);
     LoadObjectReflectionPalette(objectEvent, reflectionSprite);
 
     if (!stillReflection)
@@ -192,16 +192,8 @@ u8 CreateWarpArrowSprite(void)
 
     if (spriteId != MAX_SPRITES)
     {
-        if (gSaveBlock2Ptr->playerGender == MALE)
-        {
-            paletteSlot = GetObjectPaletteSlot(0x1100);
-            PatchObjectPalette(0x1100, paletteSlot);
-        }
-        else
-        {
-            paletteSlot = GetObjectPaletteSlot(0x1110);
-            PatchObjectPalette(0x1110, paletteSlot);
-        }
+        paletteSlot = GetObjectPaletteSlot(0x1100);
+        PatchObjectPalette(0x1100, paletteSlot);
 
         sprite = &gSprites[spriteId];
         sprite->oam.priority = 2;

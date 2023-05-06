@@ -143,17 +143,14 @@ EWRAM_DATA u8 sBasePaletteColorMapTypes[32] =
     COLOR_MAP_NONE,
 };
 
-const u16 gFogPalette[] = INCBIN_U16("graphics/weather/fog.gbapal");
-
 void StartWeather(void)
 {
     if (!FuncIsActiveTask(Task_WeatherMain))
     {
         u8 index = 15;
-        CpuCopy32(gFogPalette, &gPlttBufferUnfaded[0x100 + index * 16], 32);
         BuildColorMaps();
         gWeatherPtr->contrastColorMapSpritePalIndex = index;
-        gWeatherPtr->weatherPicSpritePalIndex = AllocSpritePalette(PALTAG_WEATHER_2);
+        gWeatherPtr->weatherPicSpritePalIndex = AllocSpritePalette(PALTAG_WEATHER);
         gWeatherPtr->rainSpriteCount = 0;
         gWeatherPtr->curRainSpriteIndex = 0;
         gWeatherPtr->cloudSpritesCreated = 0;
@@ -181,6 +178,7 @@ void SetNextWeather(u8 weather)
         PlayRainStoppingSoundEffect();
     }
 
+    LoadWeatherPalette(weather);
     if (gWeatherPtr->nextWeather != weather && gWeatherPtr->currWeather == weather)
     {
         sWeatherFuncs[weather].initVars();
@@ -232,6 +230,7 @@ static void Task_WeatherInit(u8 taskId)
     // When the screen fades in, this is set to TRUE.
     if (gWeatherPtr->readyForInit)
     {
+        LoadWeatherPalette(gWeatherPtr->currWeather);
         sWeatherFuncs[gWeatherPtr->currWeather].initAll();
         gTasks[taskId].func = Task_WeatherMain;
     }
@@ -245,6 +244,7 @@ static void Task_WeatherMain(u8 taskId)
             && gWeatherPtr->palProcessingState != WEATHER_PAL_STATE_SCREEN_FADING_OUT)
         {
             // Finished cleaning up previous weather. Now transition to next weather.
+            LoadWeatherPalette(gWeatherPtr->nextWeather);
             sWeatherFuncs[gWeatherPtr->nextWeather].initVars();
             gWeatherPtr->colorMapStepCounter = 0;
             gWeatherPtr->palProcessingState = WEATHER_PAL_STATE_CHANGING_WEATHER;

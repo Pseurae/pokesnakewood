@@ -4,6 +4,7 @@
 #include "fieldmap.h"
 #include "field_weather.h"
 #include "overworld.h"
+#include "palette.h"
 #include "random.h"
 #include "script.h"
 #include "constants/weather.h"
@@ -17,6 +18,7 @@
 EWRAM_DATA static u8 sCurrentAbnormalWeather = 0;
 EWRAM_DATA static u16 sUnusedWeatherRelated = 0;
 
+const u16 gFogWeatherPalette[] = INCBIN_U16("graphics/weather/fog.gbapal");
 const u16 gCloudsWeatherPalette[] = INCBIN_U16("graphics/weather/cloud.gbapal");
 const u16 gSandstormWeatherPalette[] = INCBIN_U16("graphics/weather/sandstorm.gbapal");
 const u8 gWeatherFogDiagonalTiles[] = INCBIN_U8("graphics/weather/fog_diagonal.4bpp");
@@ -29,9 +31,34 @@ const u8 gWeatherAshTiles[] = INCBIN_U8("graphics/weather/ash.4bpp");
 const u8 gWeatherRainTiles[] = INCBIN_U8("graphics/weather/rain.4bpp");
 const u8 gWeatherSandstormTiles[] = INCBIN_U8("graphics/weather/sandstorm.4bpp");
 
-const struct SpritePalette sFogSpritePalette = {gFogPalette, 0x1201};
-const struct SpritePalette sCloudsSpritePalette = {gCloudsWeatherPalette, 0x1207};
-const struct SpritePalette sSandstormSpritePalette = {gSandstormWeatherPalette, 0x1204};
+void LoadWeatherPalette(u8 weather)
+{
+    u8 paletteSlot;
+    const u16 *palette;
+
+    switch (weather)
+    {
+    case WEATHER_VOLCANIC_ASH:
+    case WEATHER_RAIN:
+    case WEATHER_SNOW:
+    case WEATHER_UNDERWATER_BUBBLES:
+    case WEATHER_FOG_HORIZONTAL:
+    case WEATHER_FOG_DIAGONAL:
+        palette = gFogWeatherPalette;
+        break;
+    case WEATHER_SANDSTORM:
+        palette = gSandstormWeatherPalette;
+        break;
+    case WEATHER_SUNNY_CLOUDS:
+        palette = gCloudsWeatherPalette;
+        break;
+    default:
+        return;
+    }
+
+    paletteSlot = IndexOfSpritePaletteTag(PALTAG_WEATHER);
+    LoadPalette(palette, 0x100 + paletteSlot * 16, 32);
+}
 
 //------------------------------------------------------------------------------
 // WEATHER_SUNNY_CLOUDS
@@ -88,7 +115,7 @@ static const union AnimCmd *const sCloudSpriteAnimCmds[] =
 static const struct SpriteTemplate sCloudSpriteTemplate =
 {
     .tileTag = GFXTAG_CLOUD,
-    .paletteTag = 0x1207,
+    .paletteTag = PALTAG_WEATHER,
     .oam = &sCloudSpriteOamData,
     .anims = sCloudSpriteAnimCmds,
     .images = NULL,
@@ -185,7 +212,6 @@ static void CreateCloudSprites(void)
         return;
 
     LoadSpriteSheet(&sCloudSpriteSheet);
-    LoadCustomWeatherSpritePalette(&sCloudsSpritePalette);
     for (i = 0; i < NUM_CLOUD_SPRITES; i++)
     {
         spriteId = CreateSprite(&sCloudSpriteTemplate, 0, 0, 0xFF);
@@ -1646,7 +1672,7 @@ static const union AnimCmd *const sAshSpriteAnimCmds[] =
 static const struct SpriteTemplate sAshSpriteTemplate =
 {
     .tileTag = GFXTAG_ASH,
-    .paletteTag = 0x1201,
+    .paletteTag = PALTAG_WEATHER,
     .oam = &sAshSpriteOamData,
     .anims = sAshSpriteAnimCmds,
     .images = NULL,
@@ -1669,7 +1695,6 @@ static void CreateAshSprites(void)
     {
         for (i = 0; i < NUM_ASH_SPRITES; i++)
         {
-            LoadCustomWeatherSpritePalette(&sFogSpritePalette);
             spriteId = CreateSpriteAtEnd(&sAshSpriteTemplate, 0, 0, 0x4E);
             if (spriteId != MAX_SPRITES)
             {
@@ -2111,7 +2136,7 @@ static const union AnimCmd *const sSandstormSpriteAnimCmds[] =
 static const struct SpriteTemplate sSandstormSpriteTemplate =
 {
     .tileTag = GFXTAG_SANDSTORM,
-    .paletteTag = 0x1204,
+    .paletteTag = PALTAG_WEATHER,
     .oam = &sSandstormSpriteOamData,
     .anims = sSandstormSpriteAnimCmds,
     .images = NULL,
@@ -2144,7 +2169,6 @@ static void CreateSandstormSprites(void)
     if (!gWeatherPtr->sandstormSpritesCreated)
     {
         LoadSpriteSheet(&sSandstormSpriteSheet);
-        LoadCustomWeatherSpritePalette(&sSandstormSpritePalette);
         for (i = 0; i < NUM_SANDSTORM_SPRITES; i++)
         {
             spriteId = CreateSpriteAtEnd(&sSandstormSpriteTemplate, 0, (i / 5) * 64, 1);

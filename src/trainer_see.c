@@ -688,11 +688,10 @@ u8 FldEff_ExclamationMarkIcon(void)
     if (spriteId != MAX_SPRITES)
     {
         paletteSlot = GetObjectPaletteSlot(0x1104);
-        IncrementSpritePaletteReferenceCount(paletteSlot);
         PatchObjectPalette(0x1104, paletteSlot);
 
         SetIconSpriteData(&gSprites[spriteId], FLDEFF_EXCLAMATION_MARK_ICON, 0);
-        gSprites[spriteId].oam.paletteNum = paletteSlot;
+        gSprites[spriteId].oam.paletteNum = IncrementSpritePaletteReferenceCount(paletteSlot);
     }
 
     return 0;
@@ -706,11 +705,10 @@ u8 FldEff_QuestionMarkIcon(void)
     if (spriteId != MAX_SPRITES)
     {
         paletteSlot = GetObjectPaletteSlot(0x1104);
-        IncrementSpritePaletteReferenceCount(paletteSlot);
         PatchObjectPalette(0x1104, paletteSlot);
 
         SetIconSpriteData(&gSprites[spriteId], FLDEFF_EXCLAMATION_MARK_ICON, 0);
-        gSprites[spriteId].oam.paletteNum = paletteSlot;
+        gSprites[spriteId].oam.paletteNum = IncrementSpritePaletteReferenceCount(paletteSlot);
     }
 
     return 0;
@@ -724,11 +722,10 @@ u8 FldEff_HeartIcon(void)
     if (spriteId != MAX_SPRITES)
     {
         paletteSlot = GetObjectPaletteSlot(0x1104);
-        IncrementSpritePaletteReferenceCount(paletteSlot);
         PatchObjectPalette(0x1104, paletteSlot);
 
         SetIconSpriteData(&gSprites[spriteId], FLDEFF_HEART_ICON, 0);
-        gSprites[spriteId].oam.paletteNum = paletteSlot;
+        gSprites[spriteId].oam.paletteNum = IncrementSpritePaletteReferenceCount(paletteSlot);
     }
 
     return 0;

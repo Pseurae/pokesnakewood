@@ -139,9 +139,9 @@ struct Weather
 // field_weather.c
 extern struct Weather gWeather;
 extern struct Weather *const gWeatherPtr;
-extern const u16 gFogPalette[];
 
 // field_weather_effect.c
+extern const u16 gFogWeatherPalette[];
 extern const u8 gWeatherFogHorizontalTiles[];
 
 enum
@@ -180,6 +180,7 @@ void ResetPreservedPalettesInWeather(void);
 void UpdatePaletteColorMap(u8 index, u8 mapType);
 
 // field_weather_effect.c
+void LoadWeatherPalette(u8);
 void Clouds_InitVars(void);
 void Clouds_Main(void);
 void Clouds_InitAll(void);
