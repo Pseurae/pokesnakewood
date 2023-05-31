@@ -202,9 +202,9 @@ void SetNextWeather(u8 weather)
         }
 
         if (gWeatherPtr->nextWeather == WEATHER_FOG_HORIZONTAL)
-            BlendPalettesGradually(palettes << 16, 10, 3, 12, RGB(28, 31, 28), 0, 0);
+            BlendPalettesGradually(palettes << 16, 12, 3, 8, RGB(28, 31, 28), 0, 0);
         else if (gWeatherPtr->currWeather == WEATHER_FOG_HORIZONTAL)
-            BlendPalettesGradually(palettes << 16, 10, 12, 0, RGB(28, 31, 28), 0, 0);
+            BlendPalettesGradually(palettes << 16, 12, 8, 0, RGB(28, 31, 28), 0, 0);
     }
 }
 
@@ -723,7 +723,7 @@ static void MarkFogSpritePalToLighten(u8 paletteIndex)
 
 static bool8 LightenSpritePaletteInFog(u8 paletteIndex)
 {
-    return sPaletteColorMapTypes[paletteIndex] != COLOR_MAP_NONE;
+    return FALSE;
 }
 
 void ApplyWeatherColorMapIfIdle(s8 colorMapIndex)
