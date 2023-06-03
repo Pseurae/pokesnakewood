@@ -485,7 +485,8 @@ void DoWarp(void)
 {
     LockPlayerFieldControls();
     TryFadeOutOldMapMusic();
-    WarpFadeOutScreen();
+    if (!FlagGet(FLAG_REMOVE_WARP_FADE))
+        WarpFadeOutScreen();
     PlayRainStoppingSoundEffect();
     PlaySE(SE_EXIT);
     gFieldCallback = FieldCB_DefaultWarpExit;
