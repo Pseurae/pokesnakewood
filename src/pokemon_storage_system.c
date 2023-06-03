@@ -2061,7 +2061,7 @@ static void SetPokeStorageTask(TaskFunc newFunc)
     sStorage->state = 0;
 }
 
-static inline __attribute__((always_inline)) bool8 IsHardwarePaletteFadeActive(void)
+static bool8 IsHardwarePaletteFadeActive(void)
 {
     return (gPaletteFade.active && gPaletteFade.y == 16 && gPaletteFade.mode == 2);
 }

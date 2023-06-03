@@ -211,9 +211,28 @@ script Route101_EventScript_ZombieBoyDefeat {
 	setvar(VAR_ROUTE101_STATE, 3)
 	clearflag(FLAG_HIDE_ROUTE_103_BIRCH)
 	clearflag(FLAG_HIDE_MAP_NAME_POPUP)
+	applymovement(LOCALID_BIRCH, Route101_Movement_BirchExit)
+	applymovement(OBJ_EVENT_ID_PLAYER, Route101_Movement_PlayerExit)
+	fadescreenspeed(FADE_TO_BLACK, 6)
 	special(EnableWildEncounters)
+	delay(20)
+	setflag(FLAG_REMOVE_WARP_FADE)
 	warp(MAP_OLDALE_TOWN_POKEMON_CENTER_1F, 7, 5)
+	clearflag(FLAG_REMOVE_WARP_FADE)
 	waitstate
 	release
 	end
+}
+
+movement Route101_Movement_BirchExit {
+	walk_up * 3
+	walk_right * 4
+	step_end
+}
+
+movement Route101_Movement_PlayerExit {
+	walk_left
+	walk_up * 3
+	walk_right * 3
+	step_end
 }
