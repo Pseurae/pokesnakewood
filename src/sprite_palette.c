@@ -5,6 +5,12 @@
 
 EWRAM_DATA struct SpritePaletteReference sSpritePaletteReferences[SWAPABLE_PALETTES] = { 0 };
 
+u8 GetSpritePaletteReferenceType(u8 i)
+{
+    if (i >= SWAPABLE_PALETTES) return PAL_UNUSED;
+    return sSpritePaletteReferences[i].type;
+}
+
 u8 FindSpritePaletteReference(u8 type, u16 tag)
 {
     u8 i;
@@ -63,29 +69,11 @@ void ClearSpritePaletteReferences(void)
     memset(sSpritePaletteReferences, 0, sizeof(sSpritePaletteReferences));
 }
 
-u8 GetObjectPaletteSlot(u16 tag)
+u8 GetSpritePaletteSlot(u8 type, u16 tag)
 {
-    u8 slot = FindSpritePaletteReference(PAL_NPC, tag);
+    u8 slot = FindSpritePaletteReference(type, tag);
     if (slot != 0xFF)
         return slot;
 
-    return AddSpritePaletteReference(PAL_NPC, tag);
-}
-
-u8 GetReflectionPaletteSlot(u16 tag)
-{
-    u8 slot = FindSpritePaletteReference(PAL_REFLECTION, tag);
-    if (slot != 0xFF)
-        return slot;
-
-    return AddSpritePaletteReference(PAL_REFLECTION, tag);
-}
-
-u8 GetItemIconPaletteSlot(u16 tag)
-{
-    u8 slot = FindSpritePaletteReference(PAL_ITEM_ICON, tag);
-    if (slot != 0xFF)
-        return slot;
-
-    return AddSpritePaletteReference(PAL_ITEM_ICON, tag);
+    return AddSpritePaletteReference(type, tag);
 }

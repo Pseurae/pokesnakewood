@@ -107,7 +107,7 @@ u8 AddObtainedItemIconSpriteInternal(u16 itemId)
         spriteSheet.tag = 0x3400;
         LoadSpriteSheet(&spriteSheet);
 
-        paletteSlot = GetItemIconPaletteSlot(3);
+        paletteSlot = GetSpritePaletteSlot(PAL_NORMAL, 3);
         LZ77UnCompWram(GetItemIconPicOrPalette(itemId, 1), gDecompressionBuffer);
         LoadPalette(gDecompressionBuffer, 0x100 + paletteSlot * 16, 32);
         PreservePaletteInWeather(paletteSlot + 0x10);

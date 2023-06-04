@@ -62,7 +62,7 @@ void SetUpReflection(struct ObjectEvent *objectEvent, struct Sprite *sprite, boo
     reflectionSprite->sReflectionObjEventId = sprite->data[0];
     reflectionSprite->sReflectionObjEventLocalId = objectEvent->localId;
     reflectionSprite->sIsStillReflection = stillReflection;
-    paletteSlot = GetReflectionPaletteSlot(GetObjectEventGraphicsInfo(objectEvent->graphicsId)->paletteTag);
+    paletteSlot = GetSpritePaletteSlot(PAL_REFLECTION, GetObjectEventGraphicsInfo(objectEvent->graphicsId)->paletteTag);
     reflectionSprite->oam.paletteNum = IncrementSpritePaletteReferenceCount(paletteSlot);
     LoadObjectReflectionPalette(objectEvent, reflectionSprite);
 
@@ -108,7 +108,6 @@ static void LoadObjectRegularReflectionPalette(struct ObjectEvent *objectEvent, 
 	BlendPalettes(gBitTable[(paletteIndex + 16)], 10, RGB(12, 20, 27)); //Make it blueish
     LoadPalette(&gPlttBufferFaded[(paletteIndex + 16) << 4], (paletteIndex + 16) << 4, 0x20);
     UpdatePaletteColorMap(paletteIndex, COLOR_MAP_DARK_CONTRAST);
-    UpdateSpritePaletteWithWeather(paletteIndex);
 }
 
 // When walking on a bridge high above water (Route 120), the reflection is a solid dark blue color.
@@ -123,7 +122,6 @@ static void LoadObjectHighBridgeReflectionPalette(struct ObjectEvent *objectEven
 	BlendPalettes(gBitTable[(paletteIndex + 16)], 10, RGB(6, 10, 27)); //Make it blueish
     LoadPalette(&gPlttBufferFaded[(paletteIndex + 16) << 4], (paletteIndex + 16) << 4, 0x20);
     UpdatePaletteColorMap(paletteIndex, COLOR_MAP_DARK_CONTRAST);
-    UpdateSpritePaletteWithWeather(paletteIndex);
 }
 
 static void UpdateObjectReflectionSprite(struct Sprite *reflectionSprite)
@@ -192,7 +190,7 @@ u8 CreateWarpArrowSprite(void)
 
     if (spriteId != MAX_SPRITES)
     {
-        paletteSlot = GetObjectPaletteSlot(0x1100);
+        paletteSlot = GetSpritePaletteSlot(PAL_OBJEVENT, 0x1100);
         PatchObjectPalette(0x1100, paletteSlot);
 
         sprite = &gSprites[spriteId];
