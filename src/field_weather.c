@@ -13,6 +13,7 @@
 #include "start_menu.h"
 #include "sound.h"
 #include "sprite.h"
+#include "sprite_palette.h"
 #include "task.h"
 #include "trig.h"
 #include "gpu_regs.h"
@@ -201,7 +202,7 @@ void SetNextWeather(u8 weather)
         u8 i;
         u16 palettes;
 
-        for (i = 0; i < 16; i++)
+        for (i = 0; i < 12; i++)
         {
             if (sPaletteColorMapTypes[16 + i] == COLOR_MAP_NONE)
                 continue;
@@ -696,9 +697,9 @@ static void ApplyFogBlend(u8 blendCoeff, u16 blendColor)
                 u8 g = color.g;
                 u8 b = color.b;
 
-                r += ((28 - r) * 3) >> 2;
-                g += ((31 - g) * 3) >> 2;
-                b += ((28 - b) * 3) >> 2;
+                r += ((28 - r) * 8) >> 4;
+                g += ((31 - g) * 8) >> 4;
+                b += ((28 - b) * 8) >> 4;
 
                 r += ((rBlend - r) * blendCoeff) >> 4;
                 g += ((gBlend - g) * blendCoeff) >> 4;
@@ -726,7 +727,15 @@ static void MarkFogSpritePalToLighten(u8 paletteIndex)
 
 static bool8 LightenSpritePaletteInFog(u8 paletteIndex)
 {
-    return FALSE;
+    u8 i;
+
+    for (i = 0; i < gWeatherPtr->lightenedFogSpritePalsCount; i++)
+    {
+        if (gWeatherPtr->lightenedFogSpritePals[i] == paletteIndex)
+            return TRUE;
+    }
+
+    return GetSpritePaletteReferenceType(paletteIndex - 16) == PAL_OBJEVENT;
 }
 
 void ApplyWeatherColorMapIfIdle(s8 colorMapIndex)
@@ -856,7 +865,7 @@ void UpdateSpritePaletteWithWeather(u8 spritePaletteIndex)
         else
         {
             paletteIndex *= 16;
-            BlendPalette(paletteIndex, 16, 12, RGB(28, 31, 28));
+            BlendPalette(paletteIndex, 16, 8, RGB(28, 31, 28));
         }
         break;
     }

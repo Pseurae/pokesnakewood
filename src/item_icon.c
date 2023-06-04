@@ -85,6 +85,43 @@ void CopyItemIconPicTo4x4Buffer(const void *src, void *dest)
         CpuCopy16(src + i * 96, dest + i * 128, 0x60);
 }
 
+u8 AddObtainedItemIconSpriteInternal(u16 itemId)
+{
+    if (!AllocItemIconTemporaryBuffers())
+    {
+        return MAX_SPRITES;
+    }
+    else
+    {
+        u8 spriteId, paletteSlot;
+        struct SpriteSheet spriteSheet;
+        struct SpriteTemplate spriteTemplate;
+
+        LZDecompressWram(GetItemIconPicOrPalette(itemId, 0), gItemIconDecompressionBuffer);
+        CopyItemIconPicTo4x4Buffer(gItemIconDecompressionBuffer, gItemIcon4x4Buffer);
+        spriteSheet.data = gItemIcon4x4Buffer;
+        spriteSheet.size = 0x200;
+        spriteSheet.tag = 0x3400;
+        LoadSpriteSheet(&spriteSheet);
+
+        paletteSlot = GetSpritePaletteSlot(PAL_NORMAL, 3);
+        LZ77UnCompWram(GetItemIconPicOrPalette(itemId, 1), gDecompressionBuffer);
+        LoadPalette(gDecompressionBuffer, 0x100 + paletteSlot * 16, 32);
+        PreservePaletteInWeather(paletteSlot + 0x10);
+
+        CpuCopy16(&gItemIconSpriteTemplate, &spriteTemplate, sizeof(struct SpriteTemplate));
+        spriteTemplate.tileTag = 0x3400;
+        spriteTemplate.paletteTag = TAG_NONE;
+
+        spriteId = CreateSprite(&spriteTemplate, 0, 0, 0);
+        gSprites[spriteId].oam.paletteNum = IncrementSpritePaletteReferenceCount(paletteSlot);
+
+        FreeItemIconTemporaryBuffers();
+
+        return spriteId;
+    }
+}
+
 void AddObtainedItemIconSprite(void)
 {
     u16 itemId;
