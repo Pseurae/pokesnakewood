@@ -100,7 +100,7 @@ static const struct WindowTemplate sYesNo_WindowTemplates =
     .bg = 0,
     .tilemapLeft = 21,
     .tilemapTop = 9,
-    .width = 5,
+    .width = 6,
     .height = 4,
     .paletteNum = 15,
     .baseBlock = 0x125
@@ -1531,15 +1531,15 @@ void CreateYesNoMenu(const struct WindowTemplate *window, u16 baseTileNum, u8 pa
 
     printer.currentChar = gText_YesNo;
     printer.windowId = sYesNoWindowId;
-    printer.fontId = FONT_NORMAL;
+    printer.fontId = FONT_SHORT;
     printer.x = 8;
-    printer.y = 1;
+    printer.y = 2;
     printer.currentX = printer.x;
     printer.currentY = printer.y;
-    printer.fgColor = GetFontAttribute(FONT_NORMAL, FONTATTR_COLOR_FOREGROUND);
-    printer.bgColor = GetFontAttribute(FONT_NORMAL, FONTATTR_COLOR_BACKGROUND);
-    printer.shadowColor = GetFontAttribute(FONT_NORMAL, FONTATTR_COLOR_SHADOW);
-    printer.unk = GetFontAttribute(FONT_NORMAL, FONTATTR_UNKNOWN);
+    printer.fgColor = GetFontAttribute(FONT_SHORT, FONTATTR_COLOR_FOREGROUND);
+    printer.bgColor = GetFontAttribute(FONT_SHORT, FONTATTR_COLOR_BACKGROUND);
+    printer.shadowColor = GetFontAttribute(FONT_SHORT, FONTATTR_COLOR_SHADOW);
+    printer.unk = GetFontAttribute(FONT_SHORT, FONTATTR_UNKNOWN);
     printer.letterSpacing = 0;
     printer.lineSpacing = 0;
 
