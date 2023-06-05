@@ -370,6 +370,9 @@ static void Task_DisplayIntroText(u8 taskId)
         ClearWindowTilemap(tWindowId);
         RemoveWindow(tWindowId);
         ScheduleBgCopyTilemapToVram(0);
+        tState++;
+        break;
+    case 6:
         SetGpuReg(REG_OFFSET_BLDY, 0);
         StartNextTask();
         DestroyTask(taskId);
@@ -416,21 +419,16 @@ static void Task_StartGenderSelection(u8 taskId)
         break;
     case 1:
         tBrendanSpriteId = CreateTrainerSprite(TRAINER_PIC_BRENDAN, 120, 60, 0, &gDecompressionBuffer[0]);
-        gSprites[tBrendanSpriteId].invisible = TRUE;
         gSprites[tBrendanSpriteId].oam.priority = 0;
         gSprites[tBrendanSpriteId].data[0] = taskId;
         gSprites[tBrendanSpriteId].data[1] = MALE;
-        tState++;
-        break;
-    case 2:
+
         tMaySpriteId = CreateTrainerSprite(TRAINER_PIC_MAY, 120, 60, 0, &gDecompressionBuffer[0x800]);
-        gSprites[tMaySpriteId].invisible = TRUE;
         gSprites[tMaySpriteId].oam.priority = 0;
         gSprites[tMaySpriteId].data[0] = taskId;
         gSprites[tMaySpriteId].data[1] = FEMALE;
-        tState++;
-        break;
-    case 3:
+
+        BlendPalettes(PALETTES_OBJECTS, 16, RGB_BLACK);
         gTasks[taskId].func = Task_GenderSelection;
         tState = 0;
         break;
@@ -457,8 +455,6 @@ static void Task_GenderSelection(u8 taskId)
         if (!RunTextPrintersAndIsPrinter0Active())
         {
             BeginNormalPaletteFade(PALETTES_OBJECTS, 0, 16, 0, RGB_BLACK);
-            gSprites[tBrendanSpriteId].invisible = FALSE;
-            gSprites[tMaySpriteId].invisible = FALSE;
             gSprites[tBrendanSpriteId].callback = SpriteCB_GenderSelection;
             gSprites[tMaySpriteId].callback = SpriteCB_GenderSelection;
             tState++;
@@ -628,6 +624,7 @@ static void Task_NamingScreen(u8 taskId)
             NamingScreen_SetDefaultName(Random() % 20);
             DoNamingScreen(NAMING_SCREEN_PLAYER, gSaveBlock2Ptr->playerName, gSaveBlock2Ptr->playerGender, 0, 0, CB2_ReturnFromNamingScreen);
             DestroyTask(taskId);
+            tState = 0;
         }
         break;
     }
@@ -652,17 +649,28 @@ static void CB2_ReturnFromNamingScreen(void)
 {
     u8 taskId;
     SetupReturnCB();
+
     taskId = CreateTask(Task_NamingScreen_WaitForYesNo, 0);
-    gTasks[taskId].tPlayerSpriteId = CreateTrainerSprite(TRAINER_PIC_BRENDAN, 120, 60, 0, &gDecompressionBuffer[0]);
+
+    if (gSaveBlock2Ptr->playerGender == MALE)
+        gTasks[taskId].tPlayerSpriteId = CreateTrainerSprite(TRAINER_PIC_BRENDAN, 120, 60, 0, &gDecompressionBuffer[0]);
+    else
+        gTasks[taskId].tPlayerSpriteId = CreateTrainerSprite(TRAINER_PIC_MAY, 120, 60, 0, &gDecompressionBuffer[0]);
+
+    BeginNormalPaletteFade(PALETTES_ALL, 0, 16, 0, RGB_BLACK);
 }
 
 static void Task_NamingScreen_WaitForYesNo(u8 taskId)
 {
+    if (gPaletteFade.active)
+        return;
+
     InitWindows(sIntroSpeechMessageTemplates);
     LoadMessageBoxGfx(0, 0xFC, 0xF0);
     LoadUserWindowBorderGfxOnBg(0, 0xF3, 32);
     ClearDialogueWindow(0);
     ShowDialogueWindow(0, TRUE);
+
     StringExpandPlaceholders(gStringVar4, gText_Birch_SoItsPlayer);
     AddTextPrinterForMessage(0);
     gTasks[taskId].func = Task_NamingScreen_YesNo;
