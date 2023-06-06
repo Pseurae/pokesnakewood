@@ -74,9 +74,6 @@ enum
 bool8 (*gMenuCallback)(void);
 
 // EWRAM
-EWRAM_DATA static u8 sClockWindowId = 0;
-EWRAM_DATA static u8 sSafariBallsWindowId = 0;
-EWRAM_DATA static u8 sBattlePyramidFloorWindowId = 0;
 EWRAM_DATA static u8 sStartMenuCursorPos = 0;
 EWRAM_DATA static u8 sNumStartMenuActions = 0;
 EWRAM_DATA static u8 sCurrentStartMenuActions[9] = {0};
@@ -202,7 +199,6 @@ static void BuildUnionRoomStartMenu(void);
 static void BuildBattlePikeStartMenu(void);
 static void BuildBattlePyramidStartMenu(void);
 static void BuildMultiPartnerRoomStartMenu(void);
-static void ShowClockWindow(void);
 static void RemoveExtraStartMenuWindows(void);
 static bool32 PrintStartMenuActions(s8 *pIndex, u32 count);
 static bool32 InitStartMenuStep(void);
@@ -353,71 +349,8 @@ static void BuildMultiPartnerRoomStartMenu(void)
     AddStartMenuAction(MENU_ACTION_EXIT);
 }
 
-static const u8 sTimeFormat1[] = _("{STR_VAR_1}:{STR_VAR_2} {STR_VAR_3}");
-static const u8 sTimeFormat2[] = _("{STR_VAR_1}{COLOR TRANSPARENT}{SHADOW TRANSPARENT}:{COLOR DARK_GRAY}{SHADOW LIGHT_GRAY}{STR_VAR_2} {STR_VAR_3}");
-static const u8 sTimeAM[] = _("AM");
-static const u8 sTimePM[] = _("PM");
-
-#define tUpdateTimer data[0]
-#define tFlickerTimer data[1]
-
-static void Task_UpdateClockWindow(u8 taskId)
-{
-    s16 *data = gTasks[taskId].data;
-
-    switch (tUpdateTimer)
-    {
-    default:
-        tUpdateTimer++;
-        break;
-    case 10:
-        RtcCalcLocalTime();
-        tUpdateTimer++;
-        break;
-    case 20:
-        FillWindowPixelBuffer(sClockWindowId, PIXEL_FILL(1));
-        ConvertIntToDecimalStringN(gStringVar1, gLocalTime.hours % 12, STR_CONV_MODE_LEADING_ZEROS, 2);
-        ConvertIntToDecimalStringN(gStringVar2, gLocalTime.minutes, STR_CONV_MODE_LEADING_ZEROS, 2);
-        StringExpandPlaceholders(gStringVar3, (gLocalTime.hours < 12) ? sTimeAM : sTimePM);
-        StringExpandPlaceholders(gStringVar4, tFlickerTimer ? sTimeFormat1 : sTimeFormat2);
-        AddTextPrinterParameterized(sClockWindowId, FONT_SHORT, gStringVar4, 1, 1, TEXT_SKIP_DRAW, NULL);
-        CopyWindowToVram(sClockWindowId, COPYWIN_GFX);
-        tUpdateTimer++;
-        break;
-    case 40:
-        tFlickerTimer++;
-        tFlickerTimer %= 2;
-        tUpdateTimer = 0;
-        break;
-    }
-}
-
-#undef tUpdateTimer
-#undef tFlickerTimer
-
-static void ShowClockWindow(void)
-{
-    sClockWindowId = AddWindow(&sClockWindowTemplate);
-    PutWindowTilemap(sClockWindowId);
-    LoadStdBoxGfx(sClockWindowId, 0x21F, 0xD0);
-    DrawStdFrameWithCustomTileAndPalette(sClockWindowId, FALSE, 0x21F, 13);
-
-    ConvertIntToDecimalStringN(gStringVar1, gLocalTime.hours % 12, STR_CONV_MODE_LEADING_ZEROS, 2);
-    ConvertIntToDecimalStringN(gStringVar2, gLocalTime.minutes, STR_CONV_MODE_LEADING_ZEROS, 2);
-    StringExpandPlaceholders(gStringVar3, (gLocalTime.hours < 12) ? sTimeAM : sTimePM);
-
-    StringExpandPlaceholders(gStringVar4, sTimeFormat1);
-
-    AddTextPrinterParameterized(sClockWindowId, FONT_SHORT, gStringVar4, 1, 1, TEXT_SKIP_DRAW, NULL);
-    CopyWindowToVram(sClockWindowId, COPYWIN_GFX);
-    sClockUpdateTaskId = CreateTask(Task_UpdateClockWindow, 0);
-}
-
 static void RemoveExtraStartMenuWindows(void)
 {
-    ClearStdWindowAndFrameToTransparent(sClockWindowId, FALSE);
-    RemoveWindow(sClockWindowId);
-    DestroyTask(sClockUpdateTaskId);
 }
 
 static bool32 PrintStartMenuActions(s8 *pIndex, u32 count)
@@ -467,18 +400,15 @@ static bool32 InitStartMenuStep(void)
     case 2:
         LoadMessageBoxAndBorderGfx();
         DrawStdWindowFrame(AddStartMenuWindow(sNumStartMenuActions), FALSE);
+        LoadStdBoxGfx(0, 0x21F, 0xD0);
         sInitStartMenuData[1] = 0;
         sInitStartMenuData[0]++;
         break;
     case 3:
-        ShowClockWindow();
-        sInitStartMenuData[0]++;
-        break;
-    case 4:
         if (PrintStartMenuActions(&sInitStartMenuData[1], 2))
             sInitStartMenuData[0]++;
         break;
-    case 5:
+    case 4:
         sStartMenuCursorPos = InitMenuNormal(GetStartMenuWindowId(), FONT_SHORT, 0, 0, 15, sNumStartMenuActions, sStartMenuCursorPos);
         CopyWindowToVram(GetStartMenuWindowId(), COPYWIN_MAP);
         return TRUE;
@@ -1056,7 +986,7 @@ static void ShowSaveInfoWindow(void)
     }
 
     sSaveInfoWindowId = AddWindow(&saveInfoWindow);
-    DrawStdWindowFrame(sSaveInfoWindowId, FALSE);
+    DrawStdFrameWithCustomTileAndPalette(sSaveInfoWindowId, FALSE, 0x21F, 13);
 
     gender = gSaveBlock2Ptr->playerGender;
     color = TEXT_COLOR_RED;  // Red when female, blue when male.

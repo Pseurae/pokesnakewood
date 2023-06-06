@@ -7571,7 +7571,6 @@ static void GetGroundEffectFlags_Shadow(struct ObjectEvent *objEvent, u32 *flags
     {
         if (!objEvent->hasShadow)
         {
-            objEvent->hasShadow = FALSE;
             objEvent->hasShadow = TRUE;
             *flags |= GROUND_EFFECT_FLAG_SHADOW;
         }
