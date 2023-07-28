@@ -1138,7 +1138,7 @@ static const u16 sMarkings_Pal[] = INCBIN_U16("graphics/summary_screen/markings.
 static u8 ShowSplitIcon(u32 split)
 {
     if (sMonSummaryScreen->splitSpriteId == 0xFF)
-        sMonSummaryScreen->splitSpriteId = CreateSprite(&sSpriteTemplate_SplitIcons, 48, 129, 0);
+        sMonSummaryScreen->splitSpriteId = CreateSprite(&sSpriteTemplate_SplitIcons, 48, 128, 0);
 
     gSprites[sMonSummaryScreen->splitSpriteId].invisible = FALSE;
     StartSpriteAnim(&gSprites[sMonSummaryScreen->splitSpriteId], split);
@@ -3732,6 +3732,7 @@ static void PrintMoveDetails(u16 move)
     {
         if (sMonSummaryScreen->currPageIndex == PSS_PAGE_BATTLE_MOVES)
         {
+            ShowSplitIcon(gBattleMoves[move].category);
             PrintMovePowerAndAccuracy(move);
             PrintTextOnWindow(windowId, gMoveDescriptionPointers[move - 1], 6, 1, 0, 0);
         }
