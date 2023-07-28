@@ -112,10 +112,10 @@
 #define METATILE_BrendansMaysHouse_MovingBox_Open    0x270
 
 // gTileset_Building
-#define METATILE_Building_PC_Off  0x062
-#define METATILE_Building_PC_On   0x063
-#define METATILE_Building_TV_Off  0x035
-#define METATILE_Building_TV_On   0x061
+#define METATILE_Building_PC_Off  0x004
+#define METATILE_Building_PC_On   0x005
+#define METATILE_Building_TV_Off  0x002
+#define METATILE_Building_TV_On   0x003
 
 // gTileset_Cave
 #define METATILE_Cave_CrackedFloor                       0x22F
@@ -210,13 +210,11 @@
 #define METATILE_General_CalmWater             0x170
 #define METATILE_General_CaveEntrance_Bottom   0x0A7
 #define METATILE_General_CaveEntrance_Top      0x09F
-#define METATILE_General_Door                  0x03D
+#define METATILE_General_Door                  0x021
 #define METATILE_General_Door_Contest          0x1DB
 #define METATILE_General_Door_Gym              0x1CD
 #define METATILE_General_Door_PokeCenter       0x061
 #define METATILE_General_Door_PokeMart         0x041
-#define METATILE_General_Door_SlidingDouble    0x15B
-#define METATILE_General_Door_SlidingSingle    0x062
 #define METATILE_General_Grass                 0x001
 #define METATILE_General_Grass_TreeLeft        0x1CE
 #define METATILE_General_Grass_TreeRight       0x1CF
@@ -433,13 +431,13 @@
 #define METATILE_PokemonCenter_Floor_ShadowTop           0x21E
 #define METATILE_PokemonCenter_Floor_ShadowTop_Alt       0x2DC
 
-// gTileset_RS
-#define METATILE_RS_MossdeepGym_RedArrow_Down   0x205
-#define METATILE_RS_MossdeepGym_RedArrow_Left   0x20C
-#define METATILE_RS_MossdeepGym_RedArrow_Right  0x204
-#define METATILE_RS_MossdeepGym_RedArrow_Up     0x20D
-#define METATILE_RS_MossdeepGym_Switch_Down     0x239
-#define METATILE_RS_MossdeepGym_Switch_Up       0x238
+// gTileset_RSMossdeepGym
+#define METATILE_RSMossdeepGym_RedArrow_Down   0x205
+#define METATILE_RSMossdeepGym_RedArrow_Left   0x20C
+#define METATILE_RSMossdeepGym_RedArrow_Right  0x204
+#define METATILE_RSMossdeepGym_RedArrow_Up     0x20D
+#define METATILE_RSMossdeepGym_Switch_Down     0x239
+#define METATILE_RSMossdeepGym_Switch_Up       0x238
 
 // gTileset_Rustboro
 #define METATILE_Rustboro_Door_Gray  0x21F
@@ -461,9 +459,7 @@
 #define METATILE_SecretBase_BigPlant_BaseRight1         0x2ED
 #define METATILE_SecretBase_BigPlant_BaseRight2         0x2EF
 #define METATILE_SecretBase_BigPlant_TopLeft            0x2E4
-#define METATILE_SecretBase_BigPlant_TopLeftWall        0x2E5
 #define METATILE_SecretBase_BigPlant_TopRight           0x2E6
-#define METATILE_SecretBase_BigPlant_TopRightWall       0x2E6
 #define METATILE_SecretBase_BlueBalloon                 0x33C
 #define METATILE_SecretBase_BlueBrick_Bottom            0x22F
 #define METATILE_SecretBase_BlueBrick_Top               0x227
@@ -790,8 +786,5 @@
 // gTileset_Underwater
 #define METATILE_Underwater_FloorShadow  0x228
 #define METATILE_Underwater_RockWall     0x21E
-
-// gTileset_ViridianCity
-#define METATILE_ViridianCity_Door  0x299
 
 #endif // GUARD_METATILE_LABELS_H

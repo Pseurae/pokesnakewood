@@ -364,8 +364,6 @@ static const struct MenuAction sMenuActions_Gender[] = {
     {gText_BirchGirl, NULL}
 };
 
-// .text
-
 enum
 {
     HAS_NO_SAVED_GAME,     //NEW GAME, OPTION
@@ -433,8 +431,8 @@ static u32 InitMainMenu(bool8 returningFromOptionsMenu)
     DmaFill16(3, 0, (void *)(PLTT + 2), PLTT_SIZE - 2);
 
     ResetPaletteFade();
-    LoadPalette(sMainMenuBgPal, 0, 32);
-    LoadPalette(sMainMenuTextPal, 0xF0, 32);
+    LoadPalette(sMainMenuBgPal, BG_PLTT_ID(0), PLTT_SIZE_4BPP);
+    LoadPalette(sMainMenuTextPal, BG_PLTT_ID(15), PLTT_SIZE_4BPP);
     ScanlineEffect_Stop();
     ResetTasks();
     ResetSpriteData();
@@ -602,29 +600,32 @@ static void Task_DisplayMainMenu(u8 taskId)
         SetGpuReg(REG_OFFSET_BLDALPHA, BLDALPHA_BLEND(7, 11));
         SetGpuReg(REG_OFFSET_BLDY, 7);
 
+        // palette = RGB_BLACK;
+        // LoadPalette(&palette, BG_PLTT_ID(15) + 14, PLTT_SIZEOF(1));
+
         palette = RGB_WHITE;
-        LoadPalette(&palette, 250, 2);
+        LoadPalette(&palette, BG_PLTT_ID(15) + 10, PLTT_SIZEOF(1));
 
         palette = RGB_BLACK;
-        LoadPalette(&palette, 251, 2);
+        LoadPalette(&palette, BG_PLTT_ID(15) + 11, 2);
 
         // palette = RGB(12, 12, 12);
-        // LoadPalette(&palette, 251, 2);
+        // LoadPalette(&palette, BG_PLTT_ID(15) + 11, PLTT_SIZEOF(1));
 
         // palette = RGB(26, 26, 25);
-        // LoadPalette(&palette, 252, 2);
+        // LoadPalette(&palette, BG_PLTT_ID(15) + 12, PLTT_SIZEOF(1));
 
         // Note: If there is no save file, the save block is zeroed out,
         // so the default gender is MALE.
         if (gSaveBlock2Ptr->playerGender == MALE)
         {
             palette = RGB(4, 16, 31);
-            LoadPalette(&palette, 241, 2);
+            LoadPalette(&palette, BG_PLTT_ID(15) + 1, PLTT_SIZEOF(1));
         }
         else
         {
             palette = RGB(31, 3, 21);
-            LoadPalette(&palette, 241, 2);
+            LoadPalette(&palette, BG_PLTT_ID(15) + 1, PLTT_SIZEOF(1));
         }
 
         switch (gTasks[taskId].tMenuType)
@@ -814,8 +815,8 @@ static void Task_HandleMainMenuAPressed(u8 taskId)
             case ACTION_INVALID:
                 gTasks[taskId].tCurrItem = 0;
                 gTasks[taskId].func = Task_DisplayMainMenuInvalidActionError;
-                gPlttBufferUnfaded[0xF1] = RGB_WHITE;
-                gPlttBufferFaded[0xF1] = RGB_WHITE;
+                gPlttBufferUnfaded[BG_PLTT_ID(15) + 1] = RGB_WHITE;
+                gPlttBufferFaded[BG_PLTT_ID(15) + 1] = RGB_WHITE;
                 SetGpuReg(REG_OFFSET_BG2HOFS, 0);
                 SetGpuReg(REG_OFFSET_BG2VOFS, 0);
                 SetGpuReg(REG_OFFSET_BG1HOFS, 0);
@@ -1078,8 +1079,10 @@ static void MainMenu_CreatePokeIcons(u8 windowId)
 
 static void LoadMainMenuWindowFrameTiles(u8 bgId, u16 tileOffset)
 {
+    // LoadBgTiles(bgId, GetWindowFrameTilesPal(gSaveBlock2Ptr->optionsWindowFrameType)->tiles, 0x120, tileOffset);
+    // LoadPalette(GetWindowFrameTilesPal(gSaveBlock2Ptr->optionsWindowFrameType)->pal, BG_PLTT_ID(2), PLTT_SIZE_4BPP);
     LoadBgTiles(bgId, sMainMenuFrame_Gfx, 0x120, tileOffset);
-    LoadPalette(sMainMenuFrame_Pal, 32, 32);
+    LoadPalette(sMainMenuFrame_Pal, BG_PLTT_ID(2), PLTT_SIZE_4BPP);
 }
 
 static void DrawMainMenuWindowBorder(const struct WindowTemplate *template, u16 baseTileNum)

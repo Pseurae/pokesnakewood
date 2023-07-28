@@ -149,6 +149,8 @@ static const u8 *const sFemalePresetNames[] = {
     gText_DefaultNameHalie
 };
 
+#define NUM_PRESET_NAMES min(ARRAY_COUNT(sMalePresetNames), ARRAY_COUNT(sFemalePresetNames))
+
 static u8 StartNextTask(void);
 
 static void SetupReturnCB(void);
@@ -621,7 +623,7 @@ static void Task_NamingScreen(u8 taskId)
         if (!gPaletteFade.active)
         {
             FreeAllWindowBuffers();
-            NamingScreen_SetDefaultName(Random() % 20);
+            NamingScreen_SetDefaultName(Random() % NUM_PRESET_NAMES);
             DoNamingScreen(NAMING_SCREEN_PLAYER, gSaveBlock2Ptr->playerName, gSaveBlock2Ptr->playerGender, 0, 0, CB2_ReturnFromNamingScreen);
             DestroyTask(taskId);
             tState = 0;

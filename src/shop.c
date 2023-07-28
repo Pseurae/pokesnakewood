@@ -742,16 +742,16 @@ static void BuyMenuDecompressBgGraphics(void)
 {
     DecompressAndCopyTileDataToVram(1, gShopMenu_Gfx, 0x480, 0x3DC, 0);
     LZDecompressWram(gShopMenu_Tilemap, sShopData->tilemapBuffers[0]);
-    LoadCompressedPalette(gShopMenu_Pal, 0xB0, 0x20);
+    LoadCompressedPalette(gShopMenu_Pal, BG_PLTT_ID(12), PLTT_SIZE_4BPP);
 }
 
 static void BuyMenuInitWindows(void)
 {
     InitWindows(sShopBuyMenuWindowTemplates);
     DeactivateAllTextPrinters();
-    LoadUserWindowBorderGfx(WIN_MONEY, 0x20B, 0xD0);
-    LoadStdBoxGfx(WIN_QUANTITY_IN_BAG, 0x216, 0xE0);
-    LoadMessageBoxGfx(WIN_MESSAGE, 0x21F, 0xF0);
+    LoadUserWindowBorderGfx(WIN_MONEY, 0x20B, BG_PLTT_ID(13));
+    LoadStdBoxGfx(WIN_QUANTITY_IN_BAG, 0x216, BG_PLTT_ID(14));
+    LoadMessageBoxGfx(WIN_MESSAGE, 0x21F, BG_PLTT_ID(15));
     PutWindowTilemap(WIN_MONEY);
     PutWindowTilemap(WIN_ITEM_LIST);
     PutWindowTilemap(WIN_ITEM_DESCRIPTION);

@@ -1075,6 +1075,27 @@ static void TilesetAnim_BikeShop(u16 timer)
         QueueAnimTiles_BikeShop_BlinkingLights(timer / 4);
 }
 
+static void TilesetAnim_BattlePyramid(u16 timer)
+{
+    if (timer % 8 == 0)
+    {
+        QueueAnimTiles_BattlePyramid_Torch(timer / 8);
+        QueueAnimTiles_BattlePyramid_StatueShadow(timer / 8);
+    }
+}
+
+static void TilesetAnim_BattleDome(u16 timer)
+{
+    if (timer % 4 == 0)
+        BlendAnimPalette_BattleDome_FloorLights(timer / 4);
+}
+
+static void TilesetAnim_BattleDome2(u16 timer)
+{
+    if (timer % 4 == 0)
+        BlendAnimPalette_BattleDome_FloorLightsNoBlend(timer / 4);
+}
+
 static void QueueAnimTiles_Building_TVTurnedOn(u16 timer)
 {
     u16 i = timer % ARRAY_COUNT(gTilesetAnims_Building_TvTurnedOn);
@@ -1116,4 +1137,38 @@ static void QueueAnimTiles_Sootopolis_StormyWater(u16 timer)
 {
     u16 i = timer % ARRAY_COUNT(gTilesetAnims_Sootopolis_StormyWater);
     AppendTilesetAnimToBuffer(gTilesetAnims_Sootopolis_StormyWater[i], (u16 *)(BG_VRAM + TILE_OFFSET_4BPP(NUM_TILES_IN_PRIMARY + 240)), 96 * TILE_SIZE_4BPP);
+}
+
+static void QueueAnimTiles_BattlePyramid_Torch(u16 timer)
+{
+    u16 i = timer % ARRAY_COUNT(gTilesetAnims_BattlePyramid_Torch);
+    AppendTilesetAnimToBuffer(gTilesetAnims_BattlePyramid_Torch[i], (u16 *)(BG_VRAM + TILE_OFFSET_4BPP(NUM_TILES_IN_PRIMARY + 151)), 8 * TILE_SIZE_4BPP);
+}
+
+static void QueueAnimTiles_BattlePyramid_StatueShadow(u16 timer)
+{
+    u16 i = timer % ARRAY_COUNT(gTilesetAnims_BattlePyramid_StatueShadow);
+    AppendTilesetAnimToBuffer(gTilesetAnims_BattlePyramid_StatueShadow[i], (u16 *)(BG_VRAM + TILE_OFFSET_4BPP(NUM_TILES_IN_PRIMARY + 135)), 8 * TILE_SIZE_4BPP);
+}
+
+static void BlendAnimPalette_BattleDome_FloorLights(u16 timer)
+{
+    CpuCopy16(sTilesetAnims_BattleDomeFloorLightPals[timer % ARRAY_COUNT(sTilesetAnims_BattleDomeFloorLightPals)], &gPlttBufferUnfaded[BG_PLTT_ID(8)], PLTT_SIZE_4BPP);
+    BlendPalette(BG_PLTT_ID(8), 16, gPaletteFade.y, gPaletteFade.blendColor & 0x7FFF);
+    if ((u8)FindTaskIdByFunc(Task_BattleTransition_Intro) != TASK_NONE)
+    {
+        sSecondaryTilesetAnimCallback = TilesetAnim_BattleDome2;
+        sSecondaryTilesetAnimCounterMax = 32;
+    }
+}
+
+static void BlendAnimPalette_BattleDome_FloorLightsNoBlend(u16 timer)
+{
+    CpuCopy16(sTilesetAnims_BattleDomeFloorLightPals[timer % ARRAY_COUNT(sTilesetAnims_BattleDomeFloorLightPals)], &gPlttBufferUnfaded[BG_PLTT_ID(8)], PLTT_SIZE_4BPP);
+    if ((u8)FindTaskIdByFunc(Task_BattleTransition_Intro) == TASK_NONE)
+    {
+        BlendPalette(BG_PLTT_ID(8), 16, gPaletteFade.y, gPaletteFade.blendColor & 0x7FFF);
+        if (!--sSecondaryTilesetAnimCounterMax)
+            sSecondaryTilesetAnimCallback = NULL;
+    }
 }
