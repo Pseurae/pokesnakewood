@@ -185,7 +185,7 @@ script Route101_EventScript_ZombieBoy {
 
 	msgbox(format("{COLOR DARK_GRAY}{PLAYER}:{PLAYER_COLOR} Oh, right. You see, I just woke up in that ruined town south of here, and realised that I had lost my memory."))
 	
-	msgbox(format("{COLOR DARK_GRAY}Prof. Birch:{COLOR BLUE} So, it’s true then? Littleroot has been destroyed?"
+	msgbox(format("{COLOR DARK_GRAY}Prof. Birch:{COLOR BLUE} So, it’s true then? Littleroot has been destroyed?\p"
 		"You don't remember, but it was our home, {PLAYER}.\p"
 		"Was anyone else there when you woke up? My daughter? Your brother?"))
 
