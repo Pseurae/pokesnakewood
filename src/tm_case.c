@@ -376,7 +376,7 @@ void OpenTMCase(u8 type, void (* callback)(void), u8 a2)
     sTMCaseDynamicResources->savedCallback = NULL;
     sTMCaseDynamicResources->scrollIndicatorArrowPairId = 0xFF;
     sTMCaseDynamicResources->contextMenuWindowId = 0xFF;
-    if (type != TMCASE_NA)
+    if (type != TMCASE_REOPENING)
         sTMCaseStaticResources.tmCaseMenuType = type;
     if (callback != NULL)
         sTMCaseStaticResources.savedCallback = callback;
@@ -1258,13 +1258,13 @@ static void InitTMCaseWindows(void)
 
     InitWindows(sWindowTemplates);
     DeactivateAllTextPrinters();
-    LoadMessageBoxGfx(WIN_LIST, 0x64, 0xB0);
-    LoadUserWindowBorderGfx(WIN_LIST, 0x78, 0xD0);
-    LoadPalette(sTMCaseMainWindowPalette, 0xF0, 0x20);
-    LoadPalette(sTMCaseMainWindowPalette, 0xA0, 0x20);
-    LoadPalette(sPal3Override, 0xF6, 0x04);
-    LoadPalette(sPal3Override, 0xD6, 0x04);
-    ListMenuLoadStdPalAt(0xc0, 0x01);
+    LoadMessageBoxGfx(WIN_LIST, 100, BG_PLTT_ID(11));
+    LoadUserWindowBorderGfx(WIN_LIST, 120, BG_PLTT_ID(13));
+    LoadPalette(sTMCaseMainWindowPalette, BG_PLTT_ID(15), PLTT_SIZE_4BPP);
+    LoadPalette(sTMCaseMainWindowPalette, BG_PLTT_ID(10), PLTT_SIZE_4BPP);
+    LoadPalette(sPal3Override, BG_PLTT_ID(15) + 6, PLTT_SIZEOF(2));
+    LoadPalette(sPal3Override, BG_PLTT_ID(13) + 6, PLTT_SIZEOF(2));
+    ListMenuLoadStdPalAt(BG_PLTT_ID(12), 1);
 
     for (i = 0; i < 9; i++)
         FillWindowPixelBuffer(i, 0x00);
@@ -1291,12 +1291,12 @@ static void AddTextPrinterParameterized_ColorByIndex(u8 windowId, u8 fontId, con
 
 static void TMCase_SetWindowBorder1(u8 windowId)
 {
-    DrawStdFrameWithCustomTileAndPalette(windowId, FALSE, 0x5B, 0x0E);
+    DrawStdFrameWithCustomTileAndPalette(windowId, FALSE, 0x5B, 14);
 }
 
 static void TMCase_SetWindowBorder2(u8 windowId)
 {
-    DrawStdFrameWithCustomTileAndPalette(windowId, FALSE, 0x78, 0x0D);
+    DrawStdFrameWithCustomTileAndPalette(windowId, FALSE, 0x78, 13);
 }
 
 static void TMCase_PrintMessageWithFollowupTask(u8 taskId, u8 fontId, const u8 * str, TaskFunc func)
@@ -1426,12 +1426,8 @@ static void SetTMSpriteAnim(struct Sprite *sprite, u8 idx)
 
 static void TintTMSpriteByType(u8 type)
 {
-    u8 palIndex = IndexOfSpritePaletteTag(TM_CASE_TM_TAG) << 4;
-    LoadPalette(sTMSpritePaletteBuffer + sTMSpritePaletteOffsetByType[type], 0x100 | palIndex, 0x20);
-    if (sTMCaseStaticResources.tmCaseMenuType == 4)
-    {
-        BlendPalettes(1 << (0x10 + palIndex), 4, RGB_BLACK);
-    }
+    u8 palIndex = PLTT_ID(IndexOfSpritePaletteTag(TM_CASE_TM_TAG));
+    LoadPalette(sTMSpritePaletteBuffer + sTMSpritePaletteOffsetByType[type], OBJ_PLTT_OFFSET + palIndex, PLTT_SIZE_4BPP);
 }
 
 static void UpdateTMSpritePosition(struct Sprite *sprite, u8 var)

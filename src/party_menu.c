@@ -4329,7 +4329,7 @@ static void CB2_ReturnToBagMenu(void)
 
 static void CB2_ReturnToTMCaseMenu(void)
 {
-    OpenTMCase(TMCASE_NA, NULL, 0xFF);
+    OpenTMCase(TMCASE_REOPENING, NULL, 0xFF);
 }
 
 static void Task_SetSacredAshCB(u8 taskId)
