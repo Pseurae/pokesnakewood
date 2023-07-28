@@ -1254,7 +1254,7 @@ static u8 TrySetupObjectEventSprite(struct ObjectEventTemplate *objectEventTempl
     sprite->centerToCornerVecY = -(graphicsInfo->height >> 1);
     sprite->x += 8;
     sprite->y += 16 + sprite->centerToCornerVecY;
-    sprite->oam.paletteNum = paletteSlot;
+    sprite->oam.paletteNum = IncrementSpritePaletteReferenceCount(paletteSlot);
     sprite->coordOffsetEnabled = TRUE;
     sprite->sObjEventId = objectEventId;
     objectEvent->spriteId = spriteId;
@@ -1417,7 +1417,7 @@ u8 CreateVirtualObject(u8 graphicsId, u8 virtualObjId, s16 x, s16 y, u8 elevatio
         paletteSlot = GetSpritePaletteSlot(PAL_OBJEVENT, graphicsInfo->paletteTag);
         PatchObjectPalette(graphicsInfo->paletteTag, paletteSlot | 0xf0);
 
-        sprite->oam.paletteNum = paletteSlot;
+        sprite->oam.paletteNum = IncrementSpritePaletteReferenceCount(paletteSlot);
         if (subspriteTables != NULL)
         {
             SetSubspriteTables(sprite, subspriteTables);
@@ -1557,7 +1557,7 @@ static void SpawnObjectEventOnReturnToField(u8 objectEventId, s16 x, s16 y)
         if (subspriteTables != NULL)
             SetSubspriteTables(sprite, subspriteTables);
 
-        sprite->oam.paletteNum = paletteSlot;
+        sprite->oam.paletteNum = IncrementSpritePaletteReferenceCount(paletteSlot);
         sprite->coordOffsetEnabled = TRUE;
         sprite->sObjEventId = objectEventId;
         objectEvent->spriteId = i;
@@ -1605,7 +1605,7 @@ void ObjectEventSetGraphicsId(struct ObjectEvent *objectEvent, u8 graphicsId)
     sprite->images = graphicsInfo->images;
     sprite->anims = graphicsInfo->anims;
     sprite->subspriteTables = graphicsInfo->subspriteTables;
-    sprite->oam.paletteNum = paletteSlot;
+    sprite->oam.paletteNum = IncrementSpritePaletteReferenceCount(paletteSlot);
     objectEvent->inanimate = graphicsInfo->inanimate;
     objectEvent->graphicsId = graphicsId;
     SetSpritePosToMapCoords(objectEvent->currentCoords.x, objectEvent->currentCoords.y, &sprite->x, &sprite->y);
@@ -8346,6 +8346,7 @@ void SetVirtualObjectGraphics(u8 virtualObjId, u8 graphicsId)
         sprite->oam = *graphicsInfo->oam;
         sprite->oam.tileNum = tileNum;
         PatchObjectPalette(graphicsInfo->paletteTag, paletteSlot);
+        DecrementSpritePaletteReferenceCount(sprite->oam.paletteNum);
         sprite->oam.paletteNum = IncrementSpritePaletteReferenceCount(paletteSlot);
         sprite->images = graphicsInfo->images;
 
