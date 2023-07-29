@@ -3072,7 +3072,6 @@ s32 CalculateBaseDamage(struct BattlePokemon *attacker, struct BattlePokemon *de
     u8 defenderHoldEffectParam;
     u8 attackerHoldEffect;
     u8 attackerHoldEffectParam;
-    u8 category = gBattleMoves[move].category;
 
     if (!powerOverride)
         gBattleMovePower = gBattleMoves[move].power;
@@ -3185,7 +3184,7 @@ s32 CalculateBaseDamage(struct BattlePokemon *attacker, struct BattlePokemon *de
     if (gBattleMoves[gCurrentMove].effect == EFFECT_EXPLOSION)
         defense /= 2;
 
-    if (category == MOVE_CATEGORY_PHYSICAL)
+    if (IS_MOVE_PHYSICAL(move))
     {
         if (gCritMultiplier == 2)
         {
@@ -3233,10 +3232,10 @@ s32 CalculateBaseDamage(struct BattlePokemon *attacker, struct BattlePokemon *de
             damage = 1;
     }
 
-    else if (category == MOVE_CATEGORY_STATUS)
+    else if (IS_MOVE_STATUS(move))
         damage = 0; // is ??? type. does 0 damage.
 
-    if (category == MOVE_CATEGORY_SPECIAL)
+    else if (IS_MOVE_SPECIAL(move))
     {
         if (gCritMultiplier == 2)
         {
