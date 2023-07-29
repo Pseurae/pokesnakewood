@@ -135,9 +135,9 @@ static void Cmd_get_move_type_from_result(void);
 static void Cmd_get_move_power_from_result(void);
 static void Cmd_get_move_effect_from_result(void);
 static void Cmd_get_protect_count(void);
-static void Cmd_nop_52(void);
-static void Cmd_nop_53(void);
-static void Cmd_nop_54(void);
+static void Cmd_if_has_move_with_category(void);
+static void Cmd_if_doesnt_have_move_with_category(void);
+static void Cmd_get_move_category_from_result(void);
 static void Cmd_nop_55(void);
 static void Cmd_nop_56(void);
 static void Cmd_nop_57(void);
@@ -244,9 +244,9 @@ static const BattleAICmdFunc sBattleAICmdTable[] =
     Cmd_get_move_power_from_result,                 // 0x4F
     Cmd_get_move_effect_from_result,                // 0x50
     Cmd_get_protect_count,                          // 0x51
-    Cmd_nop_52,                                     // 0x52
-    Cmd_nop_53,                                     // 0x53
-    Cmd_nop_54,                                     // 0x54
+    Cmd_if_has_move_with_category,                  // 0x52
+    Cmd_if_doesnt_have_move_with_category,          // 0x53
+    Cmd_get_move_category_from_result,              // 0x54
     Cmd_nop_55,                                     // 0x55
     Cmd_nop_56,                                     // 0x56
     Cmd_nop_57,                                     // 0x57
@@ -2151,16 +2151,115 @@ static void Cmd_get_protect_count(void)
     gAIScriptPtr += 2;
 }
 
-static void Cmd_nop_52(void)
+static void Cmd_if_has_move_with_category(void)
 {
+    s32 i;
+    const u8 *categoryPtr = (u8 *)(gAIScriptPtr + 2);
+
+    switch (gAIScriptPtr[1])
+    {
+    case AI_USER:
+        for (i = 0; i < MAX_MON_MOVES; i++)
+        {
+            if (gBattleMoves[gBattleMons[sBattler_AI].moves[i]].category == *categoryPtr)
+                break;
+        }
+        if (i == MAX_MON_MOVES)
+            gAIScriptPtr += 7;
+        else
+            gAIScriptPtr = T1_READ_PTR(gAIScriptPtr + 3);
+        break;
+    case AI_USER_PARTNER:
+        if (gBattleMons[BATTLE_PARTNER(sBattler_AI)].hp == 0)
+        {
+            gAIScriptPtr += 7;
+            break;
+        }
+        else
+        {
+            for (i = 0; i < MAX_MON_MOVES; i++)
+            {
+                if (gBattleMoves[gBattleMons[BATTLE_PARTNER(sBattler_AI)].moves[i]].category == *categoryPtr)
+                    break;
+            }
+        }
+        if (i == MAX_MON_MOVES)
+            gAIScriptPtr += 7;
+        else
+            gAIScriptPtr = T1_READ_PTR(gAIScriptPtr + 3);
+        break;
+    case AI_TARGET:
+    case AI_TARGET_PARTNER:
+        for (i = 0; i < MAX_MON_MOVES; i++)
+        {
+            if (gBattleMoves[BATTLE_HISTORY->usedMoves[gBattlerTarget].moves[i]].category == *categoryPtr)
+                break;
+        }
+        if (i == MAX_MON_MOVES)
+            gAIScriptPtr += 7;
+        else
+            gAIScriptPtr = T1_READ_PTR(gAIScriptPtr + 3);
+        break;
+    }
 }
 
-static void Cmd_nop_53(void)
+static void Cmd_if_doesnt_have_move_with_category(void)
 {
+    s32 i;
+    const u8 *categoryPtr = (u8 *)(gAIScriptPtr + 2);
+
+    switch (gAIScriptPtr[1])
+    {
+    case AI_USER:
+        for (i = 0; i < MAX_MON_MOVES; i++)
+        {
+            if (gBattleMoves[gBattleMons[sBattler_AI].moves[i]].category == *categoryPtr)
+                break;
+        }
+        if (i != MAX_MON_MOVES)
+            gAIScriptPtr += 7;
+        else
+            gAIScriptPtr = T1_READ_PTR(gAIScriptPtr + 3);
+        break;
+    case AI_USER_PARTNER:
+        if (gBattleMons[BATTLE_PARTNER(sBattler_AI)].hp == 0)
+        {
+            gAIScriptPtr += 7;
+            break;
+        }
+        else
+        {
+            for (i = 0; i < MAX_MON_MOVES; i++)
+            {
+                if (gBattleMoves[gBattleMons[BATTLE_PARTNER(sBattler_AI)].moves[i]].category == *categoryPtr)
+                    break;
+            }
+        }
+        if (i != MAX_MON_MOVES)
+            gAIScriptPtr += 7;
+        else
+            gAIScriptPtr = T1_READ_PTR(gAIScriptPtr + 3);
+        break;
+    case AI_TARGET:
+    case AI_TARGET_PARTNER:
+        for (i = 0; i < MAX_MON_MOVES; i++)
+        {
+            if (gBattleMoves[BATTLE_HISTORY->usedMoves[gBattlerTarget].moves[i]].category == *categoryPtr)
+                break;
+        }
+        if (i != MAX_MON_MOVES)
+            gAIScriptPtr += 7;
+        else
+            gAIScriptPtr = T1_READ_PTR(gAIScriptPtr + 3);
+        break;
+    }
 }
 
-static void Cmd_nop_54(void)
+static void Cmd_get_move_category_from_result(void)
 {
+    AI_THINKING_STRUCT->funcResult = gBattleMoves[AI_THINKING_STRUCT->funcResult].category;
+
+    gAIScriptPtr += 1;
 }
 
 static void Cmd_nop_55(void)

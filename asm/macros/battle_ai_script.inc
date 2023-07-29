@@ -467,15 +467,21 @@
 	.byte \battler
 	.endm
 
-	.macro nop_52
+	.macro if_has_move_with_category battler:req, category:req, address:req
 	.byte 0x52
+	.byte \battler
+	.byte \category
+	.4byte \address
 	.endm
 
-	.macro nop_53
+	.macro if_doesnt_have_move_with_category battler:req, category:req, address:req
 	.byte 0x53
+	.byte \battler
+	.byte \category
+	.4byte \address
 	.endm
 
-	.macro nop_54
+	.macro get_move_category_from_result
 	.byte 0x54
 	.endm
 
