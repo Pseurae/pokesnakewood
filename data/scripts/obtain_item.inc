@@ -55,16 +55,14 @@ EventScript_BufferBerriesPocket::
 
 EventScript_ObtainedItem:: @ 8271B95
 	special AddObtainedItemIconSprite
-	compare VAR_0x8001, TRUE
+	compare AMOUNT, 1
 	goto_if_eq EventScript_ObtainedItemMessage
-	buffernumberstring 0, VAR_0x8001
+	buffernumberstring 0, AMOUNT
 	message gText_ObtainedTheItems
 	goto EventScript_ContinueObtainedItem
 
 EventScript_ObtainedItemMessage:
 	message gText_ObtainedTheItem
-	return
-
 EventScript_ContinueObtainedItem:
 	waitfanfare
 	special RemoveObtainedItemIconSprite
@@ -158,9 +156,9 @@ EventScript_FoundTMHM::
 	return
 
 EventScript_FoundItem:: @ 8271C9B
-    compare VAR_0x8001, TRUE
+    compare AMOUNT, 1
     goto_if_eq EventScript_FoundItemMessage
-    buffernumberstring 0, VAR_0x8001
+    buffernumberstring 0, AMOUNT
     message gText_PlayerFoundItems
     return
 

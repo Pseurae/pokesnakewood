@@ -204,9 +204,8 @@ void AddTextPrinterForMessage_2(bool8 allowSkippingDelayWithButtonPress)
 
 void AddTextPrinterForMessageWithTextColor(bool8 allowSkippingDelayWithButtonPress)
 {
-    u8 color;
     gTextFlags.canABSpeedUpPrint = allowSkippingDelayWithButtonPress;
-    color = ContextNpcGetTextColor();
+    GetObjectTextColor();
     AddTextPrinterParameterized2(0, FONT_SHORT, gStringVar4, GetPlayerTextSpeedDelay(), NULL, gSpecialVar_TextColor, TEXT_COLOR_WHITE, TEXT_COLOR_LIGHT_GRAY);      
 }
 

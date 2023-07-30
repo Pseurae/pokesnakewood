@@ -4280,13 +4280,13 @@ u8 Script_TryGainNewFanFromCounter(void)
     return TryGainNewFanFromCounter(gSpecialVar_0x8004);
 }
 
-u8 ContextNpcGetTextColor(void)
+void GetObjectTextColor(void)
 {
     u8 gfxId;
     const struct ObjectEventGraphicsInfo *graphicsInfo;
 
     if (gSpecialVar_TextColor != 0xFF)
-        return gSpecialVar_TextColor;
+        return;
     else if (gSelectedObjectEvent == 0)
         gSpecialVar_TextColor = TEXT_COLOR_DARK_GRAY;
     else
