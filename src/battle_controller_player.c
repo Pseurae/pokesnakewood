@@ -10,7 +10,6 @@
 #include "battle_tv.h"
 #include "bg.h"
 #include "data.h"
-#include "day_night.h"
 #include "item.h"
 #include "item_menu.h"
 #include "link.h"

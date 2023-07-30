@@ -1,7 +1,6 @@
 #include "global.h"
 #include "battle.h"
 #include "battle_anim.h"
-#include "day_night.h"
 #include "decompress.h"
 #include "graphics.h"
 #include "main.h"
@@ -373,7 +372,7 @@ static void Task_DoPokeballSendOutAnim(u8 taskId)
         itemId = GetMonData(&gPlayerParty[gBattlerPartyIndexes[battlerId]], MON_DATA_POKEBALL);
 
     ballId = ItemIdToBallId(itemId);
-    LoadBallDNGfx(ballId);
+    LoadBallGfx(ballId);
     ballSpriteId = CreateSprite(&gBallSpriteTemplates[ballId], 32, 80, 29);
     gSprites[ballSpriteId].data[0] = 0x80;
     gSprites[ballSpriteId].data[1] = 0;
@@ -1315,29 +1314,6 @@ void LoadBallGfx(u8 ballId)
     {
         LoadCompressedSpriteSheetUsingHeap(&gBallSpriteSheets[ballId]);
         LoadCompressedSpritePaletteUsingHeap(&gBallSpritePalettes[ballId]);
-    }
-
-    switch (ballId)
-    {
-    case BALL_DIVE:
-    case BALL_LUXURY:
-    case BALL_PREMIER:
-        break;
-    default:
-        var = GetSpriteTileStartByTag(gBallSpriteSheets[ballId].tag);
-        LZDecompressVram(gOpenPokeballGfx, (void *)(OBJ_VRAM0 + 0x100 + var * 32));
-        break;
-    }
-}
-
-void LoadBallDNGfx(u8 ballId)
-{
-    u16 var;
-
-    if (GetSpriteTileStartByTag(gBallSpriteSheets[ballId].tag) == 0xFFFF)
-    {
-        LoadCompressedSpriteSheetUsingHeap(&gBallSpriteSheets[ballId]);
-        LoadCompressedSpritePalette(&gBallSpritePalettes[ballId]);
     }
 
     switch (ballId)

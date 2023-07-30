@@ -1,6 +1,5 @@
 #include "global.h"
 #include "field_effect_helpers.h"
-#include "day_night.h"
 #include "event_object_movement.h"
 #include "field_camera.h"
 #include "field_effect.h"

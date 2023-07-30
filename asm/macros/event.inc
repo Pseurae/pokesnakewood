@@ -1739,24 +1739,6 @@
 	.byte \hm
 	.endm
 
-	.macro applypath index:req, x:req, y:req, mode=1, map
-		.ifb \map
-			.byte 0xe6
-			.2byte \index
-			.2byte \x
-			.2byte \y
-			.byte \mode
-		.else
-			@ Really only useful if the object has followed from one map to another (e.g. Wally during the catching event).
-			.byte 0xe7
-			.2byte \index
-			.2byte \x
-			.2byte \y
-			.byte \mode
-			map \map
-		.endif
-	.endm
-
 @ Supplementary
 
 	.macro goto_if_unset flag:req, dest:req

@@ -230,8 +230,6 @@ gScriptCmdTable::
 	.4byte ScrCmd_shownuminput
 	.4byte ScrCmd_setfieldtint
 	.4byte ScrCmd_canpartyusehm
-	.4byte ScrCmd_applypath
-	.4byte ScrCmd_applypathat
 
 gScriptCmdTableEnd::
 	.4byte ScrCmd_nop

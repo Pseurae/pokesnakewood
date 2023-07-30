@@ -35,7 +35,6 @@
 #include "pokemon_storage_system.h"
 #include "random.h"
 #include "overworld.h"
-#include "pathfinding.h"
 #include "rotating_tile_puzzle.h"
 #include "rtc.h"
 #include "script.h"
@@ -2400,32 +2399,4 @@ bool8 ScrCmd_exitcutscene(struct ScriptContext *ctx)
     sPauseCounter = 0;
     SetupNativeScript(ctx, ExitCutsceneTimer);
     return TRUE;
-}
-
-bool8 ScrCmd_applypath(struct ScriptContext *ctx)
-{
-    u16 localId = VarGet(ScriptReadHalfword(ctx));
-    u16 x = VarGet(ScriptReadHalfword(ctx));
-    u16 y = VarGet(ScriptReadHalfword(ctx));
-    u8 mode = ScriptReadByte(ctx);
-
-    if (ScriptMovement_StartPath(localId, gSaveBlock1Ptr->location.mapNum, gSaveBlock1Ptr->location.mapGroup, x, y, mode))
-        sMovingNpcId = localId;
-
-    return FALSE;
-}
-
-bool8 ScrCmd_applypathat(struct ScriptContext *ctx)
-{
-    u16 localId = VarGet(ScriptReadHalfword(ctx));
-    u16 x = VarGet(ScriptReadHalfword(ctx));
-    u16 y = VarGet(ScriptReadHalfword(ctx));
-    u8 mode = ScriptReadByte(ctx);
-    u8 mapGroup = ScriptReadByte(ctx);
-    u8 mapNum = ScriptReadByte(ctx);
-
-    if (ScriptMovement_StartPath(localId, mapNum, mapGroup, x, y, mode))
-        sMovingNpcId = localId;
-
-    return FALSE;
 }

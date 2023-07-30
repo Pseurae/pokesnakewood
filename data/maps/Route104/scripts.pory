@@ -2,7 +2,6 @@ script Route104_EventScript_StartPeekoRescue {
 	lockall
 	initcutscene
 	special(SpawnCameraObject)
-	applypath(OBJ_EVENT_ID_CAMERA, 26, 59, 2)
 	waitmovement(0)
 	special(RemoveCameraObject)
 

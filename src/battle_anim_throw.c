@@ -704,7 +704,7 @@ void AnimTask_SwitchOutBallEffect(u8 taskId)
 void AnimTask_LoadBallGfx(u8 taskId)
 {
     u8 ballId = ItemIdToBallId(gLastUsedItem);
-    LoadBallDNGfx(ballId);
+    LoadBallGfx(ballId);
     DestroyAnimVisualTask(taskId);
 }
 

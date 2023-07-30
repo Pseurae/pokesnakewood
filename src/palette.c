@@ -1,7 +1,6 @@
 #include "global.h"
 #include "palette.h"
 #include "util.h"
-#include "day_night.h"
 #include "decompress.h"
 #include "gpu_regs.h"
 #include "task.h"

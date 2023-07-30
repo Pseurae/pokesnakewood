@@ -19,7 +19,6 @@
 #include "party_menu.h"
 #include "m4a.h"
 #include "decompress.h"
-#include "day_night.h"
 #include "data.h"
 #include "palette.h"
 #include "contest.h"

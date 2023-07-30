@@ -1,4 +1,0 @@
-#ifndef GUARD_DAY_NIGHT_H
-#define GUARD_DAY_NIGHT_H
-
-#endif // GUARD_DAY_NIGHT_H

@@ -3,7 +3,6 @@
 #include "battle_pyramid.h"
 #include "berry.h"
 #include "characters.h"
-#include "day_night.h"
 #include "decoration.h"
 #include "event_data.h"
 #include "event_object_movement.h"

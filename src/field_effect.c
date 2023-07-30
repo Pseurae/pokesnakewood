@@ -1,5 +1,4 @@
 #include "global.h"
-#include "day_night.h"
 #include "decompress.h"
 #include "event_object_movement.h"
 #include "field_camera.h"

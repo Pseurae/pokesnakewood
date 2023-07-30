@@ -345,10 +345,8 @@ SECTIONS {
         src/international_string_util.o(.text);
         src/tm_case.o(.text);
         src/berry_pouch.o(.text);
-        src/day_night.o(.text);
         src/number_input.o(.text);
         src/intro_speech.o(.text);
-        src/pathfinding.o(.text);
         src/sprite_palette.o(.text);
     } =0
 
@@ -711,10 +709,8 @@ SECTIONS {
         src/international_string_util.o(.rodata);
         src/tm_case.o(.rodata);
         src/berry_pouch.o(.rodata);
-        src/day_night.o(.rodata);
         src/number_input.o(.rodata);
         src/intro_speech.o(.rodata);
-        src/pathfinding.o(.rodata);
         src/sprite_palette.o(.rodata);
         src/mystery_event_msg.o(.rodata);
         data/mystery_gift.o(.rodata);

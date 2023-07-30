@@ -757,8 +757,6 @@ void LoadBattleMenuWindowGfx(void)
     }
 }
 
-#include "day_night.h"
-
 void DrawMainBattleBackground(void)
 {
     if (gBattleTypeFlags & (BATTLE_TYPE_LINK | BATTLE_TYPE_FRONTIER | BATTLE_TYPE_EREADER_TRAINER | BATTLE_TYPE_RECORDED_LINK))

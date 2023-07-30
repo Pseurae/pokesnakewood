@@ -15,7 +15,6 @@
 #include "berry.h"
 #include "bg.h"
 #include "data.h"
-#include "day_night.h"
 #include "decompress.h"
 #include "dma3.h"
 #include "event_data.h"

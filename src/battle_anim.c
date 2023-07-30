@@ -5,7 +5,6 @@
 #include "battle_interface.h"
 #include "bg.h"
 #include "contest.h"
-#include "day_night.h"
 #include "decompress.h"
 #include "dma3.h"
 #include "gpu_regs.h"
