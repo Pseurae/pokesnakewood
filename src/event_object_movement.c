@@ -1821,6 +1821,7 @@ void PatchObjectPalette(u16 paletteTag, u8 paletteSlot)
     u8 paletteIndex = FindObjectEventPaletteIndexByTag(paletteTag);
 
     LoadPalette(sObjectEventSpritePalettes[paletteIndex].data, OBJ_PLTT_ID(paletteSlot), PLTT_SIZE_4BPP);
+    UpdateSpritePaletteWithWeather(paletteSlot);
 }
 
 static u8 FindObjectEventPaletteIndexByTag(u16 tag)

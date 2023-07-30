@@ -4,6 +4,7 @@
 #include "fieldmap.h"
 #include "field_weather.h"
 #include "overworld.h"
+#include "palette.h"
 #include "random.h"
 #include "script.h"
 #include "constants/weather.h"
@@ -1474,6 +1475,7 @@ static void CreateFogHorizontalSprites(void)
             .tag = GFXTAG_FOG_H,
         };
         LoadSpriteSheet(&fogHorizontalSpriteSheet);
+        LoadPalette(gFogPalette, OBJ_PLTT_ID(gWeatherPtr->contrastColorMapSpritePalIndex), PLTT_SIZE_4BPP);
         for (i = 0; i < NUM_FOG_HORIZONTAL_SPRITES; i++)
         {
             spriteId = CreateSpriteAtEnd(&sFogHorizontalSpriteTemplate, 0, 0, 0xFF);
@@ -1881,6 +1883,7 @@ static void CreateFogDiagonalSprites(void)
     {
         fogDiagonalSpriteSheet = sFogDiagonalSpriteSheet;
         LoadSpriteSheet(&fogDiagonalSpriteSheet);
+        LoadPalette(gFogPalette, OBJ_PLTT_ID(gWeatherPtr->contrastColorMapSpritePalIndex), PLTT_SIZE_4BPP);
         for (i = 0; i < NUM_FOG_DIAGONAL_SPRITES; i++)
         {
             spriteId = CreateSpriteAtEnd(&sFogDiagonalSpriteTemplate, 0, (i / 5) * 64, 0xFF);

@@ -5,6 +5,7 @@
 #include "util.h"
 #include "event_object_movement.h"
 #include "field_weather.h"
+#include "fieldmap.h"
 #include "main.h"
 #include "menu.h"
 #include "palette.h"
@@ -36,6 +37,9 @@ struct WeatherCallbacks
 };
 
 // This file's functions.
+static bool8 IsWeatherFog(u8);
+static void StartFogSpriteBlend(u8 delay, u8 coeff, u8 coeffTarget);
+static void Task_BlendFogSprites(u8 taskId);
 static bool8 LightenSpritePaletteInFog(u8);
 static void BuildColorMaps(void);
 static void UpdateWeatherColorMap(void);
@@ -149,10 +153,8 @@ void StartWeather(void)
 {
     if (!FuncIsActiveTask(Task_WeatherMain))
     {
-        u8 index = AllocSpritePalette(PALTAG_WEATHER);
-        CpuCopy32(gFogPalette, &gPlttBufferUnfaded[OBJ_PLTT_ID(index)], PLTT_SIZE_4BPP);
         BuildColorMaps();
-        gWeatherPtr->contrastColorMapSpritePalIndex = index;
+        gWeatherPtr->contrastColorMapSpritePalIndex = AllocSpritePalette(PALTAG_WEATHER);
         gWeatherPtr->weatherPicSpritePalIndex = AllocSpritePalette(PALTAG_WEATHER_2);
         gWeatherPtr->rainSpriteCount = 0;
         gWeatherPtr->curRainSpriteIndex = 0;
@@ -174,6 +176,60 @@ void StartWeather(void)
     }
 }
 
+static bool8 IsWeatherFog(u8 weather)
+{
+    return weather == WEATHER_FOG_DIAGONAL ||
+        weather == WEATHER_FOG_HORIZONTAL;
+}
+
+#define tDelay data[0]
+#define tCoeff data[1]
+#define tTarget data[2]
+#define tDelta data[3]
+#define tTimer data[4]
+
+static void StartFogSpriteBlend(u8 delay, u8 coeff, u8 coeffTarget)
+{
+    u8 taskId = CreateTask(Task_BlendFogSprites, 0);
+    gTasks[taskId].tDelay = delay;
+    gTasks[taskId].tCoeff = coeff;
+    gTasks[taskId].tTarget = coeffTarget;
+    gTasks[taskId].tDelta = (coeff < coeffTarget) ? 1 : -1;
+}
+
+static void Task_BlendFogSprites(u8 taskId)
+{
+    s16 *data = gTasks[taskId].data;
+
+    if (tTimer++ > tDelay)
+    {
+        u8 paletteIndex;
+        tTimer = 0;
+
+        for (paletteIndex = 0; paletteIndex < 16; ++paletteIndex)
+        {
+            if (LightenSpritePaletteInFog(paletteIndex + 16))
+                BlendPalette(PLTT_ID(paletteIndex + 16), 16, tCoeff, RGB(28, 31, 28));
+        }
+
+        if (tCoeff == tTarget)
+            DestroyTask(taskId);
+        else
+            tCoeff += tDelta;
+
+        if (tDelta >= 0)
+            tCoeff = min(tCoeff, tTarget);
+        else
+            tCoeff = max(tCoeff, tTarget);
+    }
+}
+
+#undef tDelay
+#undef tCoeff
+#undef tTarget
+#undef tDelta
+#undef tTimer
+
 void SetNextWeather(u8 weather)
 {
     if (weather != WEATHER_RAIN && weather != WEATHER_RAIN_THUNDERSTORM && weather != WEATHER_DOWNPOUR)
@@ -192,21 +248,10 @@ void SetNextWeather(u8 weather)
 
     if (gWeatherPtr->nextWeather != gWeatherPtr->currWeather)
     {
-        u8 i;
-        u16 palettes;
-
-        for (i = 0; i < 12; i++)
-        {
-            if (sPaletteColorMapTypes[16 + i] == COLOR_MAP_NONE)
-                continue;
-
-            palettes |= 1 << i;
-        }
-
-        if (gWeatherPtr->nextWeather == WEATHER_FOG_HORIZONTAL)
-            BlendPalettesGradually(palettes << 16, 12, 3, 8, RGB(28, 31, 28), 0, 0);
-        else if (gWeatherPtr->currWeather == WEATHER_FOG_HORIZONTAL)
-            BlendPalettesGradually(palettes << 16, 12, 8, 0, RGB(28, 31, 28), 0, 0);
+        if (IsWeatherFog(gWeatherPtr->nextWeather))
+            StartFogSpriteBlend(12, 3, 8);
+        else if (IsWeatherFog(gWeatherPtr->currWeather))
+            StartFogSpriteBlend(12, 8, 0);
     }
 }
 
@@ -409,6 +454,7 @@ static void FadeInScreenWithWeather(void)
             gWeatherPtr->palProcessingState = WEATHER_PAL_STATE_IDLE;
         }
         break;
+    case WEATHER_FOG_DIAGONAL:
     case WEATHER_FOG_HORIZONTAL:
         if (FadeInScreen_FogHorizontal() == FALSE)
         {
@@ -418,7 +464,6 @@ static void FadeInScreenWithWeather(void)
         break;
     case WEATHER_VOLCANIC_ASH:
     case WEATHER_SANDSTORM:
-    case WEATHER_FOG_DIAGONAL:
     case WEATHER_UNDERWATER:
     default:
         if (!gPaletteFade.active)
@@ -709,7 +754,7 @@ static void ApplyFogBlend(u8 blendCoeff, u16 blendColor)
     }
 }
 
-static void MarkFogSpritePalToLighten(u8 paletteIndex)
+void MarkFogSpritePalToLighten(u8 paletteIndex)
 {
     if (gWeatherPtr->lightenedFogSpritePalsCount < 6)
     {
@@ -720,15 +765,17 @@ static void MarkFogSpritePalToLighten(u8 paletteIndex)
 
 static bool8 LightenSpritePaletteInFog(u8 paletteIndex)
 {
-    u8 i;
+    u8 i, paletteRef = GetSpritePaletteReferenceType(paletteIndex - 16);
+    if (paletteRef == PAL_OBJEVENT || paletteRef == PAL_REFLECTION)
+        return TRUE;
 
-    for (i = 0; i < gWeatherPtr->lightenedFogSpritePalsCount; i++)
+    for (i = 0; i < gWeatherPtr->lightenedFogSpritePalsCount; ++i)
     {
         if (gWeatherPtr->lightenedFogSpritePals[i] == paletteIndex)
             return TRUE;
     }
 
-    return GetSpritePaletteReferenceType(paletteIndex - 16) == PAL_OBJEVENT;
+    return FALSE;
 }
 
 void ApplyWeatherColorMapIfIdle(s8 colorMapIndex)
@@ -800,7 +847,7 @@ void FadeScreen(u8 mode, s8 delay)
     if (fadeOut)
     {
         if (useWeatherPal)
-            CpuFastCopy(gPlttBufferFaded, gPlttBufferUnfaded, PLTT_SIZE);
+            CpuFastCopy(gPlttBufferFaded, gPlttBufferUnfaded, PLTT_BUFFER_SIZE * 2);
 
         BeginNormalPaletteFade(PALETTES_ALL, delay, 0, 16, fadeColor);
         gWeatherPtr->palProcessingState = WEATHER_PAL_STATE_SCREEN_FADING_OUT;
@@ -809,7 +856,11 @@ void FadeScreen(u8 mode, s8 delay)
     {
         gWeatherPtr->fadeDestColor = fadeColor;
         if (useWeatherPal)
+        {
+            LoadMapTilesetPalettes(gMapHeader.mapLayout);
+            CpuFastFill16(0, gPlttBufferFaded, PLTT_BUFFER_SIZE * 2);
             gWeatherPtr->fadeScreenCounter = 0;
+        }
         else
             BeginNormalPaletteFade(PALETTES_ALL, delay, 16, 0, fadeColor);
 
@@ -836,8 +887,6 @@ void UpdateSpritePaletteWithWeather(u8 spritePaletteIndex)
     case WEATHER_PAL_STATE_SCREEN_FADING_IN:
         if (gWeatherPtr->fadeInFirstFrame)
         {
-            if (gWeatherPtr->currWeather == WEATHER_FOG_HORIZONTAL)
-                MarkFogSpritePalToLighten(paletteIndex);
             paletteIndex = PLTT_ID(paletteIndex);
             for (i = 0; i < 16; i++)
                 gPlttBufferFaded[paletteIndex + i] = gWeatherPtr->fadeDestColor;
@@ -851,15 +900,10 @@ void UpdateSpritePaletteWithWeather(u8 spritePaletteIndex)
     // WEATHER_PAL_STATE_CHANGING_WEATHER
     // WEATHER_PAL_STATE_CHANGING_IDLE
     default:
-        if (gWeatherPtr->currWeather != WEATHER_FOG_HORIZONTAL)
-        {
-            ApplyColorMap(paletteIndex, 1, gWeatherPtr->colorMapIndex);
-        }
+        if (IsWeatherFog(gWeatherPtr->currWeather))
+            BlendPalette(PLTT_ID(paletteIndex), 16, 8, RGB(28, 31, 28));
         else
-        {
-            paletteIndex = PLTT_ID(paletteIndex);
-            BlendPalette(paletteIndex, 16, 8, RGB(28, 31, 28));
-        }
+            ApplyColorMap(paletteIndex, 1, gWeatherPtr->colorMapIndex);
         break;
     }
 }
