@@ -204,6 +204,9 @@ void NewGameInitData(void)
     WipeTrainerNameRecords();
     ResetTrainerHillResults();
     ResetContestLinkResults();
+
+    AddBagItem(ITEM_TM01_FOCUS_PUNCH, 1);
+    AddBagItem(ITEM_TM02_DRAGON_CLAW, 1);
 }
 
 static void ResetMiniGamesRecords(void)

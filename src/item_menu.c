@@ -2568,7 +2568,7 @@ static void RemoveMoneyWindow(void)
 
 static void CB2_TMCaseGive(void)
 {
-    OpenTMCase(TMCASE_FROMPARTYGIVE, CB2_SelectBagItemToGive, FALSE);
+    OpenTMCase(TMCASE_FROM_PARTY, CB2_SelectBagItemToGive, FALSE);
 }
 
 static void CB2_BerryPouchGive(void)
@@ -2578,7 +2578,7 @@ static void CB2_BerryPouchGive(void)
 
 static void CB2_TMCaseGiveToPC(void)
 {
-    OpenTMCase(TMCASE_FROMPOKEMONSTORAGEPC, CB2_BagMenuFromPokeStorage, FALSE);
+    OpenTMCase(TMCASE_FROM_PCBOX, CB2_BagMenuFromPokeStorage, FALSE);
 }
 
 static void CB2_BerryPouchGiveToPC(void)
@@ -2588,7 +2588,7 @@ static void CB2_BerryPouchGiveToPC(void)
 
 static void CB2_TMCaseSell(void)
 {
-    OpenTMCase(TMCASE_FROMMARTSELL, CB2_GoToSellMenu, FALSE);
+    OpenTMCase(TMCASE_FROM_SHOP, CB2_GoToSellMenu, FALSE);
 }
 
 static void CB2_BerryPouchSell(void)

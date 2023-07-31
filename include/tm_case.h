@@ -1,35 +1,29 @@
 #ifndef GUARD_TM_CASE_H
 #define GUARD_TM_CASE_H
 
-struct TMCaseControl
+struct TMCaseMenu
 {
-    void (*savedCallback)(void);
+    void (*newScreenCallback)(void);
+    u8 tilemapBuffer[BG_SCREEN_SIZE];
     u8 tmCaseMenuType;
     u16 selectedRow;
     u16 scrollOffset;
-};
-
-struct TMCaseData
-{
-    void (* savedCallback)(void);
     u8 tmSpriteId;
-    u8 maxTMsShown;
+    u8 numShownTMs;
     u8 numTMs;
     u8 contextMenuWindowId;
-    u8 scrollIndicatorArrowPairId;
-    u16 currItem;
-    const u8 *menuActionIndices;
-    u8 numMenuActions;
-    s16 seqId;
-    u16 itemId;
+    u8 scrollArrowsTask;
+    const u8 *contextMenuItemsPtr;
+    u8 contextMenuNumItems;
+    s16 graphicsLoadState;
 };
 
 enum TMCaseType
 {
-    TMCASE_FROMFIELD,
-    TMCASE_FROMPARTYGIVE,
-    TMCASE_FROMMARTSELL,
-    TMCASE_FROMPOKEMONSTORAGEPC,
+    TMCASE_FROM_FIELD,
+    TMCASE_FROM_PARTY,
+    TMCASE_FROM_SHOP,
+    TMCASE_FROM_PCBOX,
     TMCASE_REOPENING
 };
 

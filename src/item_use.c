@@ -711,7 +711,7 @@ static void Task_OpenRegisteredPokeblockCase(u8 taskId)
 
 static void CB2_OpenTMCaseFromBag(void)
 {
-    OpenTMCase(TMCASE_FROMFIELD, CB2_BagMenuFromStartMenu, 0);
+    OpenTMCase(TMCASE_FROM_FIELD, CB2_BagMenuFromStartMenu, 0);
 }
 
 static void Task_OpenRegisteredTMCase(u8 taskId)
@@ -719,7 +719,7 @@ static void Task_OpenRegisteredTMCase(u8 taskId)
     if (!gPaletteFade.active)
     {
         CleanupOverworldWindowsAndTilemaps();
-        OpenTMCase(TMCASE_FROMFIELD, CB2_ReturnToField, 1);
+        OpenTMCase(TMCASE_FROM_FIELD, CB2_ReturnToField, 1);
         DestroyTask(taskId);
     }
 }
