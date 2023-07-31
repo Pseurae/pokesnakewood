@@ -131,6 +131,7 @@
 // NUM_DEX_FLAG_BYTES allocates more flags than it needs to, as NUM_SPECIES includes the "old unown"
 // values that don't appear in the Pokedex. NATIONAL_DEX_COUNT does not include these values.
 #define NUM_DEX_FLAG_BYTES ROUND_BITS_TO_BYTES(NUM_SPECIES)
+#define NUM_TM_HM_FLAG_BYTES ROUND_BITS_TO_BYTES(BAG_TMHM_COUNT)
 #define NUM_FLAG_BYTES ROUND_BITS_TO_BYTES(FLAGS_COUNT)
 #define NUM_TRENDY_SAYING_BYTES ROUND_BITS_TO_BYTES(NUM_TRENDY_SAYINGS)
 
@@ -604,7 +605,7 @@ struct Roamer
     /*0x11*/ u8 smart;
     /*0x12*/ u8 tough;
     /*0x13*/ bool8 active;
-    /*0x14*/ u8 filler[0x8];
+    /*0x14*/ //u8 filler[0x8];
 };
 
 struct RamScriptData
@@ -646,7 +647,7 @@ struct MauvilleManBard
     /*0x02*/ u16 songLyrics[BARD_SONG_LENGTH];
     /*0x0E*/ u16 temporaryLyrics[BARD_SONG_LENGTH];
     /*0x1A*/ u8 playerName[PLAYER_NAME_LENGTH + 1];
-    /*0x22*/ u8 filler_2DB6[0x3];
+    /*0x22*/ //u8 filler_2DB6[0x3];
     /*0x25*/ u8 playerTrainerId[TRAINER_ID_LENGTH];
     /*0x29*/ bool8 hasChangedSong;
     /*0x2A*/ u8 language;
@@ -657,7 +658,7 @@ struct MauvilleManStoryteller
 {
     u8 id;
     bool8 alreadyRecorded;
-    u8 filler2[2];
+    //u8 filler2[2];
     u8 gameStatIDs[NUM_STORYTELLER_TALES];
     u8 trainerNames[NUM_STORYTELLER_TALES][PLAYER_NAME_LENGTH];
     u8 statValues[NUM_STORYTELLER_TALES][4];
@@ -726,7 +727,7 @@ struct RecordMixingGiftData
     u8 unk0;
     u8 quantity;
     u16 itemId;
-    u8 filler4[8];
+    //u8 filler4[8];
 };
 
 struct RecordMixingGift
@@ -992,7 +993,8 @@ struct SaveBlock1
     /*0x560*/ struct ItemSlot bagPocket_Items[BAG_ITEMS_COUNT];
     /*0x5D8*/ struct ItemSlot bagPocket_KeyItems[BAG_KEYITEMS_COUNT];
     /*0x650*/ struct ItemSlot bagPocket_PokeBalls[BAG_POKEBALLS_COUNT];
-    /*0x690*/ struct ItemSlot bagPocket_TMHM[BAG_TMHM_COUNT];
+    // /*0x690*/ struct ItemSlot bagPocket_TMHM[BAG_TMHM_COUNT];
+    u8 bagPocket_TMHM_Flags[NUM_TM_HM_FLAG_BYTES];
     /*0x790*/ struct ItemSlot bagPocket_Berries[BAG_BERRIES_COUNT];
     /*0x848*/ struct Pokeblock pokeblocks[POKEBLOCKS_COUNT];
     /*0x988*/ u8 seen1[NUM_DEX_FLAG_BYTES];

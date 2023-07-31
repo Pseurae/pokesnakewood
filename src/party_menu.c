@@ -2631,7 +2631,7 @@ static bool8 CanUseHM(struct Pokemon *mon, u8 hm)
     if (GetMonData(mon, MON_DATA_IS_EGG))
         return FALSE;
 
-    if (MonKnowsMove(mon, sTMHMMoves[NUM_TECHNICAL_MACHINES + hm]) 
+    if (MonKnowsMove(mon, gTMHMMoves[NUM_TECHNICAL_MACHINES + hm]) 
         || (CanMonLearnTMHM(mon, NUM_TECHNICAL_MACHINES + hm) && CheckBagHasItem(ITEM_HM01 + hm, 1)))
     {
         return TRUE;
@@ -4739,7 +4739,7 @@ void ItemUseCB_PPUp(u8 taskId, TaskFunc task)
 u16 ItemIdToBattleMoveId(u16 item)
 {
     u16 tmNumber = item - ITEM_TM01;
-    return sTMHMMoves[tmNumber];
+    return gTMHMMoves[tmNumber];
 }
 
 bool8 IsMoveHm(u16 move)
@@ -4748,7 +4748,7 @@ bool8 IsMoveHm(u16 move)
 
     for (i = 0; i < NUM_HIDDEN_MACHINES; i++)
     {
-        if (sTMHMMoves[i + NUM_TECHNICAL_MACHINES] == move)
+        if (gTMHMMoves[i + NUM_TECHNICAL_MACHINES] == move)
             return TRUE;
     }
     return FALSE;

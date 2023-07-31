@@ -10,6 +10,7 @@
 #include "strings.h"
 #include "load_save.h"
 #include "item_use.h"
+#include "party_menu.h"
 #include "battle_pyramid.h"
 #include "battle_pyramid_bag.h"
 #include "constants/items.h"
@@ -20,6 +21,7 @@ static bool8 CheckPyramidBagHasSpace(u16 itemId, u16 count);
 static bool8 AddBagItemInternal(u16 itemId, u16 count);
 
 EWRAM_DATA struct BagPocket gBagPockets[POCKETS_COUNT] = {0};
+EWRAM_DATA struct ItemSlot gTMHMItemSlot[BAG_TMHM_COUNT] = {0};
 
 #include "data/text/item_descriptions.h"
 #include "data/text/tm_descriptions.h"
@@ -60,6 +62,20 @@ void ApplyNewEncryptionKeyToBagItems_(u32 newKey) // really GF?
     ApplyNewEncryptionKeyToBagItems(newKey);
 }
 
+void PopulateTMHMSlots(void)
+{
+    int i;
+
+    ClearItemSlots(gTMHMItemSlot, BAG_TMHM_COUNT);
+
+    for (i = 0; i < TMHM_COUNT; ++i)
+    {
+        u8 mask = 1 << (i % 8);
+        if (gSaveBlock1Ptr->bagPocket_TMHM_Flags[i / 8] & mask)
+            AddBagItem(i + ITEM_TM01, 1);
+    }
+}
+
 void SetBagItemsPointers(void)
 {
     gBagPockets[ITEMS_POCKET].itemSlots = gSaveBlock1Ptr->bagPocket_Items;
@@ -71,7 +87,7 @@ void SetBagItemsPointers(void)
     gBagPockets[BALLS_POCKET].itemSlots = gSaveBlock1Ptr->bagPocket_PokeBalls;
     gBagPockets[BALLS_POCKET].capacity = BAG_POKEBALLS_COUNT;
 
-    gBagPockets[TMHM_POCKET].itemSlots = gSaveBlock1Ptr->bagPocket_TMHM;
+    gBagPockets[TMHM_POCKET].itemSlots = gTMHMItemSlot;
     gBagPockets[TMHM_POCKET].capacity = BAG_TMHM_COUNT;
 
     gBagPockets[BERRIES_POCKET].itemSlots = gSaveBlock1Ptr->bagPocket_Berries;
@@ -337,10 +353,21 @@ static bool8 AddBagItemInternal(u16 itemId, u16 count)
     }
 }
 
+static void SetTMHMOwned(u16 itemId)
+{
+    u8* flagByte = &gSaveBlock1Ptr->bagPocket_TMHM_Flags[(itemId - ITEM_TM01) / 8];
+    *flagByte = (*flagByte) | (1 << ((itemId - ITEM_TM01) % 8));
+}
+
 bool8 AddBagItem(u16 itemId, u16 count)
 {
-    if (ItemId_GetPocket(itemId) == POCKET_TM_HM && !CheckBagHasItem(ITEM_TM_CASE, 1))
-        AddBagItemInternal(ITEM_TM_CASE, 1);
+    if (ItemId_GetPocket(itemId) == POCKET_TM_HM)
+    {
+        SetTMHMOwned(itemId);
+
+        if (!CheckBagHasItem(ITEM_TM_CASE, 1))
+            AddBagItemInternal(ITEM_TM_CASE, 1);
+    }
     
     if (ItemId_GetPocket(itemId) == POCKET_BERRIES && !CheckBagHasItem(ITEM_BERRY_POUCH, 1))
         AddBagItemInternal(ITEM_BERRY_POUCH, 1);

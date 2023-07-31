@@ -655,7 +655,7 @@ static void TMCase_ItemPrintFunc(u8 windowId, u32 itemId, u8 y)
 {
     if (itemId != LIST_CANCEL)
     {
-        if (ItemId_GetImportance(BagGetItemIdByPocketPosition(POCKET_TM_HM, itemId)))
+        if (BagGetItemIdByPocketPosition(POCKET_TM_HM, itemId) >= ITEM_HM01)
         {
             PlaceHMTileInWindow(windowId, 8, y);
         }
