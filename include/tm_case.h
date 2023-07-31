@@ -33,8 +33,6 @@ enum TMCaseType
     TMCASE_REOPENING
 };
 
-#define TM_CASE_TM_TAG 400
-
 void OpenTMCase(u8 type, void (* exitCallback)(void), u8 a2);
 void ResetTMCaseCursorPos(void);
 

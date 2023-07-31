@@ -35,18 +35,18 @@
 #include "constants/rgb.h"
 
 static const u32 sTMCaseTiles[] = INCBIN_U32("graphics/tm_case/tiles.4bpp.lz");
-static const u32 gUnknown_8E84A24[] = INCBIN_U32("graphics/tm_case/unk_8E84A24.bin.lz");
-static const u32 gUnknown_8E84B70[] = INCBIN_U32("graphics/tm_case/unk_8E84B70.bin.lz");
+static const u32 sTMCaseMenu_Tilemap[] = INCBIN_U32("graphics/tm_case/menu.bin.lz");
+static const u32 sTMCase_Tilemap[] = INCBIN_U32("graphics/tm_case/case.bin.lz");
 static const u32 sTMCaseMale_Pal[] = INCBIN_U32("graphics/tm_case/male.gbapal.lz");
 static const u32 sTMCaseFemale_Pal[] = INCBIN_U32("graphics/tm_case/female.gbapal.lz");
-static const u32 sTMCase_DiskSpriteGfx[] = INCBIN_U32("graphics/tm_case/disk.4bpp.lz");
-static const u32 sTMCaseTypes_Pal1[] = INCBIN_U32("graphics/tm_case/types1.gbapal.lz");
-static const u32 sTMCaseTypes_Pal2[] = INCBIN_U32("graphics/tm_case/types2.gbapal.lz");
+static const u32 sTMDisc_Gfx[] = INCBIN_U32("graphics/tm_case/disk.4bpp.lz");
+static const u32 sTMCaseTypes1_Pal[] = INCBIN_U32("graphics/tm_case/types1.gbapal.lz");
+static const u32 sTMCaseTypes2_Pal[] = INCBIN_U32("graphics/tm_case/types2.gbapal.lz");
 static const u8 sTMCaseHMIcon_Gfx[] = INCBIN_U8("graphics/tm_case/hm.4bpp");
-
 static const u16 sTMCaseMainWindowPalette[] = INCBIN_U16("graphics/tm_case/window.gbapal");
 
 static const u8 sText_ClearTo18[] = _("{CLEAR_TO 18}");
+static const u8 sText_TMCaseWillBePutAway[] = _("The TM Case will be\nput away.");
 
 static EWRAM_DATA struct TMCaseControl sTMCaseStaticResources = {};
 static EWRAM_DATA struct TMCaseData * sTMCaseDynamicResources = NULL;
@@ -62,62 +62,48 @@ static bool8 HandleLoadTMCaseGraphicsAndPalettes(void);
 static void CreateTMCaseListMenuBuffers(void);
 static void InitTMCaseListMenuItems(void);
 static void GetTMNumberAndMoveString(u8 * dest, u16 itemId);
-static void TMCase_MoveCursorFunc(s32 itemIndex, bool8 onInit, struct ListMenu *list);
+static void TMCase_MoveCursorCallback(s32 itemIndex, bool8 onInit, struct ListMenu *list);
 static void TMCase_ItemPrintFunc(u8 windowId, u32 itemId, u8 y);
-static void TMCase_MoveCursor_UpdatePrintedDescription(s32 itemIndex);
-static void PrintListMenuCursorAt_WithColorIdx(u8 a0, u8 a1);
-static void CreateTMCaseScrollIndicatorArrowPair_Main(void);
+static void PrintDescription(s32 itemIndex);
+static void TMCase_PrintCursorAtPos(u8 y, u8 colorIdx);
+static void CreateTMCaseScrollIndicatorArrows(void);
 static void TMCaseSetup_GetTMCount(void);
 static void TMCaseSetup_InitListMenuPositions(void);
 static void TMCaseSetup_UpdateVisualMenuOffset(void);
 static void DestroyTMCaseBuffers(void);
-static void Task_TMCaseFadeOut(u8 taskId);
+static void Task_CloseTMCase(u8 taskId);
 static void Task_TMCaseHandleInput(u8 taskId);
 static void Task_ContextMenu_FromFieldBag(u8 taskId);
-static void Task_TMContextMenu_HandleInput(u8 taskId);
-static void TMHMContextMenuAction_Use(u8 taskId);
-static void TMHMContextMenuAction_Give(u8 taskId);
-static void PrintError_ThereIsNoPokemon(u8 taskId);
-static void PrintError_ItemCantBeHeld(u8 taskId);
-static void Task_WaitButtonAfterErrorPrint(u8 taskId);
-static void Subtask_CloseContextMenuAndReturnToMain(u8 taskId);
-static void TMHMContextMenuAction_Exit(u8 taskId);
+static void Task_TMContext_HandleInput(u8 taskId);
+static void TMCaseAction_Use(u8 taskId);
+static void PrintThereIsNoPokemon(u8 taskId);
+static void PrintItemCantBeHeld(u8 taskId);
+static void HandleErrorMessage(u8 taskId);
+static void CloseTMCaseMessage(u8 taskId);
+static void TMCaseAction_Cancel(u8 taskId);
 static void Task_ContextMenu_FromPartyGiveMenu(u8 taskId);
 static void Task_ContextMenu_FromPokemonPC(u8 taskId);
 static void Task_ContextMenu_FromSellMenu(u8 taskId);
-static void Task_AskConfirmSaleWithAmount(u8 taskId);
-static void Task_PlaceYesNoBox(u8 taskId);
-static void Task_SaleOfTMsCanceled(u8 taskId);
-static void Task_InitQuantitySelectUI(u8 taskId);
-static void SellTM_PrintQuantityAndSalePrice(s16 quantity, s32 value);
-static void Task_QuantitySelect_HandleInput(u8 taskId);
-static void Task_PrintSaleConfirmedText(u8 taskId);
-static void Task_DoSaleOfTMs(u8 taskId);
-static void Task_AfterSale_ReturnToList(u8 taskId);
-static void Task_TMCaseDude1(u8 taskId);
-static void Task_TMCaseDude_Playback(u8 taskId);
 static void InitTMCaseWindows(void);
-static void AddTextPrinterParameterized_ColorByIndex(u8 windowId, u8 fontId, const u8 * str, u8 x, u8 y, u8 letterSpacing, u8 lineSpacing, u8 speed, u8 colorIdx);
-static void TMCase_SetWindowBorder1(u8 windowId);
-static void TMCase_SetWindowBorder2(u8 windowId);
-static void TMCase_PrintMessageWithFollowupTask(u8 taskId, u8 fontId, const u8 * str, TaskFunc func);
+static void TMCase_Print(u8 windowId, u8 fontId, const u8 * str, u8 x, u8 y, u8 letterSpacing, u8 lineSpacing, u8 speed, u8 colorIdx);
+static void TMCase_SetWindowBorder(u8 windowId);
+static void TMCase_DisplayMessageWithCallback(u8 taskId, u8 fontId, const u8 * str, TaskFunc func);
 static void PrintTMCaseLabel(void);
 static void DrawMoveInfoUIMarkers(void);
-static void TMCase_MoveCursor_UpdatePrintedTMInfo(u16 itemId);
+static void PrintTMInfo(u16 itemId);
 static void PlaceHMTileInWindow(u8 windowId, u8 x, u8 y);
-static void HandlePrintMoneyOnHand(void);
-static void HandleCreateYesNoMenu(u8 taskId, const struct YesNoFuncTable * ptrs);
-static u8 AddTMContextMenu(u8 * a0);
-static void RemoveTMContextMenu(u8 * a0);
-static u8 CreateTMSprite(u16 itemId);
+static u8 AddContextWindow(u8 *windowId);
+static void RemoveContextWindow(u8 *windowId);
+static u8 CreateDiscSprite(u16 itemId);
 static void SetTMSpriteAnim(struct Sprite *sprite, u8 var);
-static void TintTMSpriteByType(u8 type);
-static void UpdateTMSpritePosition(struct Sprite *sprite, u8 var);
+static void TintDiscSpriteByType(u8 type);
+static void UpdateDiscSpritePosition(struct Sprite *sprite, u8 tm);
 static void InitSelectedTMSpriteData(u8 a0, u16 itemId);
 static void SpriteCB_MoveTMSpriteInCase(struct Sprite *sprite);
 static void LoadTMTypePalettes(void);
 
-static const struct BgTemplate sBgTemplates[] = {
+static const struct BgTemplate sTMCaseBgTemplates[] = 
+{
     {
         .bg = 0,
         .charBaseIndex = 0,
@@ -147,52 +133,49 @@ static const struct BgTemplate sBgTemplates[] = {
     }
 };
 
-static void (*const sSelectTMActionTasks[])(u8 taskId) = {
-    Task_ContextMenu_FromFieldBag,
-    Task_ContextMenu_FromPartyGiveMenu,
-    Task_ContextMenu_FromSellMenu,
-    Task_ContextMenu_FromPokemonPC
+static const TaskFunc sSelectTMActionTasks[] = 
+{
+    [TMCASE_FROMFIELD] = Task_ContextMenu_FromFieldBag,
+    [TMCASE_FROMPARTYGIVE] = Task_ContextMenu_FromPartyGiveMenu,
+    [TMCASE_FROMMARTSELL] = Task_ContextMenu_FromSellMenu,
+    [TMCASE_FROMPOKEMONSTORAGEPC] = Task_ContextMenu_FromPokemonPC
 };
 
 enum
 {
     ACTION_USE,
-    // ACTION_GIVE,
     ACTION_EXIT
 };
 
-static const struct MenuAction sMenuActions_UseGiveExit[] = {
-    [ACTION_USE] =  { gMenuText_Use,  TMHMContextMenuAction_Use  },
-    // [ACTION_GIVE] = { gMenuText_Give, TMHMContextMenuAction_Give },
-    [ACTION_EXIT] = { gText_MenuExit, TMHMContextMenuAction_Exit },
+static const struct MenuAction sTMCaseMenuActions[] = 
+{
+    [ACTION_USE] =  { gMenuText_Use,  TMCaseAction_Use },
+    [ACTION_EXIT] = { gText_MenuExit, TMCaseAction_Cancel },
 };
 
-static const u8 sMenuActionIndices_Field[] = {
+static const u8 sTMCaseMenuItems_Normal[] = {
     ACTION_USE, 
-    // ACTION_GIVE, 
     ACTION_EXIT
 };
 
-static const u8 sMenuActionIndices_UnionRoom[] = {
-    // ACTION_GIVE, 
+static const u8 sTMCaseMenuItems_UnionRoom[] = {
     ACTION_EXIT
 };
 
-static const struct YesNoFuncTable sYesNoFuncTable = {
-    .yesFunc = Task_PrintSaleConfirmedText, 
-    .noFunc = Task_SaleOfTMsCanceled
+enum 
+{
+    COLORID_LIGHT,
+    COLORID_DARK,
+    COLORID_CURSOR_SELECTED,
+    COLORID_MOVE_INFO,
+    COLORID_NONE = 0xFF
 };
 
-static const u16 sPal3Override[] = {
-    RGB(8, 8, 8), 
-    RGB(30, 16, 6)
-};
-
-static const u8 sTextColors[][3] = {
-    {TEXT_COLOR_TRANSPARENT, TEXT_COLOR_WHITE, TEXT_COLOR_DARK_GRAY},
-    {TEXT_COLOR_TRANSPARENT, TEXT_COLOR_DARK_GRAY, TEXT_COLOR_LIGHT_GRAY},
-    {TEXT_COLOR_TRANSPARENT, TEXT_COLOR_LIGHT_GRAY, TEXT_COLOR_DARK_GRAY},
-    {TEXT_COLOR_TRANSPARENT, TEXT_DYNAMIC_COLOR_5, TEXT_DYNAMIC_COLOR_1}
+static const u8 sFontColorTable[][3] = {
+    [COLORID_LIGHT] = {TEXT_COLOR_TRANSPARENT, TEXT_COLOR_WHITE, TEXT_COLOR_DARK_GRAY},
+    [COLORID_DARK] = {TEXT_COLOR_TRANSPARENT, TEXT_COLOR_DARK_GRAY, TEXT_COLOR_LIGHT_GRAY},
+    [COLORID_CURSOR_SELECTED] = {TEXT_COLOR_TRANSPARENT, TEXT_COLOR_LIGHT_GRAY, TEXT_COLOR_DARK_GRAY},
+    [COLORID_MOVE_INFO] = {TEXT_COLOR_TRANSPARENT, TEXT_DYNAMIC_COLOR_5, TEXT_DYNAMIC_COLOR_1}
 };
 
 enum {
@@ -215,7 +198,7 @@ static const struct WindowTemplate sWindowTemplates[] = {
         .tilemapTop = 1, 
         .width = 19, 
         .height = 10, 
-        .paletteNum = 15, 
+        .paletteNum = 4, 
         .baseBlock = 129
     },
     [WIN_INFO] = {
@@ -224,7 +207,7 @@ static const struct WindowTemplate sWindowTemplates[] = {
         .tilemapTop = 12, 
         .width = 18, 
         .height = 8, 
-        .paletteNum = 10, 
+        .paletteNum = 6, 
         .baseBlock = 319
     },
     [WIN_MSG] = {
@@ -233,7 +216,7 @@ static const struct WindowTemplate sWindowTemplates[] = {
         .tilemapTop = 15, 
         .width = 15, 
         .height = 4, 
-        .paletteNum = 15, 
+        .paletteNum = 4, 
         .baseBlock = 505
     },
     [WIN_LABEL] = {
@@ -242,7 +225,7 @@ static const struct WindowTemplate sWindowTemplates[] = {
         .tilemapTop = 1, 
         .width = 10, 
         .height = 2, 
-        .paletteNum = 15, 
+        .paletteNum = 4, 
         .baseBlock = 565
     },
     [WIN_UI_MARKERS] = {
@@ -251,7 +234,7 @@ static const struct WindowTemplate sWindowTemplates[] = {
         .tilemapTop = 13, 
         .width = 5, 
         .height = 6, 
-        .paletteNum = 12, 
+        .paletteNum = 7, 
         .baseBlock = 585
     },
     [WIN_MOVE_INFO] = {
@@ -260,16 +243,16 @@ static const struct WindowTemplate sWindowTemplates[] = {
         .tilemapTop = 13, 
         .width = 5, 
         .height = 6, 
-        .paletteNum = 12, 
+        .paletteNum = 7, 
         .baseBlock = 615
     },
     [WIN_CASHIER_MSG] = {
         .bg = 1, 
         .tilemapLeft = 2, 
         .tilemapTop = 15, 
-        .width = 0x1a, 
+        .width = 26, 
         .height = 4, 
-        .paletteNum = 11, 
+        .paletteNum = 4, 
         .baseBlock = 645
     },
     [WIN_QUANTITY] = {
@@ -293,80 +276,81 @@ static const struct WindowTemplate sWindowTemplates[] = {
     DUMMY_WIN_TEMPLATE
 };
 
-static const struct WindowTemplate sYesNoWindowTemplate = {
-    .bg = 1, 
-    .tilemapLeft = 21, 
-    .tilemapTop = 9, 
-    .width = 6, 
-    .height = 4, 
-    .paletteNum = 15, 
-    .baseBlock = 463
-};
-
-static const struct WindowTemplate sTMContextWindowTemplates = {
+static const struct WindowTemplate sContextWindowTemplate = {
     .bg = 1, 
     .tilemapLeft = 24, 
     .tilemapTop = 15, 
     .width = 5, 
     .height = 4, 
-    .paletteNum = 15, 
+    .paletteNum = 4, 
     .baseBlock = 463
 };
 
-static const struct OamData sTMSpriteOamData = {
+enum {
+    ANIM_TM,
+    ANIM_HM
+};
+
+#define TAG_DISC 400 
+
+static const struct OamData sOamData_TMDisc = {
     .size = 2,
     .priority = 2
 };
 
-static const union AnimCmd sTMSpriteAnim0[] = {
+static const union AnimCmd sAnims_TMSpriteTM[] = {
     ANIMCMD_FRAME(0, 0),
     ANIMCMD_END
 };
 
-static const union AnimCmd sTMSpriteAnim1[] = {
+static const union AnimCmd sAnims_TMSpriteHM[] = {
     ANIMCMD_FRAME(16, 0),
     ANIMCMD_END
 };
 
-static const union AnimCmd *const sTMSpriteAnims[] = {
-    sTMSpriteAnim0,
-    sTMSpriteAnim1
+static const union AnimCmd *const sAnims_TMDisc[] = 
+{
+    [ANIM_TM] = sAnims_TMSpriteTM,
+    [ANIM_HM] = sAnims_TMSpriteHM
 };
 
-static const struct CompressedSpriteSheet sTMSpriteSheet = {
-    (const void *)sTMCase_DiskSpriteGfx,
-    0x400,
-    TM_CASE_TM_TAG
+static const struct CompressedSpriteSheet sSpriteSheet_TMDisc = 
+{
+    .data = sTMDisc_Gfx,
+    .size = 0x400,
+    .tag = TAG_DISC
 };
 
-static const struct SpriteTemplate sTMSpriteTemplate = {
-    TM_CASE_TM_TAG,
-    TM_CASE_TM_TAG,
-    &sTMSpriteOamData,
-    sTMSpriteAnims,
-    NULL,
-    gDummySpriteAffineAnimTable,
-    SpriteCallbackDummy
+static const struct SpriteTemplate sSpriteTemplate_TMDisc = 
+{
+    .tileTag = TAG_DISC,
+    .paletteTag = TAG_DISC,
+    .oam = &sOamData_TMDisc,
+    .anims = sAnims_TMDisc,
+    .images = NULL,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = SpriteCallbackDummy
 };
 
-static const u16 sTMSpritePaletteOffsetByType[] = {
-    [TYPE_NORMAL]   = 0x000,
-    [TYPE_FIRE]     = 0x010,
-    [TYPE_WATER]    = 0x020,
-    [TYPE_GRASS]    = 0x030,
-    [TYPE_ELECTRIC] = 0x040,
-    [TYPE_ROCK]     = 0x050,
-    [TYPE_GROUND]   = 0x060,
-    [TYPE_ICE]      = 0x070,
-    [TYPE_FLYING]   = 0x080,
-    [TYPE_FIGHTING] = 0x090,
-    [TYPE_GHOST]    = 0x0a0,
-    [TYPE_BUG]      = 0x0b0,
-    [TYPE_POISON]   = 0x0c0,
-    [TYPE_PSYCHIC]  = 0x0d0,
-    [TYPE_STEEL]    = 0x0e0,
-    [TYPE_DARK]     = 0x0f0,
-    [TYPE_DRAGON]   = 0x100
+static const u8 sTMSpritePaletteOffsetByType[] = 
+{
+    [TYPE_NORMAL]   = 0x00,
+    [TYPE_FIRE]     = 0x01,
+    [TYPE_WATER]    = 0x02,
+    [TYPE_GRASS]    = 0x03,
+    [TYPE_ELECTRIC] = 0x04,
+    [TYPE_ROCK]     = 0x05,
+    [TYPE_GROUND]   = 0x06,
+    [TYPE_ICE]      = 0x07,
+    [TYPE_FLYING]   = 0x08,
+    [TYPE_FIGHTING] = 0x09,
+    [TYPE_GHOST]    = 0x0a,
+    [TYPE_BUG]      = 0x0b,
+    [TYPE_POISON]   = 0x0c,
+    [TYPE_PSYCHIC]  = 0x0d,
+    [TYPE_STEEL]    = 0x0e,
+    [TYPE_DARK]     = 0x0f,
+    [TYPE_DRAGON]   = 0x10
 };
 
 void OpenTMCase(u8 type, void (* callback)(void), u8 a2)
@@ -374,8 +358,8 @@ void OpenTMCase(u8 type, void (* callback)(void), u8 a2)
     DestroyTMCaseBuffers();
     sTMCaseDynamicResources = Alloc(sizeof(struct TMCaseData));
     sTMCaseDynamicResources->savedCallback = NULL;
-    sTMCaseDynamicResources->scrollIndicatorArrowPairId = 0xFF;
-    sTMCaseDynamicResources->contextMenuWindowId = 0xFF;
+    sTMCaseDynamicResources->scrollIndicatorArrowPairId = TASK_NONE;
+    sTMCaseDynamicResources->contextMenuWindowId = WINDOW_NONE;
     if (type != TMCASE_REOPENING)
         sTMCaseStaticResources.tmCaseMenuType = type;
     if (callback != NULL)
@@ -486,11 +470,11 @@ static bool8 InitTMCase(void)
         gMain.state++;
         break;
     case 15:
-        CreateTMCaseScrollIndicatorArrowPair_Main();
+        CreateTMCaseScrollIndicatorArrows();
         gMain.state++;
         break;
     case 16:
-        sTMCaseDynamicResources->tmSpriteId = CreateTMSprite(BagGetItemIdByPocketPosition(POCKET_TM_HM, sTMCaseStaticResources.scrollOffset + sTMCaseStaticResources.selectedRow));
+        sTMCaseDynamicResources->tmSpriteId = CreateDiscSprite(BagGetItemIdByPocketPosition(POCKET_TM_HM, sTMCaseStaticResources.scrollOffset + sTMCaseStaticResources.selectedRow));
         gMain.state++;
         break;
     case 17:
@@ -516,7 +500,7 @@ static void LoadBgTemplates(void)
     ResetAllBgsCoordinates();
     sTilemapBuffer = AllocZeroed(0x800);
     ResetBgsAndClearDma3BusyFlags(0);
-    InitBgsFromTemplates(0, sBgTemplates, NELEMS(sBgTemplates));
+    InitBgsFromTemplates(0, sTMCaseBgTemplates, NELEMS(sTMCaseBgTemplates));
     SetBgTilemapBuffer(2, sTilemapBuffer);
     ScheduleBgCopyTilemapToVram(1);
     ScheduleBgCopyTilemapToVram(2);
@@ -539,23 +523,23 @@ static bool8 HandleLoadTMCaseGraphicsAndPalettes(void)
     case 1:
         if (FreeTempTileDataBuffersIfPossible() != TRUE)
         {
-            LZDecompressWram(gUnknown_8E84A24, sTilemapBuffer);
+            LZDecompressWram(sTMCaseMenu_Tilemap, sTilemapBuffer);
             sTMCaseDynamicResources->seqId++;
         }
         break;
     case 2:
-        LZDecompressWram(gUnknown_8E84B70, GetBgTilemapBuffer(1));
+        LZDecompressWram(sTMCase_Tilemap, GetBgTilemapBuffer(1));
         sTMCaseDynamicResources->seqId++;
         break;
     case 3:
         if (gSaveBlock2Ptr->playerGender == MALE)
-            LoadCompressedPalette(sTMCaseMale_Pal, 0, 0x80);
+            LoadCompressedPalette(sTMCaseMale_Pal, BG_PLTT_ID(0), PLTT_SIZE_4BPP * 4);
         else
-            LoadCompressedPalette(sTMCaseFemale_Pal, 0, 0x80);
+            LoadCompressedPalette(sTMCaseFemale_Pal, BG_PLTT_ID(0), PLTT_SIZE_4BPP * 4);
         sTMCaseDynamicResources->seqId++;
         break;
     case 4:
-        LoadCompressedSpriteSheet(&sTMSpriteSheet);
+        LoadCompressedSpriteSheet(&sSpriteSheet_TMDisc);
         sTMCaseDynamicResources->seqId++;
         break;
     default:
@@ -569,7 +553,7 @@ static bool8 HandleLoadTMCaseGraphicsAndPalettes(void)
 
 static void CreateTMCaseListMenuBuffers(void)
 {
-    struct BagPocket * pocket = &gBagPockets[POCKET_TM_HM - 1];
+    struct BagPocket *pocket = &gBagPockets[POCKET_TM_HM - 1];
     sListMenuItemsBuffer = Alloc((pocket->capacity + 1) * sizeof(struct ListMenuItem));
     sListMenuStringsBuffer = Alloc(sTMCaseDynamicResources->numTMs * 29);
 }
@@ -601,13 +585,13 @@ static void InitTMCaseListMenuItems(void)
     gMultiuseListMenuTemplate.cursorPal = 2;
     gMultiuseListMenuTemplate.fillValue = 0;
     gMultiuseListMenuTemplate.cursorShadowPal = 3;
-    gMultiuseListMenuTemplate.moveCursorFunc = TMCase_MoveCursorFunc;
+    gMultiuseListMenuTemplate.moveCursorFunc = TMCase_MoveCursorCallback;
     gMultiuseListMenuTemplate.itemPrintFunc = TMCase_ItemPrintFunc;
     gMultiuseListMenuTemplate.cursorKind = 0;
     gMultiuseListMenuTemplate.scrollMultiple = 0;
 }
 
-static void GetTMNumberAndMoveString(u8 * dest, u16 itemId)
+static void GetTMNumberAndMoveString(u8 *dest, u16 itemId)
 {
     StringCopy(gStringVar4, gText_FontSize0);
     if (itemId >= ITEM_HM01)
@@ -629,7 +613,7 @@ static void GetTMNumberAndMoveString(u8 * dest, u16 itemId)
     StringCopy(dest, gStringVar4);
 }
 
-static void TMCase_MoveCursorFunc(s32 itemIndex, bool8 onInit, struct ListMenu *list)
+static void TMCase_MoveCursorCallback(s32 itemIndex, bool8 onInit, struct ListMenu *list)
 {
     u16 itemId;
 
@@ -643,11 +627,8 @@ static void TMCase_MoveCursorFunc(s32 itemIndex, bool8 onInit, struct ListMenu *
         PlaySE(SE_SELECT);
         InitSelectedTMSpriteData(sTMCaseDynamicResources->tmSpriteId, itemId);
     }
-    else
-    {
-        TMCase_MoveCursor_UpdatePrintedDescription(itemId);
-        TMCase_MoveCursor_UpdatePrintedTMInfo(itemId);
-    }
+    PrintDescription(itemId);
+    PrintTMInfo(itemId);
     sTMCaseDynamicResources->itemId = itemId;
 }
 
@@ -662,65 +643,48 @@ static void TMCase_ItemPrintFunc(u8 windowId, u32 itemId, u8 y)
     }
 }
 
-const u8 gText_TMCaseWillBePutAway[] = _("The TM Case will be\nput away.");
-const u8 gText_TMCase[] = _("TM Case");
-
-static void TMCase_MoveCursor_UpdatePrintedDescription(s32 itemId)
+static void PrintDescription(s32 itemId)
 {
-    const u8 * str;
-    if (itemId != ITEM_NONE)
-    {
-        str = ItemId_GetDescription(itemId);
-    }
-    else
-    {
-        str = gText_TMCaseWillBePutAway;
-    }
+    const u8 *str = itemId != ITEM_NONE ? ItemId_GetDescription(itemId) : sText_TMCaseWillBePutAway;
     FillWindowPixelBuffer(WIN_INFO, 0);
-    AddTextPrinterParameterized_ColorByIndex(WIN_INFO, FONT_SHORT, str, 2, 3, 1, 0, 0, 0);
+    TMCase_Print(WIN_INFO, FONT_SHORT, str, 2, 3, 1, 0, 0, COLORID_LIGHT);
 }
 
-static void FillBG2RowWithPalette_2timesNplus1(s32 a0)
+static void ShadeDescriptionWindow(bool8 darken)
 {
-    SetBgTilemapPalette(2, 0, 12, 30, 8, 2 * a0 + 1);
+    SetBgTilemapPalette(2, 0, 12, 30, 8, 2 * darken + 1);
     ScheduleBgCopyTilemapToVram(2);
 }
 
-static void PrintListMenuCursorByID_WithColorIdx(u8 a0, u8 a1)
+static void TMCase_PrintCursor(u8 listTaskId, u8 colorIdx)
 {
-    PrintListMenuCursorAt_WithColorIdx(ListMenuGetYCoordForPrintingArrowCursor(a0), a1);
+    TMCase_PrintCursorAtPos(ListMenuGetYCoordForPrintingArrowCursor(listTaskId), colorIdx);
 }
 
-static void PrintListMenuCursorAt_WithColorIdx(u8 a0, u8 a1)
+static void TMCase_PrintCursorAtPos(u8 y, u8 colorIdx)
 {
-    if (a1 == 0xFF)
+    if (colorIdx == COLORID_NONE)
     {
-        FillWindowPixelRect(WIN_LIST, 0, 0, a0, GetFontAttribute(FONT_SHORT, FONTATTR_MAX_LETTER_WIDTH), GetFontAttribute(FONT_SHORT, FONTATTR_MAX_LETTER_HEIGHT));
+        FillWindowPixelRect(WIN_LIST, 0, 0, y, GetFontAttribute(FONT_SHORT, FONTATTR_MAX_LETTER_WIDTH), GetFontAttribute(FONT_SHORT, FONTATTR_MAX_LETTER_HEIGHT));
         CopyWindowToVram(WIN_LIST, COPYWIN_GFX);
     }
     else
     {
-        AddTextPrinterParameterized_ColorByIndex(WIN_LIST, FONT_SHORT, gText_SelectorArrow2, 0, a0, 0, 0, 0, a1);
+        TMCase_Print(WIN_LIST, FONT_SHORT, gText_SelectorArrow2, 0, y, 0, 0, 0, colorIdx);
     }
 }
 
-static void CreateTMCaseScrollIndicatorArrowPair_Main(void)
+static void CreateTMCaseScrollIndicatorArrows(void)
 {
     sTMCaseDynamicResources->scrollIndicatorArrowPairId = AddScrollIndicatorArrowPairParameterized(WIN_MSG, 0xA0, 0x08, 0x58, sTMCaseDynamicResources->numTMs - sTMCaseDynamicResources->maxTMsShown + 1, 0x6E, 0x6E, &sTMCaseStaticResources.scrollOffset);
 }
 
-static void CreateTMCaseScrollIndicatorArrowPair_SellQuantitySelect(void)
+static void RemoveTMCaseScrollIndicatorArrows(void)
 {
-    sTMCaseDynamicResources->currItem = 1;
-    sTMCaseDynamicResources->scrollIndicatorArrowPairId = AddScrollIndicatorArrowPairParameterized(WIN_MSG, 0x98, 0x48, 0x68, 2, 0x6E, 0x6E, &sTMCaseDynamicResources->currItem);
-}
-
-static void RemoveTMCaseScrollIndicatorArrowPair(void)
-{
-    if (sTMCaseDynamicResources->scrollIndicatorArrowPairId != 0xFF)
+    if (sTMCaseDynamicResources->scrollIndicatorArrowPairId != TASK_NONE)
     {
         RemoveScrollIndicatorArrowPair(sTMCaseDynamicResources->scrollIndicatorArrowPairId);
-        sTMCaseDynamicResources->scrollIndicatorArrowPairId = 0xFF;
+        sTMCaseDynamicResources->scrollIndicatorArrowPairId = TASK_NONE;
     }
 }
 
@@ -735,7 +699,6 @@ static void TMCaseSetup_GetTMCount(void)
     struct BagPocket * pocket = &gBagPockets[POCKET_TM_HM - 1];
     u16 i;
 
-    // BagPocketCompaction(pocket->itemSlots, pocket->capacity);
     CompactItemsInBagPocket(pocket);
     sTMCaseDynamicResources->numTMs = 0;
     for (i = 0; i < pocket->capacity; i++)
@@ -792,13 +755,13 @@ static void DestroyTMCaseBuffers(void)
     FreeAllWindowBuffers();
 }
 
-static void Task_TMCaseStartFadeOut(u8 taskId)
+static void Task_FadeAndCloseTMCase(u8 taskId)
 {
     BeginNormalPaletteFade(PALETTES_ALL, -2, 0, 16, RGB_BLACK);
-    gTasks[taskId].func = Task_TMCaseFadeOut;
+    gTasks[taskId].func = Task_CloseTMCase;
 }
 
-static void Task_TMCaseFadeOut(u8 taskId)
+static void Task_CloseTMCase(u8 taskId)
 {
     s16 *data = gTasks[taskId].data;
 
@@ -809,78 +772,38 @@ static void Task_TMCaseFadeOut(u8 taskId)
             SetMainCallback2(sTMCaseDynamicResources->savedCallback);
         else
             SetMainCallback2(sTMCaseStaticResources.savedCallback);
-        RemoveTMCaseScrollIndicatorArrowPair();
+        RemoveTMCaseScrollIndicatorArrows();
         DestroyTMCaseBuffers();
         DestroyTask(taskId);
     }
 }
 
-#define tFadeTimer data[4]
-#define tFadeState data[5]
-
-static void Task_TextFade(u8 taskId)
-{
-    s16 *data = gTasks[taskId].data;
-
-    switch (tFadeState)
-    {
-    case 0:
-        tFadeTimer += 4;
-        SetGpuReg(REG_OFFSET_BLDALPHA, BLDALPHA_BLEND(16 - tFadeTimer, tFadeTimer));
-        if (tFadeTimer >= 16)
-            tFadeState++;
-        break;
-    case 1:
-        TMCase_MoveCursor_UpdatePrintedDescription(sTMCaseDynamicResources->itemId);
-        TMCase_MoveCursor_UpdatePrintedTMInfo(sTMCaseDynamicResources->itemId);
-        tFadeState++;
-        break;
-    case 2:
-        tFadeTimer -= 4;
-        SetGpuReg(REG_OFFSET_BLDALPHA, BLDALPHA_BLEND(16 - tFadeTimer, tFadeTimer));
-        if (tFadeTimer <= 0)
-            SwitchTaskToFollowupFunc(taskId);
-        break;
-    }
-}
-
-static void SetupTextFade(u8 taskId)
-{
-    s16 *data = gTasks[taskId].data;
-    tFadeState = 0;
-    tFadeTimer = 0;
-    SetTaskFuncWithFollowupFunc(taskId, Task_TextFade, gTasks[taskId].func);
-}
 
 static void Task_TMCaseHandleInput(u8 taskId)
 {
     s16 *data = gTasks[taskId].data;
     s32 input;
-    u16 row;
 
     if (!gPaletteFade.active)
     {
         if (MenuHelpers_ShouldWaitForLinkRecv() != TRUE)
         {
-            row = sTMCaseStaticResources.selectedRow;
             input = ListMenu_ProcessInput(data[0]);
             ListMenuGetScrollAndRow(data[0], &sTMCaseStaticResources.scrollOffset, &sTMCaseStaticResources.selectedRow);
             switch (input)
             {
             case LIST_NOTHING_CHOSEN:
-                if (row != sTMCaseStaticResources.selectedRow)
-                    SetupTextFade(taskId);
                 break;
             case LIST_CANCEL:
                 PlaySE(SE_SELECT);
                 gSpecialVar_ItemId = 0;
-                Task_TMCaseStartFadeOut(taskId);
+                Task_FadeAndCloseTMCase(taskId);
                 break;
             default:
                 PlaySE(SE_SELECT);
-                FillBG2RowWithPalette_2timesNplus1(1);
-                RemoveTMCaseScrollIndicatorArrowPair();
-                PrintListMenuCursorByID_WithColorIdx(data[0], 2);
+                ShadeDescriptionWindow(TRUE);
+                RemoveTMCaseScrollIndicatorArrows();
+                TMCase_PrintCursor(data[0], COLORID_CURSOR_SELECTED);
                 data[1] = input;
                 data[2] = BagGetQuantityByPocketPosition(POCKET_TM_HM, input);
                 gSpecialVar_ItemId = BagGetItemIdByPocketPosition(POCKET_TM_HM, input);
@@ -891,44 +814,44 @@ static void Task_TMCaseHandleInput(u8 taskId)
     }
 }
 
-static void Subtask_ReturnToTMCaseMain(u8 taskId)
+static void ReturnToTMCaseList(u8 taskId)
 {
-    FillBG2RowWithPalette_2timesNplus1(0);
-    CreateTMCaseScrollIndicatorArrowPair_Main();
+    ShadeDescriptionWindow(FALSE);
+    CreateTMCaseScrollIndicatorArrows();
     gTasks[taskId].func = Task_TMCaseHandleInput;
 }
 
 static void Task_ContextMenu_FromFieldBag(u8 taskId)
 {
-    TMCase_SetWindowBorder2(2);
-    AddTMContextMenu(&sTMCaseDynamicResources->contextMenuWindowId);
+    TMCase_SetWindowBorder(WIN_MSG);
+    AddContextWindow(&sTMCaseDynamicResources->contextMenuWindowId);
 
     if (!MenuHelpers_IsLinkActive() && InUnionRoom() != TRUE)
     {
-        sTMCaseDynamicResources->menuActionIndices = sMenuActionIndices_Field;
-        sTMCaseDynamicResources->numMenuActions = NELEMS(sMenuActionIndices_Field);
+        sTMCaseDynamicResources->menuActionIndices = sTMCaseMenuItems_Normal;
+        sTMCaseDynamicResources->numMenuActions = NELEMS(sTMCaseMenuItems_Normal);
     }
     else
     {
-        sTMCaseDynamicResources->menuActionIndices = sMenuActionIndices_UnionRoom;
-        sTMCaseDynamicResources->numMenuActions = NELEMS(sMenuActionIndices_UnionRoom);
+        sTMCaseDynamicResources->menuActionIndices = sTMCaseMenuItems_UnionRoom;
+        sTMCaseDynamicResources->numMenuActions = NELEMS(sTMCaseMenuItems_UnionRoom);
     }
-    PrintMenuActionTexts(sTMCaseDynamicResources->contextMenuWindowId, FONT_SHORT, GetMenuCursorDimensionByFont(FONT_SHORT, 0), 2, 0, GetFontAttribute(FONT_SHORT, FONTATTR_MAX_LETTER_HEIGHT) + 2, sTMCaseDynamicResources->numMenuActions, sMenuActions_UseGiveExit, sTMCaseDynamicResources->menuActionIndices);
+    PrintMenuActionTexts(sTMCaseDynamicResources->contextMenuWindowId, FONT_SHORT, GetMenuCursorDimensionByFont(FONT_SHORT, 0), 2, 0, GetFontAttribute(FONT_SHORT, FONTATTR_MAX_LETTER_HEIGHT) + 2, sTMCaseDynamicResources->numMenuActions, sTMCaseMenuActions, sTMCaseDynamicResources->menuActionIndices);
     InitMenuNormal(sTMCaseDynamicResources->contextMenuWindowId, FONT_SHORT, 0, 2, GetFontAttribute(FONT_SHORT, FONTATTR_MAX_LETTER_HEIGHT) + 2, sTMCaseDynamicResources->numMenuActions, 0);
     GetTMNumberAndMoveString(gStringVar4, gSpecialVar_ItemId);
     StringAppend(gStringVar4, gText_Var1IsSelected + 2); // +2 skips over the stringvar
-    AddTextPrinterParameterized_ColorByIndex(WIN_MSG, FONT_SHORT, gStringVar4, 0, 2, 1, 0, 0, 1);
-    if (ItemId_GetImportance(gSpecialVar_ItemId))
+    TMCase_Print(WIN_MSG, FONT_SHORT, gStringVar4, 0, 2, 1, 0, 0, COLORID_DARK);
+    if (gSpecialVar_ItemId >= ITEM_HM01)
     {
         PlaceHMTileInWindow(WIN_MSG, 0, 2);
         CopyWindowToVram(WIN_MSG, COPYWIN_GFX);
     }
     ScheduleBgCopyTilemapToVram(0);
     ScheduleBgCopyTilemapToVram(1);
-    gTasks[taskId].func = Task_TMContextMenu_HandleInput;
+    gTasks[taskId].func = Task_TMContext_HandleInput;
 }
 
-static void Task_TMContextMenu_HandleInput(u8 taskId)
+static void Task_TMContext_HandleInput(u8 taskId)
 {
     s8 input;
 
@@ -937,123 +860,93 @@ static void Task_TMContextMenu_HandleInput(u8 taskId)
         input = Menu_ProcessInputNoWrap();
         switch (input)
         {
-        case -1:
+        case MENU_B_PRESSED:
             PlaySE(SE_SELECT);
-            sMenuActions_UseGiveExit[sTMCaseDynamicResources->menuActionIndices[sTMCaseDynamicResources->numMenuActions - 1]].func.void_u8(taskId);
+            sTMCaseMenuActions[sTMCaseDynamicResources->menuActionIndices[sTMCaseDynamicResources->numMenuActions - 1]].func.void_u8(taskId);
             break;
-        case -2:
+        case MENU_NOTHING_CHOSEN:
             break;
         default:
             PlaySE(SE_SELECT);
-            sMenuActions_UseGiveExit[sTMCaseDynamicResources->menuActionIndices[input]].func.void_u8(taskId);
+            sTMCaseMenuActions[sTMCaseDynamicResources->menuActionIndices[input]].func.void_u8(taskId);
             break;
         }
     }
 }
 
-static void TMHMContextMenuAction_Use(u8 taskId)
+static void TMCaseAction_Use(u8 taskId)
 {
-    RemoveTMContextMenu(&sTMCaseDynamicResources->contextMenuWindowId);
+    RemoveContextWindow(&sTMCaseDynamicResources->contextMenuWindowId);
     ClearStdWindowAndFrameToTransparent(WIN_MSG, FALSE);
-    ClearWindowTilemap(2);
-    PutWindowTilemap(0);
+    ClearWindowTilemap(WIN_MSG);
+    PutWindowTilemap(WIN_LIST);
     ScheduleBgCopyTilemapToVram(0);
     ScheduleBgCopyTilemapToVram(1);
     if (CalculatePlayerPartyCount() == 0)
     {
-        PrintError_ThereIsNoPokemon(taskId);
+        PrintThereIsNoPokemon(taskId);
     }
     else
     {
         gItemUseCB = ItemUseCB_TMHM;
         sTMCaseDynamicResources->savedCallback = CB2_ShowPartyMenuForItemUse;
-        Task_TMCaseStartFadeOut(taskId);
+        Task_FadeAndCloseTMCase(taskId);
     }
 }
 
-static void TMHMContextMenuAction_Give(u8 taskId)
+static void PrintThereIsNoPokemon(u8 taskId)
 {
-    s16 * data = gTasks[taskId].data;
-    u16 itemId = BagGetItemIdByPocketPosition(POCKET_TM_HM, data[1]);
-    RemoveTMContextMenu(&sTMCaseDynamicResources->contextMenuWindowId);
-    ClearStdWindowAndFrameToTransparent(WIN_MSG, FALSE);
-    ClearWindowTilemap(2);
-    PutWindowTilemap(1);
-    PutWindowTilemap(4);
-    PutWindowTilemap(5);
-    ScheduleBgCopyTilemapToVram(0);
-    ScheduleBgCopyTilemapToVram(1);
-    if (!ItemId_GetImportance(itemId))
-    {
-        if (CalculatePlayerPartyCount() == 0)
-        {
-            PrintError_ThereIsNoPokemon(taskId);
-        }
-        else
-        {
-            sTMCaseDynamicResources->savedCallback = CB2_ChooseMonToGiveItem;
-            Task_TMCaseStartFadeOut(taskId);
-        }
-    }
-    else
-    {
-        PrintError_ItemCantBeHeld(taskId);
-    }
+    TMCase_DisplayMessageWithCallback(taskId, FONT_NORMAL, gText_NoPokemon, HandleErrorMessage);
 }
 
-static void PrintError_ThereIsNoPokemon(u8 taskId)
-{
-    TMCase_PrintMessageWithFollowupTask(taskId, FONT_NORMAL, gText_NoPokemon, Task_WaitButtonAfterErrorPrint);
-}
-
-static void PrintError_ItemCantBeHeld(u8 taskId)
+static void PrintItemCantBeHeld(u8 taskId)
 {
     CopyItemName(gSpecialVar_ItemId, gStringVar1);
     StringExpandPlaceholders(gStringVar4, gText_Var1CantBeHeld);
-    TMCase_PrintMessageWithFollowupTask(taskId, FONT_NORMAL, gStringVar4, Task_WaitButtonAfterErrorPrint);
+    TMCase_DisplayMessageWithCallback(taskId, FONT_NORMAL, gStringVar4, HandleErrorMessage);
 }
 
-static void Task_WaitButtonAfterErrorPrint(u8 taskId)
+static void HandleErrorMessage(u8 taskId)
 {
     if (JOY_NEW(A_BUTTON))
     {
         PlaySE(SE_SELECT);
-        Subtask_CloseContextMenuAndReturnToMain(taskId);
+        CloseTMCaseMessage(taskId);
     }
 }
 
-static void Subtask_CloseContextMenuAndReturnToMain(u8 taskId)
+static void CloseTMCaseMessage(u8 taskId)
 {
     s16 * data = gTasks[taskId].data;
 
     DestroyListMenuTask(data[0], &sTMCaseStaticResources.scrollOffset, &sTMCaseStaticResources.selectedRow);
     data[0] = ListMenuInit(&gMultiuseListMenuTemplate, sTMCaseStaticResources.scrollOffset, sTMCaseStaticResources.selectedRow);
-    PrintListMenuCursorByID_WithColorIdx(data[0], 1);
+    TMCase_PrintCursor(data[0], COLORID_DARK);
     ClearDialogWindowAndFrameToTransparent(WIN_CASHIER_MSG, FALSE);
-    ClearWindowTilemap(6);
-    PutWindowTilemap(1);
-    PutWindowTilemap(4);
-    PutWindowTilemap(5);
+    ClearWindowTilemap(WIN_CASHIER_MSG);
+    PutWindowTilemap(WIN_INFO);
+    PutWindowTilemap(WIN_UI_MARKERS);
+    PutWindowTilemap(WIN_MOVE_INFO);
     ScheduleBgCopyTilemapToVram(0);
     ScheduleBgCopyTilemapToVram(1);
-    Subtask_ReturnToTMCaseMain(taskId);
+    ReturnToTMCaseList(taskId);
 }
 
-static void TMHMContextMenuAction_Exit(u8 taskId)
+static void TMCaseAction_Cancel(u8 taskId)
 {
     s16 * data = gTasks[taskId].data;
 
-    RemoveTMContextMenu(&sTMCaseDynamicResources->contextMenuWindowId);
+    RemoveContextWindow(&sTMCaseDynamicResources->contextMenuWindowId);
     ClearStdWindowAndFrameToTransparent(WIN_MSG, FALSE);
-    ClearWindowTilemap(2);
-    PutWindowTilemap(0);
-    PrintListMenuCursorByID_WithColorIdx(data[0], 1);
-    PutWindowTilemap(1);
-    PutWindowTilemap(4);
-    PutWindowTilemap(5);
+    ClearWindowTilemap(WIN_MSG);
+    PutWindowTilemap(WIN_LIST);
+    TMCase_PrintCursor(data[0], COLORID_DARK);
+    PutWindowTilemap(WIN_INFO);
+    PutWindowTilemap(WIN_UI_MARKERS);
+    PutWindowTilemap(WIN_MOVE_INFO);
     ScheduleBgCopyTilemapToVram(0);
     ScheduleBgCopyTilemapToVram(1);
-    Subtask_ReturnToTMCaseMain(taskId);
+    ReturnToTMCaseList(taskId);
 }
 
 static void Task_ContextMenu_FromPartyGiveMenu(u8 taskId)
@@ -1063,193 +956,24 @@ static void Task_ContextMenu_FromPartyGiveMenu(u8 taskId)
     if (!ItemId_GetImportance(BagGetItemIdByPocketPosition(POCKET_TM_HM, data[1])))
     {
         sTMCaseDynamicResources->savedCallback = CB2_GiveHoldItem;
-        Task_TMCaseStartFadeOut(taskId);
+        Task_FadeAndCloseTMCase(taskId);
     }
     else
     {
-        PrintError_ItemCantBeHeld(taskId);
+        PrintItemCantBeHeld(taskId);
     }
 }
 
 static void Task_ContextMenu_FromPokemonPC(u8 taskId)
 {
-    s16 * data = gTasks[taskId].data;
-
-    if (!ItemId_GetImportance(BagGetItemIdByPocketPosition(POCKET_TM_HM, data[1])))
-    {
-        sTMCaseDynamicResources->savedCallback = CB2_ReturnToPokeStorage;
-        Task_TMCaseStartFadeOut(taskId);
-    }
-    else
-    {
-        PrintError_ItemCantBeHeld(taskId);
-    }
+    PrintItemCantBeHeld(taskId);
 }
 
 static void Task_ContextMenu_FromSellMenu(u8 taskId)
 {
-    s16 * data = gTasks[taskId].data;
-
-    if (ItemId_GetPrice(gSpecialVar_ItemId) == 0)
-    {
-        CopyItemName(gSpecialVar_ItemId, gStringVar1);
-        StringExpandPlaceholders(gStringVar4, gText_CantBuyKeyItem);
-        TMCase_PrintMessageWithFollowupTask(taskId, FONT_NORMAL, gStringVar4, Subtask_CloseContextMenuAndReturnToMain);
-    }
-    else
-    {
-        data[8] = 1;
-        if (data[2] == 1)
-        {
-            HandlePrintMoneyOnHand();
-            Task_AskConfirmSaleWithAmount(taskId);
-        }
-        else
-        {
-            if (data[2] > 99)
-                data[2] = 99;
-            CopyItemName(gSpecialVar_ItemId, gStringVar1);
-            StringExpandPlaceholders(gStringVar4, gText_HowManyToSell);
-            TMCase_PrintMessageWithFollowupTask(taskId, FONT_NORMAL, gStringVar4, Task_InitQuantitySelectUI);
-        }
-    }
-}
-
-static void Task_AskConfirmSaleWithAmount(u8 taskId)
-{
-    s16 * data = gTasks[taskId].data;
-
-    ConvertIntToDecimalStringN(gStringVar3, ItemId_GetPrice(BagGetItemIdByPocketPosition(POCKET_TM_HM, data[1])) / 2 * data[8], STR_CONV_MODE_LEFT_ALIGN, 6);
-    StringExpandPlaceholders(gStringVar4, gText_ICanPayVar1);
-    TMCase_PrintMessageWithFollowupTask(taskId, FONT_NORMAL, gStringVar4, Task_PlaceYesNoBox);
-}
-
-static void Task_PlaceYesNoBox(u8 taskId)
-{
-    HandleCreateYesNoMenu(taskId, &sYesNoFuncTable);
-}
-
-static void Task_SaleOfTMsCanceled(u8 taskId)
-{
-    s16 * data = gTasks[taskId].data;
-
-    ClearStdWindowAndFrameToTransparent(WIN_MONEYBOX, FALSE);
-    RemoveMoneyLabelObject();
-    ClearDialogWindowAndFrameToTransparent(WIN_CASHIER_MSG, FALSE);
-    PutWindowTilemap(0);
-    PutWindowTilemap(1);
-    PutWindowTilemap(3);
-    PutWindowTilemap(4);
-    PutWindowTilemap(5);
-    ScheduleBgCopyTilemapToVram(0);
-    ScheduleBgCopyTilemapToVram(1);
-    PrintListMenuCursorByID_WithColorIdx(data[0], 1);
-    Subtask_ReturnToTMCaseMain(taskId);
-}
-
-static void Task_InitQuantitySelectUI(u8 taskId)
-{
-    s16 * data = gTasks[taskId].data;
-
-    TMCase_SetWindowBorder1(7);
-    ConvertIntToDecimalStringN(gStringVar1, 1, STR_CONV_MODE_LEADING_ZEROS, 2);
-    StringExpandPlaceholders(gStringVar4, gText_xVar1);
-    AddTextPrinterParameterized_ColorByIndex(WIN_QUANTITY, FONT_SMALL, gStringVar4, 4, 10, 1, 0, 0, 1);
-    SellTM_PrintQuantityAndSalePrice(1, ItemId_GetPrice(BagGetItemIdByPocketPosition(POCKET_TM_HM, data[1])) / 2 * data[8]);
-    HandlePrintMoneyOnHand();
-    CreateTMCaseScrollIndicatorArrowPair_SellQuantitySelect();
-    ScheduleBgCopyTilemapToVram(0);
-    ScheduleBgCopyTilemapToVram(1);
-    gTasks[taskId].func = Task_QuantitySelect_HandleInput;
-}
-
-static void SellTM_PrintQuantityAndSalePrice(s16 quantity, s32 amount)
-{
-    FillWindowPixelBuffer(WIN_QUANTITY, 0x11);
-    ConvertIntToDecimalStringN(gStringVar1, quantity, STR_CONV_MODE_LEADING_ZEROS, 2);
-    StringExpandPlaceholders(gStringVar4, gText_xVar1);
-    AddTextPrinterParameterized_ColorByIndex(WIN_QUANTITY, FONT_SMALL, gStringVar4, 4, 10, 1, 0, 0, 1);
-    PrintMoneyAmount(WIN_QUANTITY, 0x38, 0x0A, amount, 0);
-}
-
-static void Task_QuantitySelect_HandleInput(u8 taskId)
-{
-    s16 * data = gTasks[taskId].data;
-
-    if (AdjustQuantityAccordingToDPadInput(&data[8], data[2]) == 1)
-    {
-        SellTM_PrintQuantityAndSalePrice(data[8], ItemId_GetPrice(BagGetItemIdByPocketPosition(POCKET_TM_HM, data[1])) / 2 * data[8]);
-    }
-    else if (JOY_NEW(A_BUTTON))
-    {
-        PlaySE(SE_SELECT);
-        ClearStdWindowAndFrameToTransparent(WIN_QUANTITY, FALSE);
-        ScheduleBgCopyTilemapToVram(0);
-        ScheduleBgCopyTilemapToVram(1);
-        RemoveTMCaseScrollIndicatorArrowPair();
-        Task_AskConfirmSaleWithAmount(taskId);
-    }
-    else if (JOY_NEW(B_BUTTON))
-    {
-        PlaySE(SE_SELECT);
-        ClearStdWindowAndFrameToTransparent(WIN_QUANTITY, FALSE);
-        ClearStdWindowAndFrameToTransparent(WIN_MONEYBOX, FALSE);
-        RemoveMoneyLabelObject();
-        ClearDialogWindowAndFrameToTransparent(WIN_CASHIER_MSG, FALSE);
-        PutWindowTilemap(3);
-        PutWindowTilemap(0);
-        PutWindowTilemap(1);
-        ScheduleBgCopyTilemapToVram(0);
-        ScheduleBgCopyTilemapToVram(1);
-        RemoveTMCaseScrollIndicatorArrowPair();
-        PrintListMenuCursorByID_WithColorIdx(data[0], 1);
-        Subtask_ReturnToTMCaseMain(taskId);
-    }
-}
-
-static void Task_PrintSaleConfirmedText(u8 taskId)
-{
-    s16 * data = gTasks[taskId].data;
-
-    PutWindowTilemap(0);
-    ScheduleBgCopyTilemapToVram(0);
-    CopyItemName(gSpecialVar_ItemId, gStringVar2);
-    ConvertIntToDecimalStringN(gStringVar1, ItemId_GetPrice(BagGetItemIdByPocketPosition(POCKET_TM_HM, data[1])) / 2 * data[8], STR_CONV_MODE_LEFT_ALIGN, 6);
-    StringExpandPlaceholders(gStringVar4, gText_TurnedOverVar1ForVar2);
-    TMCase_PrintMessageWithFollowupTask(taskId, FONT_NORMAL, gStringVar4, Task_DoSaleOfTMs);
-}
-
-static void Task_DoSaleOfTMs(u8 taskId)
-{
-    s16 * data = gTasks[taskId].data;
-
-    PlaySE(SE_SHOP);
-    RemoveBagItem(gSpecialVar_ItemId, data[8]);
-    AddMoney(&gSaveBlock1Ptr->money, ItemId_GetPrice(gSpecialVar_ItemId) / 2 * data[8]);
-    DestroyListMenuTask(data[0], &sTMCaseStaticResources.scrollOffset, &sTMCaseStaticResources.selectedRow);
-    TMCaseSetup_GetTMCount();
-    TMCaseSetup_InitListMenuPositions();
-    InitTMCaseListMenuItems();
-    data[0] = ListMenuInit(&gMultiuseListMenuTemplate, sTMCaseStaticResources.scrollOffset, sTMCaseStaticResources.selectedRow);
-    PrintListMenuCursorByID_WithColorIdx(data[0], 2);
-    PrintMoneyAmountInMoneyBox(WIN_MONEYBOX, GetMoney(&gSaveBlock1Ptr->money), 0);
-    gTasks[taskId].func = Task_AfterSale_ReturnToList;
-}
-
-static void Task_AfterSale_ReturnToList(u8 taskId)
-{
-    if (JOY_NEW(A_BUTTON) || JOY_NEW(B_BUTTON))
-    {
-        PlaySE(SE_SELECT);
-        ClearStdWindowAndFrameToTransparent(WIN_MONEYBOX, FALSE);
-        RemoveMoneyLabelObject();
-        ClearDialogWindowAndFrameToTransparent(WIN_CASHIER_MSG, FALSE);
-        PutWindowTilemap(1);
-        PutWindowTilemap(3);
-        PutWindowTilemap(4);
-        PutWindowTilemap(5);
-        Subtask_CloseContextMenuAndReturnToMain(taskId);
-    }
+    CopyItemName(gSpecialVar_ItemId, gStringVar1);
+    StringExpandPlaceholders(gStringVar4, gText_CantBuyKeyItem);
+    TMCase_DisplayMessageWithCallback(taskId, FONT_NORMAL, gStringVar4, CloseTMCaseMessage);
 }
 
 static void InitTMCaseWindows(void)
@@ -1258,22 +982,21 @@ static void InitTMCaseWindows(void)
 
     InitWindows(sWindowTemplates);
     DeactivateAllTextPrinters();
-    LoadMessageBoxGfx(WIN_LIST, 100, BG_PLTT_ID(11));
-    LoadUserWindowBorderGfx(WIN_LIST, 120, BG_PLTT_ID(13));
-    LoadPalette(sTMCaseMainWindowPalette, BG_PLTT_ID(15), PLTT_SIZE_4BPP);
-    LoadPalette(sTMCaseMainWindowPalette, BG_PLTT_ID(10), PLTT_SIZE_4BPP);
-    LoadPalette(sPal3Override, BG_PLTT_ID(15) + 6, PLTT_SIZEOF(2));
-    LoadPalette(sPal3Override, BG_PLTT_ID(13) + 6, PLTT_SIZEOF(2));
-    ListMenuLoadStdPalAt(BG_PLTT_ID(12), 1);
+    FillPalette(0, BG_PLTT_ID(0), PLTT_SIZE_4BPP * 16);
 
-    for (i = 0; i < 9; i++)
-        FillWindowPixelBuffer(i, 0x00);
+    LoadPalette(GetOverworldTextboxPalettePtr(), BG_PLTT_ID(4), PLTT_SIZE_4BPP);
+    LoadUserWindowBorderGfx(WIN_LIST, 120, BG_PLTT_ID(5));
+    LoadPalette(sTMCaseMainWindowPalette, BG_PLTT_ID(6), PLTT_SIZE_4BPP);
+    ListMenuLoadStdPalAt(BG_PLTT_ID(7), 1);
 
-    PutWindowTilemap(0);
-    PutWindowTilemap(1);
-    PutWindowTilemap(3);
-    PutWindowTilemap(4);
-    PutWindowTilemap(5);
+    for (i = 0; i < ARRAY_COUNT(sWindowTemplates); i++)
+        FillWindowPixelBuffer(i, PIXEL_FILL(0));
+
+    PutWindowTilemap(WIN_LIST);
+    PutWindowTilemap(WIN_INFO);
+    PutWindowTilemap(WIN_LABEL);
+    PutWindowTilemap(WIN_UI_MARKERS);
+    PutWindowTilemap(WIN_MOVE_INFO);
     ScheduleBgCopyTilemapToVram(0);
     SetGpuRegBits(REG_OFFSET_DISPCNT, DISPCNT_WIN0_ON);
     SetGpuReg(REG_OFFSET_WIN0H, WIN_RANGE(50, 255));
@@ -1284,31 +1007,35 @@ static void InitTMCaseWindows(void)
     SetGpuReg(REG_OFFSET_BLDALPHA, BLDALPHA_BLEND(16, 0));
 }
 
-static void AddTextPrinterParameterized_ColorByIndex(u8 windowId, u8 fontId, const u8 * str, u8 x, u8 y, u8 letterSpacing, u8 lineSpacing, u8 speed, u8 colorIdx)
+static void TMCase_Print(u8 windowId, u8 fontId, const u8 * str, u8 x, u8 y, u8 letterSpacing, u8 lineSpacing, u8 speed, u8 colorIdx)
 {
-    AddTextPrinterParameterized4(windowId, fontId, x, y, letterSpacing, lineSpacing, sTextColors[colorIdx], speed, str);
+    AddTextPrinterParameterized4(windowId, fontId, x, y, letterSpacing, lineSpacing, sFontColorTable[colorIdx], speed, str);
 }
 
-static void TMCase_SetWindowBorder1(u8 windowId)
+static void TMCase_SetWindowBorder(u8 windowId)
 {
-    DrawStdFrameWithCustomTileAndPalette(windowId, FALSE, 0x5B, 14);
+    DrawStdFrameWithCustomTileAndPalette(windowId, FALSE, 120, 5);
 }
 
-static void TMCase_SetWindowBorder2(u8 windowId)
+static void Task_TMCase_WaitForMessage(u8 taskId)
 {
-    DrawStdFrameWithCustomTileAndPalette(windowId, FALSE, 0x78, 13);
+    if (!RunTextPrintersRetIsActive(WIN_CASHIER_MSG))
+        SwitchTaskToFollowupFunc(taskId);
 }
 
-static void TMCase_PrintMessageWithFollowupTask(u8 taskId, u8 fontId, const u8 * str, TaskFunc func)
+static void TMCase_DisplayMessageWithCallback(u8 taskId, u8 fontId, const u8 *str, TaskFunc callback)
 {
-    DisplayMessageAndContinueTask(taskId, 6, 0x64, 0x0B, fontId, GetPlayerTextSpeedDelay(), str, func);
+    DrawStdFrameWithCustomTileAndPalette(WIN_CASHIER_MSG, FALSE, 120, 5);
+    TMCase_Print(WIN_CASHIER_MSG, FONT_SHORT, str, 0, 1, 1, 1, GetPlayerTextSpeedDelay(), COLORID_DARK);
+    SetTaskFuncWithFollowupFunc(taskId, Task_TMCase_WaitForMessage, callback);
     ScheduleBgCopyTilemapToVram(1);
 }
 
 static void PrintTMCaseLabel(void)
 {
-    u32 distance = 72 - GetStringWidth(FONT_NORMAL, gText_TMCase, 0);
-    AddTextPrinterParameterized3(WIN_LABEL, FONT_NORMAL, distance / 2, 1, sTextColors[0], 0, gText_TMCase);
+    const u8 *name = ItemId_GetName(ITEM_TM_CASE);
+    u32 distance = 72 - GetStringWidth(FONT_NORMAL, name, 0);
+    AddTextPrinterParameterized3(WIN_LABEL, FONT_NORMAL, distance / 2, 1, sFontColorTable[0], 0, name);
 }
 
 static void DrawMoveInfoUIMarkers(void)
@@ -1320,7 +1047,7 @@ static void DrawMoveInfoUIMarkers(void)
     CopyWindowToVram(WIN_UI_MARKERS, COPYWIN_GFX);
 }
 
-static void TMCase_MoveCursor_UpdatePrintedTMInfo(u16 itemId)
+static void PrintTMInfo(u16 itemId)
 {
     u8 i;
     u16 move;
@@ -1330,10 +1057,7 @@ static void TMCase_MoveCursor_UpdatePrintedTMInfo(u16 itemId)
     if (itemId == ITEM_NONE)
     {
         for (i = 0; i < 4; i++)
-        {
-            AddTextPrinterParameterized_ColorByIndex(WIN_MOVE_INFO, FONT_SHORT_COPY_1, gText_ThreeDashes, 7, 12 * i, 0, 0, 0xFF, 3);
-        }
-        CopyWindowToVram(WIN_MOVE_INFO, COPYWIN_GFX);
+            TMCase_Print(WIN_MOVE_INFO, FONT_SHORT_COPY_1, gText_ThreeDashes, 7, 12 * i, 0, 0, TEXT_SKIP_DRAW, COLORID_MOVE_INFO);
     }
     else
     {
@@ -1346,7 +1070,7 @@ static void TMCase_MoveCursor_UpdatePrintedTMInfo(u16 itemId)
             ConvertIntToDecimalStringN(gStringVar1, gBattleMoves[move].power, STR_CONV_MODE_RIGHT_ALIGN, 3);
             str = gStringVar1;
         }
-        AddTextPrinterParameterized_ColorByIndex(WIN_MOVE_INFO, FONT_SHORT_COPY_1, str, 7, 12, 0, 0, 0xFF, 3);
+        TMCase_Print(WIN_MOVE_INFO, FONT_SHORT_COPY_1, str, 7, 12, 0, 0, TEXT_SKIP_DRAW, COLORID_MOVE_INFO);
         if (gBattleMoves[move].accuracy == 0)
             str = gText_ThreeDashes;
         else
@@ -1354,11 +1078,11 @@ static void TMCase_MoveCursor_UpdatePrintedTMInfo(u16 itemId)
             ConvertIntToDecimalStringN(gStringVar1, gBattleMoves[move].accuracy, STR_CONV_MODE_RIGHT_ALIGN, 3);
             str = gStringVar1;
         }
-        AddTextPrinterParameterized_ColorByIndex(WIN_MOVE_INFO, FONT_SHORT_COPY_1, str, 7, 24, 0, 0, 0xFF, 3);
+        TMCase_Print(WIN_MOVE_INFO, FONT_SHORT_COPY_1, str, 7, 24, 0, 0, TEXT_SKIP_DRAW, COLORID_MOVE_INFO);
         ConvertIntToDecimalStringN(gStringVar1, gBattleMoves[move].pp, STR_CONV_MODE_RIGHT_ALIGN, 3);
-        AddTextPrinterParameterized_ColorByIndex(WIN_MOVE_INFO, FONT_SHORT_COPY_1, gStringVar1, 7, 36, 0, 0, 0xFF, 3);
-        CopyWindowToVram(WIN_MOVE_INFO, COPYWIN_GFX);
+        TMCase_Print(WIN_MOVE_INFO, FONT_SHORT_COPY_1, gStringVar1, 7, 36, 0, 0, TEXT_SKIP_DRAW, COLORID_MOVE_INFO);
     }
+    CopyWindowToVram(WIN_MOVE_INFO, COPYWIN_GFX);
 }
 
 static void PlaceHMTileInWindow(u8 windowId, u8 x, u8 y)
@@ -1366,74 +1090,63 @@ static void PlaceHMTileInWindow(u8 windowId, u8 x, u8 y)
     BlitBitmapToWindow(windowId, sTMCaseHMIcon_Gfx, x, y, 16, 12);
 }
 
-static void HandlePrintMoneyOnHand(void)
+static u8 AddContextWindow(u8 *windowId)
 {
-    AddMoneyLabelObject(19, 11);
-    PrintMoneyAmountInMoneyBoxWithBorder(WIN_MONEYBOX, 0x78, 0x0D, GetMoney(&gSaveBlock1Ptr->money));
-}
-
-static void HandleCreateYesNoMenu(u8 taskId, const struct YesNoFuncTable *ptrs)
-{
-    CreateYesNoMenuWithCallbacks(taskId, &sYesNoWindowTemplate, FONT_SHORT, 0, 2, 0x78, 0x0E, ptrs);
-}
-
-static u8 AddTMContextMenu(u8 *a0)
-{
-    if (*a0 == 0xFF)
+    if (*windowId == WINDOW_NONE)
     {
-        *a0 = AddWindow(&sTMContextWindowTemplates);
-        TMCase_SetWindowBorder2(*a0);
+        *windowId = AddWindow(&sContextWindowTemplate);
+        TMCase_SetWindowBorder(*windowId);
         ScheduleBgCopyTilemapToVram(0);
     }
-    return *a0;
+    return *windowId;
 }
 
-static void RemoveTMContextMenu(u8 * a0)
+static void RemoveContextWindow(u8 *windowId)
 {
-    ClearStdWindowAndFrameToTransparent(*a0, FALSE);
-    ClearWindowTilemap(*a0);
-    RemoveWindow(*a0);
+    ClearStdWindowAndFrameToTransparent(*windowId, FALSE);
+    ClearWindowTilemap(*windowId);
+    RemoveWindow(*windowId);
     ScheduleBgCopyTilemapToVram(0);
-    *a0 = 0xFF;
+    *windowId = WINDOW_NONE;
 }
 
-static u8 CreateTMSprite(u16 itemId)
+static u8 CreateDiscSprite(u16 itemId)
 {
-    u8 spriteId = CreateSprite(&sTMSpriteTemplate, 0x29, 0x2E, 0);
-    u8 r5;
+    u8 spriteId = CreateSprite(&sSpriteTemplate_TMDisc, 0x29, 0x2E, 0);
+    u8 tmIndex;
     if (itemId == ITEM_NONE)
     {
-        UpdateTMSpritePosition(&gSprites[spriteId], 0xFF);
+        UpdateDiscSpritePosition(&gSprites[spriteId], 0xFF);
         return spriteId;
     }
     else
     {
-        r5 = itemId - 33;
-        SetTMSpriteAnim(&gSprites[spriteId], r5);
-        TintTMSpriteByType(gBattleMoves[ItemIdToBattleMoveId(itemId)].type);
-        UpdateTMSpritePosition(&gSprites[spriteId], r5);
+        tmIndex = itemId - ITEM_TM01;
+        SetTMSpriteAnim(&gSprites[spriteId], tmIndex);
+        TintDiscSpriteByType(gBattleMoves[ItemIdToBattleMoveId(itemId)].type);
+        UpdateDiscSpritePosition(&gSprites[spriteId], tmIndex);
         return spriteId;
     }
 }
 
 static void SetTMSpriteAnim(struct Sprite *sprite, u8 idx)
 {
-    if (idx >= 50)
-        StartSpriteAnim(sprite, 1);
+    if (idx >= (ITEM_HM01 - ITEM_TM01))
+        StartSpriteAnim(sprite, ANIM_HM);
     else
-        StartSpriteAnim(sprite, 0);
+        StartSpriteAnim(sprite, ANIM_TM);
 }
 
-static void TintTMSpriteByType(u8 type)
+static void TintDiscSpriteByType(u8 type)
 {
-    u8 palIndex = PLTT_ID(IndexOfSpritePaletteTag(TM_CASE_TM_TAG));
-    LoadPalette(sTMSpritePaletteBuffer + sTMSpritePaletteOffsetByType[type], OBJ_PLTT_OFFSET + palIndex, PLTT_SIZE_4BPP);
+    u8 paletteIndex = IndexOfSpritePaletteTag(TAG_DISC);
+    LoadPalette(sTMSpritePaletteBuffer + PLTT_ID(sTMSpritePaletteOffsetByType[type]), OBJ_PLTT_ID(paletteIndex), PLTT_SIZE_4BPP);
 }
 
-static void UpdateTMSpritePosition(struct Sprite *sprite, u8 var)
+static void UpdateDiscSpritePosition(struct Sprite *sprite, u8 idx)
 {
     s32 x, y;
-    if (var == 0xFF)
+    if (idx == 0xFF)
     {
         x = 0x1B;
         y = 0x36;
@@ -1441,12 +1154,12 @@ static void UpdateTMSpritePosition(struct Sprite *sprite, u8 var)
     }
     else
     {
-        if (var >= 50)
-            var -= 50;
+        if (idx >= 50)
+            idx -= 50;
         else
-            var += 8;
-        x = 0x29 - (((0xE00 * var) / 58) >> 8);
-        y = 0x2E + (((0x800 * var) / 58) >> 8);
+            idx += 8;
+        x = 0x29 - (((0xE00 * idx) / 58) >> 8);
+        y = 0x2E + (((0x800 * idx) / 58) >> 8);
     }
     sprite->x = x;
     sprite->y = y;
@@ -1469,10 +1182,10 @@ static void SpriteCB_MoveTMSpriteInCase(struct Sprite *sprite)
             if (sprite->data[0] != ITEM_NONE)
             {
                 sprite->data[1]++;
-                TintTMSpriteByType(gBattleMoves[ItemIdToBattleMoveId(sprite->data[0])].type);
+                TintDiscSpriteByType(gBattleMoves[ItemIdToBattleMoveId(sprite->data[0])].type);
                 sprite->data[0] -= ITEM_TM01;
                 SetTMSpriteAnim(sprite, sprite->data[0]);
-                UpdateTMSpritePosition(sprite, sprite->data[0]);
+                UpdateDiscSpritePosition(sprite, sprite->data[0]);
             }
             else
                 sprite->callback = SpriteCallbackDummy;
@@ -1492,12 +1205,13 @@ static void SpriteCB_MoveTMSpriteInCase(struct Sprite *sprite)
 
 static void LoadTMTypePalettes(void)
 {
-    struct SpritePalette spritePalette;
+    // struct SpritePalette spritePalette;
 
     sTMSpritePaletteBuffer = Alloc(0x110 * sizeof(u16));
-    LZDecompressWram(sTMCaseTypes_Pal1, sTMSpritePaletteBuffer);
-    LZDecompressWram(sTMCaseTypes_Pal2, sTMSpritePaletteBuffer + 0x100);
-    spritePalette.data = sTMSpritePaletteBuffer + 0x110;
-    spritePalette.tag = TM_CASE_TM_TAG;
-    LoadSpritePalette(&spritePalette);
+    LZDecompressWram(sTMCaseTypes1_Pal, sTMSpritePaletteBuffer);
+    LZDecompressWram(sTMCaseTypes2_Pal, sTMSpritePaletteBuffer + 0x100);
+    // spritePalette.data = sTMSpritePaletteBuffer + 0x110;
+    // spritePalette.tag = TAG_DISC;
+    AllocSpritePalette(TAG_DISC);
+    // LoadSpritePalette(&spritePalette);
 }

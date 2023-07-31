@@ -2593,5 +2593,5 @@ static void CB2_TMCaseSell(void)
 
 static void CB2_BerryPouchSell(void)
 {
-    InitBerryPouch(BERRYPOUCH_FROMMARTSELL, CB2_BagMenuFromPokeStorage, FALSE);
+    InitBerryPouch(BERRYPOUCH_FROMMARTSELL, CB2_GoToSellMenu, FALSE);
 }
