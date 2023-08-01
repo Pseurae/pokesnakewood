@@ -40,8 +40,6 @@ static const u32 sTMCase_Tilemap[] = INCBIN_U32("graphics/tm_case/case.bin.lz");
 static const u32 sTMCaseMale_Pal[] = INCBIN_U32("graphics/tm_case/male.gbapal.lz");
 static const u32 sTMCaseFemale_Pal[] = INCBIN_U32("graphics/tm_case/female.gbapal.lz");
 static const u32 sTMDisc_Gfx[] = INCBIN_U32("graphics/tm_case/disc.4bpp.lz");
-// static const u32 sTMCaseTypes1_Pal[] = INCBIN_U32("graphics/tm_case/types1.gbapal.lz");
-// static const u32 sTMCaseTypes2_Pal[] = INCBIN_U32("graphics/tm_case/types2.gbapal.lz");
 static const u8 sTMCaseHMIcon_Gfx[] = INCBIN_U8("graphics/tm_case/hm.4bpp");
 static const u16 sTMCaseMainWindowPalette[] = INCBIN_U16("graphics/tm_case/window.gbapal");
 
@@ -117,8 +115,8 @@ static u8 CreateDiscSprite(u16 itemId);
 static void SetTMSpriteAnim(struct Sprite *sprite, u8 var);
 static void TintDiscSpriteByType(u8 type);
 static void UpdateDiscSpritePosition(struct Sprite *sprite, u8 tm);
-static void InitSelectedTMSpriteData(u8 a0, u16 itemId);
-static void SpriteCB_MoveTMSpriteInCase(struct Sprite *sprite);
+static void SwapTMDiscInCase(u8 a0, u16 itemId);
+static void SpriteCB_SwapTMDiscInCase(struct Sprite *sprite);
 static void LoadTMTypePalettes(void);
 
 static const struct BgTemplate sTMCaseBgTemplates[] = 
@@ -290,6 +288,13 @@ enum {
     ANIM_HM
 };
 
+#define DISC_BASE_X 41
+#define DISC_BASE_Y 46
+
+#define DISC_CASE_DISTANCE 20 // The total number of pixels a disc travels vertically in/out of the case
+#define DISC_Y_MOVE 10 // The number of pixels a disc travels vertically per movement step
+
+#define DISC_HIDDEN 0xFF
 #define TAG_DISC 400 
 
 static const struct OamData sOamData_TMDisc = {
@@ -329,27 +334,6 @@ static const struct SpriteTemplate sSpriteTemplate_TMDisc =
     .images = NULL,
     .affineAnims = gDummySpriteAffineAnimTable,
     .callback = SpriteCallbackDummy
-};
-
-static const u8 sTMSpritePaletteOffsetByType[] = 
-{
-    [TYPE_NORMAL]   = 0x00,
-    [TYPE_FIRE]     = 0x01,
-    [TYPE_WATER]    = 0x02,
-    [TYPE_GRASS]    = 0x03,
-    [TYPE_ELECTRIC] = 0x04,
-    [TYPE_ROCK]     = 0x05,
-    [TYPE_GROUND]   = 0x06,
-    [TYPE_ICE]      = 0x07,
-    [TYPE_FLYING]   = 0x08,
-    [TYPE_FIGHTING] = 0x09,
-    [TYPE_GHOST]    = 0x0a,
-    [TYPE_BUG]      = 0x0b,
-    [TYPE_POISON]   = 0x0c,
-    [TYPE_PSYCHIC]  = 0x0d,
-    [TYPE_STEEL]    = 0x0e,
-    [TYPE_DARK]     = 0x0f,
-    [TYPE_DRAGON]   = 0x10
 };
 
 void OpenTMCase(u8 type, void (* callback)(void), u8 a2)
@@ -630,7 +614,7 @@ static void TMCase_MoveCursorCallback(s32 itemIndex, bool8 onInit, struct ListMe
     if (onInit != TRUE)
     {
         PlaySE(SE_SELECT);
-        InitSelectedTMSpriteData(sTMCaseMenu->tmSpriteId, itemId);
+        SwapTMDiscInCase(sTMCaseMenu->tmSpriteId, itemId);
     }
     PrintDescription(itemId);
     PrintTMInfo(itemId);
@@ -948,6 +932,9 @@ static void TMCaseAction_Cancel(u8 taskId)
     ReturnToTMCaseList(taskId);
 }
 
+#undef tListTaskId
+#undef tListPosition
+
 static void Task_ContextMenu_FromPartyGiveMenu(u8 taskId)
 {
     PrintItemCantBeHeld(taskId);
@@ -1101,11 +1088,11 @@ static void RemoveContextWindow(u8 *windowId)
 
 static u8 CreateDiscSprite(u16 itemId)
 {
-    u8 spriteId = CreateSprite(&sSpriteTemplate_TMDisc, 0x29, 0x2E, 0);
+    u8 spriteId = CreateSprite(&sSpriteTemplate_TMDisc, DISC_BASE_X, DISC_BASE_Y, 0);
     u8 tmIndex;
     if (itemId == ITEM_NONE)
     {
-        UpdateDiscSpritePosition(&gSprites[spriteId], 0xFF);
+        UpdateDiscSpritePosition(&gSprites[spriteId], DISC_HIDDEN);
         return spriteId;
     }
     else
@@ -1134,48 +1121,50 @@ static void TintDiscSpriteByType(u8 type)
 static void UpdateDiscSpritePosition(struct Sprite *sprite, u8 idx)
 {
     s32 x, y;
-    if (idx == 0xFF)
+    if (idx == DISC_HIDDEN)
     {
-        x = 0x1B;
-        y = 0x36;
-        sprite->y2 = 0x14;
+        x = 27;
+        y = 54;
+        sprite->y2 = DISC_CASE_DISTANCE;
     }
     else
     {
-        if (idx >= 50)
+        if (idx >= NUM_TECHNICAL_MACHINES)
             idx -= 50;
         else
-            idx += 8;
-        x = 0x29 - (((0xE00 * idx) / 58) >> 8);
-        y = 0x2E + (((0x800 * idx) / 58) >> 8);
+            idx += NUM_HIDDEN_MACHINES;
+        
+        x = DISC_BASE_X - Q_24_8_TO_INT(Q_24_8(14 * idx) / (NUM_TECHNICAL_MACHINES + NUM_HIDDEN_MACHINES));
+        y = DISC_BASE_Y + Q_24_8_TO_INT(Q_24_8(8 * idx) / (NUM_TECHNICAL_MACHINES + NUM_HIDDEN_MACHINES));
     }
     sprite->x = x;
     sprite->y = y;
 }
 
-static void InitSelectedTMSpriteData(u8 spriteId, u16 itemId)
+#define sItemId data[0]
+#define sState data[1]
+
+static void SwapTMDiscInCase(u8 spriteId, u16 itemId)
 {
-    gSprites[spriteId].tListTaskId = itemId;
-    gSprites[spriteId].tListPosition = 0;
-    gSprites[spriteId].callback = SpriteCB_MoveTMSpriteInCase;
+    gSprites[spriteId].sItemId = itemId;
+    gSprites[spriteId].sState = 0;
+    gSprites[spriteId].callback = SpriteCB_SwapTMDiscInCase;
 }
 
-#undef tListTaskId
-
-static void SpriteCB_MoveTMSpriteInCase(struct Sprite *sprite)
+static void SpriteCB_SwapTMDiscInCase(struct Sprite *sprite)
 {
-    switch (sprite->data[1])
+    switch (sprite->sState)
     {
     case 0:
-        if (sprite->y2 >= 20)
+        if (sprite->y2 >= DISC_CASE_DISTANCE)
         {
-            if (sprite->data[0] != ITEM_NONE)
+            if (sprite->sItemId != ITEM_NONE)
             {
-                sprite->data[1]++;
-                TintDiscSpriteByType(gBattleMoves[ItemIdToBattleMoveId(sprite->data[0])].type);
-                sprite->data[0] -= ITEM_TM01;
-                SetTMSpriteAnim(sprite, sprite->data[0]);
-                UpdateDiscSpritePosition(sprite, sprite->data[0]);
+                sprite->sState++;
+                TintDiscSpriteByType(gBattleMoves[ItemIdToBattleMoveId(sprite->sItemId)].type);
+                sprite->sItemId -= ITEM_TM01;
+                SetTMSpriteAnim(sprite, sprite->sItemId);
+                UpdateDiscSpritePosition(sprite, sprite->sItemId);
             }
             else
                 sprite->callback = SpriteCallbackDummy;

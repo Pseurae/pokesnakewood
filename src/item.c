@@ -68,7 +68,7 @@ void PopulateTMHMSlots(void)
 
     ClearItemSlots(gTMHMItemSlot, BAG_TMHM_COUNT);
 
-    for (i = 0; i < TMHM_COUNT; ++i)
+    for (i = 0; i < (NUM_TECHNICAL_MACHINES + NUM_HIDDEN_MACHINES); ++i)
     {
         u8 mask = 1 << (i % 8);
         if (gSaveBlock1Ptr->bagPocket_TMHM_Flags[i / 8] & mask)

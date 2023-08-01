@@ -28,9 +28,6 @@ extern u8 gSelectedOrderFromParty[MAX_FRONTIER_PARTY_SIZE];
 extern u8 gBattlePartyCurrentOrder[PARTY_SIZE / 2];
 
 extern void (*gItemUseCB)(u8, TaskFunc);
-
-#define TMHM_COUNT 58
-
 extern const u16 gTutorMoves[];
 
 void AnimatePartySlot(u8 slot, u8 animNum);
