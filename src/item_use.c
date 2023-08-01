@@ -72,7 +72,7 @@ static void Task_StartUseRepel(u8);
 static void Task_UseRepel(u8);
 static void Task_CloseCantUseKeyItemMessage(u8);
 static void SetDistanceOfClosestHiddenItem(u8, s16, s16);
-static void InitBerryPouchFromBattle(void);
+static void OpenBerryPouchFromBattle(void);
 static void CB2_OpenPokeblockFromBag(void);
 static void CB2_OpenTMCaseFromBag(void);
 
@@ -653,9 +653,9 @@ void ItemUseOutOfBattle_TmCase(u8 taskId)
     }
 }
 
-static void InitBerryPouchFromBag(void)
+static void OpenBerryPouchFromBag(void)
 {
-    InitBerryPouch(BERRYPOUCH_FROMFIELD, CB2_BagMenuFromStartMenu, 0);
+    OpenBerryPouch(BERRYPOUCH_FROM_FIELD, CB2_BagMenuFromStartMenu, 0);
 }
 
 static void Task_OpenRegisteredBerryPouch(u8 taskId)
@@ -663,7 +663,7 @@ static void Task_OpenRegisteredBerryPouch(u8 taskId)
     if (!gPaletteFade.active)
     {
         CleanupOverworldWindowsAndTilemaps();
-        InitBerryPouch(BERRYPOUCH_FROMFIELD, CB2_ReturnToField, 1);
+        OpenBerryPouch(BERRYPOUCH_FROM_FIELD, CB2_ReturnToField, 1);
         DestroyTask(taskId);
     }
 }
@@ -672,7 +672,7 @@ void ItemUseOutOfBattle_BerryPouch(u8 taskId)
 {
     if (gTasks[taskId].tUsingRegisteredKeyItem != TRUE)
     {
-        gBagMenu->newScreenCallback = InitBerryPouchFromBag;
+        gBagMenu->newScreenCallback = OpenBerryPouchFromBag;
         Task_FadeAndCloseBagMenu(taskId);
     }
     else
@@ -685,13 +685,13 @@ void ItemUseOutOfBattle_BerryPouch(u8 taskId)
 
 void ItemUseInBattle_BerryPouch(u8 taskId)
 {
-    gBagMenu->newScreenCallback = InitBerryPouchFromBattle;
+    gBagMenu->newScreenCallback = OpenBerryPouchFromBattle;
     Task_FadeAndCloseBagMenu(taskId);
 }
 
-static void InitBerryPouchFromBattle(void)
+static void OpenBerryPouchFromBattle(void)
 {
-    InitBerryPouch(BERRYPOUCH_FROMBATTLE, CB2_BagMenuFromBattle, 0);
+    OpenBerryPouch(BERRYPOUCH_FROM_BATTLE, CB2_BagMenuFromBattle, 0);
 }
 
 static void CB2_OpenPokeblockFromBag(void)

@@ -742,7 +742,7 @@ static void BuyMenuDecompressBgGraphics(void)
 {
     DecompressAndCopyTileDataToVram(1, gShopMenu_Gfx, 0x480, 0x3DC, 0);
     LZDecompressWram(gShopMenu_Tilemap, sShopData->tilemapBuffers[0]);
-    LoadCompressedPalette(gShopMenu_Pal, BG_PLTT_ID(12), PLTT_SIZE_4BPP);
+    LoadCompressedPalette(gShopMenu_Pal, BG_PLTT_ID(11), PLTT_SIZE_4BPP);
 }
 
 static void BuyMenuInitWindows(void)

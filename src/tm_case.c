@@ -67,13 +67,13 @@ static const u16 sTMDiscPalettes[][16] =
 static const u8 sText_ClearTo18[] = _("{CLEAR_TO 18}");
 static const u8 sText_TMCaseWillBePutAway[] = _("The TM Case will be\nput away.");
 
-static EWRAM_DATA struct TMCaseMenu *sTMCaseMenu = NULL;
-static EWRAM_DATA void (*sTMCaseExitCallback)(void) = NULL;
+static EWRAM_DATA struct TMCase *sTMCaseMenu = NULL;
+static EWRAM_DATA struct TMCasePosition sTMCasePosition = { 0 };
 static EWRAM_DATA struct ListMenuItem * sListMenuItemsBuffer = NULL;
 static EWRAM_DATA u8 (* sListMenuStringsBuffer)[29] = NULL;
 
-static void CB2_InitTMCase(void);
-static bool8 InitTMCase(void);
+static void CB2_SetupTMCase(void);
+static bool8 SetupTMCase(void);
 static void LoadBgTemplates(void);
 static bool8 HandleLoadTMCaseGraphicsAndPalettes(void);
 static void AllocateTMCaseListBuffers(void);
@@ -81,17 +81,17 @@ static void LoadTMCaseListBuffers(void);
 static void GetTMNumberAndMoveString(u8 * dest, u16 itemId);
 static void TMCase_MoveCursorCallback(s32 itemIndex, bool8 onInit, struct ListMenu *list);
 static void TMCase_ItemPrintFunc(u8 windowId, u32 itemId, u8 y);
-static void PrintDescription(s32 itemIndex);
+static void PrintSelectedTMDescription(s32 itemIndex);
 static void TMCase_PrintCursorAtPos(u8 y, u8 colorIdx);
 static void CreateTMCaseScrollIndicatorArrows(void);
-static void TMCaseSetup_GetTMCount(void);
-static void TMCaseSetup_InitListMenuPositions(void);
-static void TMCaseSetup_UpdateVisualMenuOffset(void);
+static void UpdateTMCaseItemList(void);
+static void InitTMCaseListPositions(void);
+static void InitTMCaseScrollPositions(void);
 static void FreeTMCaseBuffers(void);
 static void Task_CloseTMCase(u8 taskId);
-static void Task_TMCaseHandleInput(u8 taskId);
+static void Task_TMCase_HandleInput(u8 taskId);
 static void Task_ContextMenu_FromFieldBag(u8 taskId);
-static void Task_TMContext_HandleInput(u8 taskId);
+static void Task_ContextMenu_HandleInput(u8 taskId);
 static void TMCaseAction_Use(u8 taskId);
 static void PrintThereIsNoPokemon(u8 taskId);
 static void PrintItemCantBeHeld(u8 taskId);
@@ -99,15 +99,15 @@ static void HandleErrorMessage(u8 taskId);
 static void CloseTMCaseMessage(u8 taskId);
 static void TMCaseAction_Cancel(u8 taskId);
 static void Task_ContextMenu_FromPartyGiveMenu(u8 taskId);
-static void Task_ContextMenu_FromPokemonPC(u8 taskId);
+static void Task_ContextMenu_Deposit(u8 taskId);
 static void Task_ContextMenu_FromSellMenu(u8 taskId);
-static void InitTMCaseWindows(void);
+static void SetupTMCaseWindows(void);
 static void TMCase_Print(u8 windowId, u8 fontId, const u8 * str, u8 x, u8 y, u8 letterSpacing, u8 lineSpacing, u8 speed, u8 colorIdx);
 static void TMCase_SetWindowBorder(u8 windowId);
 static void TMCase_DisplayMessageWithCallback(u8 taskId, u8 fontId, const u8 * str, TaskFunc func);
 static void PrintTMCaseLabel(void);
 static void DrawMoveInfoUIMarkers(void);
-static void PrintTMInfo(u16 itemId);
+static void PrintSelectedTMInfo(u16 itemId);
 static void PlaceHMTileInWindow(u8 windowId, u8 x, u8 y);
 static u8 CreateContextWindow(u8 *windowId);
 static void RemoveContextWindow(u8 *windowId);
@@ -155,28 +155,28 @@ static const TaskFunc sContextMenuFuncs[] =
     [TMCASE_FROM_FIELD] = Task_ContextMenu_FromFieldBag,
     [TMCASE_FROM_PARTY] = Task_ContextMenu_FromPartyGiveMenu,
     [TMCASE_FROM_SHOP] = Task_ContextMenu_FromSellMenu,
-    [TMCASE_FROM_PCBOX] = Task_ContextMenu_FromPokemonPC,
+    [TMCASE_FROM_ITEMPC] = Task_ContextMenu_Deposit,
 };
 
 enum
 {
     ACTION_USE,
-    ACTION_EXIT
+    ACTION_CANCEL
 };
 
 static const struct MenuAction sTMCaseMenuActions[] = 
 {
     [ACTION_USE] =  { gMenuText_Use,  TMCaseAction_Use },
-    [ACTION_EXIT] = { gText_MenuExit, TMCaseAction_Cancel },
+    [ACTION_CANCEL] = { gText_Cancel2, TMCaseAction_Cancel },
 };
 
 static const u8 sTMCaseMenuItems_Normal[] = {
     ACTION_USE, 
-    ACTION_EXIT
+    ACTION_CANCEL
 };
 
 static const u8 sTMCaseMenuItems_UnionRoom[] = {
-    ACTION_EXIT
+    ACTION_CANCEL
 };
 
 enum 
@@ -275,9 +275,9 @@ static const struct WindowTemplate sWindowTemplates[] = {
 
 static const struct WindowTemplate sContextWindowTemplate = {
     .bg = 1, 
-    .tilemapLeft = 24, 
+    .tilemapLeft = 23, 
     .tilemapTop = 15, 
-    .width = 5, 
+    .width = 6, 
     .height = 4, 
     .paletteNum = 4, 
     .baseBlock = 463
@@ -350,11 +350,11 @@ void OpenTMCase(u8 type, void (* callback)(void), u8 a2)
         sTMCaseMenu->scrollArrowsTask = TASK_NONE;
         sTMCaseMenu->newScreenCallback = NULL;
         if (type != TMCASE_REOPENING)
-            sTMCaseMenu->tmCaseMenuType = type;
+            sTMCasePosition.type = type;
         if (callback != NULL)
-            sTMCaseExitCallback = callback;
+            sTMCasePosition.exitCallback = callback;
         gTextFlags.autoScroll = FALSE;
-        SetMainCallback2(CB2_InitTMCase);
+        SetMainCallback2(CB2_SetupTMCase);
     }
 }
 
@@ -374,13 +374,13 @@ static void VBlankCB(void)
     TransferPlttBuffer();
 }
 
-static void CB2_InitTMCase(void)
+static void CB2_SetupTMCase(void)
 {
     while (1)
     {
         if (MenuHelpers_ShouldWaitForLinkRecv() == TRUE)
             break;
-        if (InitTMCase() == TRUE)
+        if (SetupTMCase() == TRUE)
             break;
         if (MenuHelpers_IsLinkActive() == TRUE)
             break;
@@ -390,7 +390,7 @@ static void CB2_InitTMCase(void)
 #define tListTaskId data[0]
 #define tListPosition data[1]
 
-static bool8 InitTMCase(void)
+static bool8 SetupTMCase(void)
 {
     u8 taskId;
 
@@ -427,7 +427,7 @@ static bool8 InitTMCase(void)
         gMain.state++;
         break;
     case 7:
-        InitTMCaseWindows();
+        SetupTMCaseWindows();
         gMain.state++;
         break;
     case 8:
@@ -439,9 +439,9 @@ static bool8 InitTMCase(void)
         gMain.state++;
         break;
     case 10:
-        TMCaseSetup_GetTMCount();
-        TMCaseSetup_InitListMenuPositions();
-        TMCaseSetup_UpdateVisualMenuOffset();
+        UpdateTMCaseItemList();
+        InitTMCaseListPositions();
+        InitTMCaseScrollPositions();
         gMain.state++;
         break;
     case 11:
@@ -458,8 +458,8 @@ static bool8 InitTMCase(void)
         gMain.state++;
         break;
     case 14:
-        taskId = CreateTask(Task_TMCaseHandleInput, 0);
-        gTasks[taskId].tListTaskId = ListMenuInit(&gMultiuseListMenuTemplate, sTMCaseMenu->scrollOffset, sTMCaseMenu->selectedRow);
+        taskId = CreateTask(Task_TMCase_HandleInput, 0);
+        gTasks[taskId].tListTaskId = ListMenuInit(&gMultiuseListMenuTemplate, sTMCasePosition.scrollOffset, sTMCasePosition.selectedRow);
         gMain.state++;
         break;
     case 15:
@@ -467,7 +467,7 @@ static bool8 InitTMCase(void)
         gMain.state++;
         break;
     case 16:
-        sTMCaseMenu->tmSpriteId = CreateDiscSprite(BagGetItemIdByPocketPosition(POCKET_TM_HM, sTMCaseMenu->scrollOffset + sTMCaseMenu->selectedRow));
+        sTMCaseMenu->tmSpriteId = CreateDiscSprite(BagGetItemIdByPocketPosition(POCKET_TM_HM, sTMCasePosition.scrollOffset + sTMCasePosition.selectedRow));
         gMain.state++;
         break;
     case 17:
@@ -616,8 +616,8 @@ static void TMCase_MoveCursorCallback(s32 itemIndex, bool8 onInit, struct ListMe
         PlaySE(SE_SELECT);
         SwapTMDiscInCase(sTMCaseMenu->tmSpriteId, itemId);
     }
-    PrintDescription(itemId);
-    PrintTMInfo(itemId);
+    PrintSelectedTMDescription(itemId);
+    PrintSelectedTMInfo(itemId);
 }
 
 static void TMCase_ItemPrintFunc(u8 windowId, u32 itemId, u8 y)
@@ -631,7 +631,7 @@ static void TMCase_ItemPrintFunc(u8 windowId, u32 itemId, u8 y)
     }
 }
 
-static void PrintDescription(s32 itemId)
+static void PrintSelectedTMDescription(s32 itemId)
 {
     const u8 *str = (itemId != ITEM_NONE) ? ItemId_GetDescription(itemId) : sText_TMCaseWillBePutAway;
     FillWindowPixelBuffer(WIN_DESCRIPTION, 0);
@@ -664,7 +664,7 @@ static void TMCase_PrintCursorAtPos(u8 y, u8 colorIdx)
 
 static void CreateTMCaseScrollIndicatorArrows(void)
 {
-    sTMCaseMenu->scrollArrowsTask = AddScrollIndicatorArrowPairParameterized(WIN_MSG, 0xA0, 0x08, 0x58, sTMCaseMenu->numTMs - sTMCaseMenu->numShownTMs + 1, 0x6E, 0x6E, &sTMCaseMenu->scrollOffset);
+    sTMCaseMenu->scrollArrowsTask = AddScrollIndicatorArrowPairParameterized(WIN_MSG, 0xA0, 0x08, 0x58, sTMCaseMenu->numTMs - sTMCaseMenu->numShownTMs + 1, 0x6E, 0x6E, &sTMCasePosition.scrollOffset);
 }
 
 static void RemoveTMCaseScrollIndicatorArrows(void)
@@ -678,11 +678,11 @@ static void RemoveTMCaseScrollIndicatorArrows(void)
 
 void ResetTMCaseCursorPos(void)
 {
-    sTMCaseMenu->selectedRow = 0;
-    sTMCaseMenu->scrollOffset = 0;
+    sTMCasePosition.selectedRow = 0;
+    sTMCasePosition.scrollOffset = 0;
 }
 
-static void TMCaseSetup_GetTMCount(void)
+static void UpdateTMCaseItemList(void)
 {
     struct BagPocket * pocket = &gBagPockets[POCKET_TM_HM - 1];
     u16 i;
@@ -699,31 +699,31 @@ static void TMCaseSetup_GetTMCount(void)
     sTMCaseMenu->numShownTMs = min(sTMCaseMenu->numTMs + 1, 5);
 }
 
-static void TMCaseSetup_InitListMenuPositions(void)
+static void InitTMCaseListPositions(void)
 {
-    if (sTMCaseMenu->scrollOffset != 0)
+    if (sTMCasePosition.scrollOffset != 0)
     {
-        if (sTMCaseMenu->scrollOffset + sTMCaseMenu->numShownTMs > sTMCaseMenu->numTMs + 1)
-            sTMCaseMenu->scrollOffset = sTMCaseMenu->numTMs + 1 - sTMCaseMenu->numShownTMs;
+        if (sTMCasePosition.scrollOffset + sTMCaseMenu->numShownTMs > sTMCaseMenu->numTMs + 1)
+            sTMCasePosition.scrollOffset = sTMCaseMenu->numTMs + 1 - sTMCaseMenu->numShownTMs;
     }
-    if (sTMCaseMenu->scrollOffset + sTMCaseMenu->selectedRow >= sTMCaseMenu->numTMs + 1)
+    if (sTMCasePosition.scrollOffset + sTMCasePosition.selectedRow >= sTMCaseMenu->numTMs + 1)
     {
         if (sTMCaseMenu->numTMs < 1)
-            sTMCaseMenu->selectedRow = 0;
+            sTMCasePosition.selectedRow = 0;
         else
-            sTMCaseMenu->selectedRow = sTMCaseMenu->numTMs;
+            sTMCasePosition.selectedRow = sTMCaseMenu->numTMs;
     }
 }
 
-static void TMCaseSetup_UpdateVisualMenuOffset(void)
+static void InitTMCaseScrollPositions(void)
 {
     u8 i;
-    if (sTMCaseMenu->selectedRow > 3)
+    if (sTMCasePosition.selectedRow > 3)
     {
-        for (i = 0; i <= sTMCaseMenu->selectedRow - 3 && sTMCaseMenu->scrollOffset + sTMCaseMenu->numShownTMs != sTMCaseMenu->numTMs + 1; i++)
+        for (i = 0; i <= sTMCasePosition.selectedRow - 3 && sTMCasePosition.scrollOffset + sTMCaseMenu->numShownTMs != sTMCaseMenu->numTMs + 1; i++)
         {
-            sTMCaseMenu->selectedRow--;
-            sTMCaseMenu->scrollOffset++;
+            sTMCasePosition.selectedRow--;
+            sTMCasePosition.scrollOffset++;
         }
     }
 }
@@ -751,11 +751,11 @@ static void Task_CloseTMCase(u8 taskId)
 
     if (!gPaletteFade.active)
     {
-        DestroyListMenuTask(tListTaskId, &sTMCaseMenu->scrollOffset, &sTMCaseMenu->selectedRow);
+        DestroyListMenuTask(tListTaskId, &sTMCasePosition.scrollOffset, &sTMCasePosition.selectedRow);
         if (sTMCaseMenu->newScreenCallback != NULL)
             SetMainCallback2(sTMCaseMenu->newScreenCallback);
-        else if (sTMCaseExitCallback)
-            SetMainCallback2(sTMCaseExitCallback);
+        else if (sTMCasePosition.exitCallback)
+            SetMainCallback2(sTMCasePosition.exitCallback);
         RemoveTMCaseScrollIndicatorArrows();
         FreeTMCaseBuffers();
         DestroyTask(taskId);
@@ -763,7 +763,7 @@ static void Task_CloseTMCase(u8 taskId)
 }
 
 
-static void Task_TMCaseHandleInput(u8 taskId)
+static void Task_TMCase_HandleInput(u8 taskId)
 {
     s16 *data = gTasks[taskId].data;
 
@@ -772,7 +772,7 @@ static void Task_TMCaseHandleInput(u8 taskId)
         if (MenuHelpers_ShouldWaitForLinkRecv() != TRUE)
         {
             s32 input = ListMenu_ProcessInput(tListTaskId);
-            ListMenuGetScrollAndRow(tListTaskId, &sTMCaseMenu->scrollOffset, &sTMCaseMenu->selectedRow);
+            ListMenuGetScrollAndRow(tListTaskId, &sTMCasePosition.scrollOffset, &sTMCasePosition.selectedRow);
 
             switch (input)
             {
@@ -790,7 +790,7 @@ static void Task_TMCaseHandleInput(u8 taskId)
                 TMCase_PrintCursor(tListTaskId, COLORID_CURSOR_SELECTED);
                 tListPosition = input;
                 gSpecialVar_ItemId = BagGetItemIdByPocketPosition(POCKET_TM_HM, input);
-                gTasks[taskId].func = sContextMenuFuncs[sTMCaseMenu->tmCaseMenuType];
+                gTasks[taskId].func = sContextMenuFuncs[sTMCasePosition.type];
                 break;
             }
         }
@@ -801,7 +801,7 @@ static void ReturnToTMCaseList(u8 taskId)
 {
     ShadeDescriptionWindow(FALSE);
     CreateTMCaseScrollIndicatorArrows();
-    gTasks[taskId].func = Task_TMCaseHandleInput;
+    gTasks[taskId].func = Task_TMCase_HandleInput;
 }
 
 static void Task_ContextMenu_FromFieldBag(u8 taskId)
@@ -831,10 +831,10 @@ static void Task_ContextMenu_FromFieldBag(u8 taskId)
     }
     ScheduleBgCopyTilemapToVram(0);
     ScheduleBgCopyTilemapToVram(1);
-    gTasks[taskId].func = Task_TMContext_HandleInput;
+    gTasks[taskId].func = Task_ContextMenu_HandleInput;
 }
 
-static void Task_TMContext_HandleInput(u8 taskId)
+static void Task_ContextMenu_HandleInput(u8 taskId)
 {
     s8 input;
 
@@ -902,8 +902,8 @@ static void CloseTMCaseMessage(u8 taskId)
 {
     s16 * data = gTasks[taskId].data;
 
-    DestroyListMenuTask(tListTaskId, &sTMCaseMenu->scrollOffset, &sTMCaseMenu->selectedRow);
-    tListTaskId = ListMenuInit(&gMultiuseListMenuTemplate, sTMCaseMenu->scrollOffset, sTMCaseMenu->selectedRow);
+    DestroyListMenuTask(tListTaskId, &sTMCasePosition.scrollOffset, &sTMCasePosition.selectedRow);
+    tListTaskId = ListMenuInit(&gMultiuseListMenuTemplate, sTMCasePosition.scrollOffset, sTMCasePosition.selectedRow);
     TMCase_PrintCursor(tListTaskId, COLORID_DARK);
     ClearDialogWindowAndFrameToTransparent(WIN_FIELD_MSG, FALSE);
     ClearWindowTilemap(WIN_FIELD_MSG);
@@ -940,7 +940,7 @@ static void Task_ContextMenu_FromPartyGiveMenu(u8 taskId)
     PrintItemCantBeHeld(taskId);
 }
 
-static void Task_ContextMenu_FromPokemonPC(u8 taskId)
+static void Task_ContextMenu_Deposit(u8 taskId)
 {
     PrintItemCantBeHeld(taskId);
 }
@@ -952,7 +952,7 @@ static void Task_ContextMenu_FromSellMenu(u8 taskId)
     TMCase_DisplayMessageWithCallback(taskId, FONT_NORMAL, gStringVar4, CloseTMCaseMessage);
 }
 
-static void InitTMCaseWindows(void)
+static void SetupTMCaseWindows(void)
 {
     u8 i;
 
@@ -1001,9 +1001,10 @@ static void Task_TMCase_WaitForMessage(u8 taskId)
 
 static void TMCase_DisplayMessageWithCallback(u8 taskId, u8 fontId, const u8 *str, TaskFunc callback)
 {
-    DrawDialogFrameWithCustomTileAndPalette(WIN_FIELD_MSG, FALSE, 100, 4);
-    TMCase_Print(WIN_FIELD_MSG, FONT_SHORT, str, 0, 1, 1, 1, GetPlayerTextSpeedDelay(), COLORID_DARK);
-    SetTaskFuncWithFollowupFunc(taskId, Task_TMCase_WaitForMessage, callback);
+    DisplayMessageAndContinueTask(taskId, WIN_FIELD_MSG, 100, 4, FONT_SHORT, GetPlayerTextSpeedDelay(), str, callback);
+    // DrawDialogFrameWithCustomTileAndPalette(WIN_FIELD_MSG, FALSE, 100, 4);
+    // TMCase_Print(WIN_FIELD_MSG, FONT_SHORT, str, 0, 1, 1, 1, GetPlayerTextSpeedDelay(), COLORID_DARK);
+    // SetTaskFuncWithFollowupFunc(taskId, Task_TMCase_WaitForMessage, callback);
     ScheduleBgCopyTilemapToVram(1);
 }
 
@@ -1023,7 +1024,7 @@ static void DrawMoveInfoUIMarkers(void)
     CopyWindowToVram(WIN_UI_MARKERS, COPYWIN_GFX);
 }
 
-static void PrintTMInfo(u16 itemId)
+static void PrintSelectedTMInfo(u16 itemId)
 {
     u8 i;
     u16 move;

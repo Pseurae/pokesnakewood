@@ -1,13 +1,19 @@
 #ifndef GUARD_TM_CASE_H
 #define GUARD_TM_CASE_H
 
-struct TMCaseMenu
+enum TMCaseType
+{
+    TMCASE_FROM_FIELD,
+    TMCASE_FROM_PARTY,
+    TMCASE_FROM_SHOP,
+    TMCASE_FROM_ITEMPC,
+    TMCASE_REOPENING
+};
+
+struct TMCase
 {
     void (*newScreenCallback)(void);
     u8 tilemapBuffer[BG_SCREEN_SIZE];
-    u8 tmCaseMenuType;
-    u16 selectedRow;
-    u16 scrollOffset;
     u8 tmSpriteId;
     u8 numShownTMs;
     u8 numTMs;
@@ -18,13 +24,12 @@ struct TMCaseMenu
     s16 graphicsLoadState;
 };
 
-enum TMCaseType
+struct TMCasePosition
 {
-    TMCASE_FROM_FIELD,
-    TMCASE_FROM_PARTY,
-    TMCASE_FROM_SHOP,
-    TMCASE_FROM_PCBOX,
-    TMCASE_REOPENING
+    void (*exitCallback)(void);
+    u8 type;
+    u16 selectedRow;
+    u16 scrollOffset;
 };
 
 void OpenTMCase(u8 type, void (* exitCallback)(void), u8 a2);

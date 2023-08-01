@@ -202,6 +202,12 @@ void AddTextPrinterForMessage_2(bool8 allowSkippingDelayWithButtonPress)
     AddTextPrinterParameterized2(0, FONT_SHORT, gStringVar4, GetPlayerTextSpeedDelay(), NULL, TEXT_COLOR_DARK_GRAY, TEXT_COLOR_WHITE, TEXT_COLOR_LIGHT_GRAY);
 }
 
+void AddTextPrinterForMessage_3(u8 windowId, bool8 allowSkippingDelayWithButtonPress)
+{
+    gTextFlags.canABSpeedUpPrint = allowSkippingDelayWithButtonPress;
+    AddTextPrinterParameterized2(windowId, FONT_SHORT, gStringVar4, GetPlayerTextSpeedDelay(), NULL, TEXT_COLOR_DARK_GRAY, TEXT_COLOR_WHITE, TEXT_COLOR_LIGHT_GRAY);
+}
+
 void AddTextPrinterForMessageWithTextColor(bool8 allowSkippingDelayWithButtonPress)
 {
     gTextFlags.canABSpeedUpPrint = allowSkippingDelayWithButtonPress;

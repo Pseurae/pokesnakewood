@@ -129,7 +129,7 @@ void DisplayMessageAndContinueTask(u8 taskId, u8 windowId, u16 tileNum, u8 palet
     if (string != gStringVar4)
         StringExpandPlaceholders(gStringVar4, string);
 
-    AddTextPrinterForMessage(TRUE);
+    AddTextPrinterForMessage_3(windowId, TRUE);
     sMessageNextTask = taskFunc;
     gTasks[taskId].func = Task_ContinueTaskAfterMessagePrints;
 }
