@@ -18,12 +18,13 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#include <cstdio>
-#include <cstdlib>
+#include <stdio.h>
+#include <stdlib.h>
 #include <list>
 #include <queue>
 #include <set>
 #include <string>
+#include <fstream>
 #include "scaninc.h"
 #include "source_file.h"
 
@@ -38,7 +39,7 @@ bool CanOpenFile(std::string path)
     return true;
 }
 
-const char *const USAGE = "Usage: scaninc [-I INCLUDE_PATH] FILE_PATH\n";
+const char *const USAGE = "Usage: scaninc [-I INCLUDE_PATH] [-M OUTPUT_FILE_PATH OBJECT_FILE_PATH] FILE_PATH\n";
 
 int main(int argc, char **argv)
 {
@@ -46,6 +47,7 @@ int main(int argc, char **argv)
     std::set<std::string> dependencies;
 
     std::vector<std::string> includeDirs;
+    std::string outputPath, objPath;
 
     argc--;
     argv++;
@@ -67,6 +69,19 @@ int main(int argc, char **argv)
                 includeDir += '/';
             }
             includeDirs.push_back(includeDir);
+        }
+        else if (arg.substr(0, 2) == "-M")
+        {
+            if (outputPath.empty())
+            {
+                argc -= 2;
+                outputPath = std::string(*(++argv));
+                objPath = std::string(*(++argv));
+            }
+            else
+            {
+                FATAL_ERROR("More than one output file specified.\n");
+            }
         }
         else
         {
@@ -121,8 +136,23 @@ int main(int argc, char **argv)
         includeDirs.pop_back();
     }
 
-    for (const std::string &path : dependencies)
+    if (outputPath.empty())
     {
-        std::printf("%s\n", path.c_str());
+        for (const std::string &path : dependencies)
+        {
+            std::printf("%s\n", path.c_str());
+        }
+    }
+    else
+    {
+        std::ofstream f(outputPath);
+
+        f << objPath << " : ";
+        for (const std::string &path : dependencies)
+            f << path << " ";
+        
+        f << std::endl;
+
+        f.close();
     }
 }
