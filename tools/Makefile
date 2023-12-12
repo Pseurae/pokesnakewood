@@ -1,4 +1,4 @@
-MAKEFLAGS += --no-print-directory
+MAKEFLAGS := --no-print-directory
 
 TOOLDIRS := $(filter-out agbcc poryscript binutils Makefile, $(wildcard *))
 
@@ -14,7 +14,8 @@ poryscript:
 	@cd ../..
 
 poryscript_clean:
-	@cd poryscript && rm -rf poryscript poryscript.exe
+	@cd poryscript && $(RM) poryscript poryscript.exe
+	@echo "$(RM) poryscript poryscript.exe"
 
 clean: poryscript_clean
 	@$(foreach tooldir,$(TOOLDIRS),$(MAKE) clean -C $(tooldir);)

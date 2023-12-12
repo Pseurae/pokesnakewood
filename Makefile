@@ -158,8 +158,13 @@ infoshell = $(foreach line, $(shell $1 | sed "s/ /__SPACE__/g"), $(info $(subst 
 # Disable dependency scanning for clean/tidy/tools
 # Use a separate minimal makefile for speed
 # Since we don't need to reload most of this makefile
+
+define CALL_TOOLMAKE
+$(call infoshell, $(MAKE) $(MAKEFLAGS) -C tools $1)
+endef
+
 ifeq (,$(filter-out all rom compare modern libagbsyscall syms,$(MAKECMDGOALS)))
-$(call infoshell, $(MAKE) -C tools)
+$(call CALL_TOOLMAKE)
 else
 NODEP ?= 1
 endif
@@ -215,7 +220,7 @@ AUTO_GEN_TARGETS :=
 all: rom
 
 tools:
-	@$(call infoshell, $(MAKE) -C tools)
+	@$(call CALL_TOOLMAKE)
 	@:
 
 syms: $(SYM)
@@ -231,7 +236,7 @@ compare: all
 clean: mostlyclean clean-tools
 
 clean-tools:
-	@$(call infoshell, $(MAKE) -C tools clean)
+	@$(call CALL_TOOLMAKE, clean)
 	@:
 
 mostlyclean: tidynonmodern tidymodern
@@ -425,7 +430,7 @@ $(OBJ_DIR)/ld_script.ld: $(LD_SCRIPT) $(LD_SCRIPT_DEPS)
 LDFLAGS = -Map ../../$(MAP)
 $(ELF): $(OBJ_DIR)/ld_script.ld $(OBJS) libagbsyscall
 	@echo "cd $(OBJ_DIR) && $(LD) $(LDFLAGS) -T ld_script.ld -o ../../$@ <objects> <lib>"
-	@cd $(OBJ_DIR) && $(LD) $(LDFLAGS) -T ld_script.ld -o ../../$@ $(OBJS_REL) $(LIB) | cat
+	@cd $(OBJ_DIR) && $(LD) $(LDFLAGS) -T ld_script.ld --no-warn-rwx-segment --print-memory-usage -o ../../$@ $(OBJS_REL) $(LIB) | cat
 	$(FIX) $@ -t"$(TITLE)" -c$(GAME_CODE) -m$(MAKER_CODE) -r$(REVISION) --silent
 
 $(ROM): $(ELF)

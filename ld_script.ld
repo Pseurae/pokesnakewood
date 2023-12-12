@@ -1324,16 +1324,11 @@ SECTIONS {
         src/graphics.o(.rodata);
     } > ROM =0
 
-    extra_text :
+    extra :
     ALIGN(4)
     {
         src/*.o(.text);
         gflib/*.o(.text);
-    } = 0
-
-    extra_rodata :
-    ALIGN(4)
-    {
         src/*.o(.rodata);
         gflib/*.o(.rodata);
         data/*.o(.rodata);
