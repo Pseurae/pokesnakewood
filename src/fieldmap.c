@@ -30,7 +30,7 @@ EWRAM_DATA static u16 ALIGNED(4) sBackupMapData[MAX_MAP_DATA_SIZE] = {0};
 EWRAM_DATA struct MapHeader gMapHeader = {0};
 EWRAM_DATA struct Camera gCamera = {0};
 EWRAM_DATA static struct ConnectionFlags sMapConnectionFlags = {0};
-EWRAM_DATA static u32 sFiller = 0; // without this, the next file won't align properly
+EWRAM_DATA static u32 UNUSED sFiller = 0; // without this, the next file won't align properly
 EWRAM_DATA u8 gFieldTintMode = 0;
 
 struct BackupMapLayout gBackupMapLayout;
@@ -801,8 +801,7 @@ void GetCameraFocusCoords(u16 *x, u16 *y)
     *y = gSaveBlock1Ptr->pos.y + MAP_OFFSET;
 }
 
-// Unused
-static void SetCameraCoords(u16 x, u16 y)
+static void UNUSED SetCameraCoords(u16 x, u16 y)
 {
     gSaveBlock1Ptr->pos.x = x;
     gSaveBlock1Ptr->pos.y = y;

@@ -1,3 +1,4 @@
+MAKEFLAGS += --no-print-directory
 
 TOOLDIRS := $(filter-out agbcc poryscript binutils Makefile, $(wildcard *))
 
