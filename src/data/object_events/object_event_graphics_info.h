@@ -285,7 +285,7 @@ const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Boy3 = {
 
 const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Girl3 = {
     .tileTag = TAG_NONE,
-    .paletteTag = OBJ_EVENT_PAL_TAG_NPC_4,
+    .paletteTag = OBJ_EVENT_PAL_TAG_NPC_2,
     .textColor = NPC_TEXT_COLOR_FEMALE,
     .size = 256,
     .width = 16,
@@ -931,7 +931,7 @@ const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Lass = {
 
 const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Gentleman = {
     .tileTag = TAG_NONE,
-    .paletteTag = OBJ_EVENT_PAL_TAG_NPC_4,
+    .paletteTag = OBJ_EVENT_PAL_TAG_NPC_3,
     .textColor = NPC_TEXT_COLOR_MALE,
     .size = 256,
     .width = 16,
@@ -1216,7 +1216,7 @@ const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_BerryTreeLateStage
 
 const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_ProfBirch = {
     .tileTag = TAG_NONE,
-    .paletteTag = OBJ_EVENT_PAL_TAG_NPC_4,
+    .paletteTag = OBJ_EVENT_PAL_TAG_NPC_3,
     .textColor = NPC_TEXT_COLOR_MALE,
     .size = 256,
     .width = 16,
@@ -1577,7 +1577,7 @@ const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_CuttableTree = {
 
 const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_MartEmployee = {
     .tileTag = TAG_NONE,
-    .paletteTag = OBJ_EVENT_PAL_TAG_NPC_4,
+    .paletteTag = OBJ_EVENT_PAL_TAG_NPC_1,
     .textColor = NPC_TEXT_COLOR_MALE,
     .size = 256,
     .width = 16,
