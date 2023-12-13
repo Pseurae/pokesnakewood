@@ -279,6 +279,7 @@ static const struct ListMenuTemplate sItemListMenu =
 
 static const struct MenuAction sItemMenuActions[] = {
     [ACTION_USE]               = {gMenuText_Use,      {ItemMenu_UseOutOfBattle}},
+    [ACTION_OPEN]              = {gMenuText_Open,     {ItemMenu_UseOutOfBattle}},
     [ACTION_TOSS]              = {gMenuText_Toss,     {ItemMenu_Toss}},
     [ACTION_REGISTER]          = {gMenuText_Register, {ItemMenu_Register}},
     [ACTION_GIVE]              = {gMenuText_Give,     {ItemMenu_Give}},
