@@ -412,7 +412,10 @@ endif
 
 ifeq ($(NODEP),1)
 # Make sure map scripts get updated on a NODEP build
-$(OBJ_DIR)/$(DATA_ASM_SUBDIR)/event_scripts.o: $(DATA_ASM_SUBDIR)/event_scripts.s $(shell $(SCANINC) -I include -I "" $(DATA_ASM_SUBDIR)/event_scripts.s)
+$(OBJ_DIR)/$(DATA_ASM_SUBDIR)/event_scripts.d: $(DATA_ASM_SUBDIR)/event_scripts.s
+	$(SCANINC) -I include -I "" -M $@ $(OBJ_DIR)/$(DATA_ASM_SUBDIR)/event_scripts.o $(DATA_ASM_SUBDIR)/event_scripts.s
+
+$(OBJ_DIR)/$(DATA_ASM_SUBDIR)/event_scripts.o: $(DATA_ASM_SUBDIR)/event_scripts.s $(OBJ_DIR)/$(DATA_ASM_SUBDIR)/event_scripts.d
 	$(PREPROC) $< charmap.txt | $(CPP) -I include - | $(AS) $(ASFLAGS) -o $@
 
 $(DATA_ASM_BUILDDIR)/%.o: $(DATA_ASM_SUBDIR)/%.s
