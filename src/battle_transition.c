@@ -3990,6 +3990,8 @@ static bool8 TransitionIntro_FadeToGray(struct Task *task)
 {
     if (task->tDelayTimer == 0 || --task->tDelayTimer == 0)
     {
+        SetGpuReg(REG_OFFSET_BLDCNT, GetGpuReg(REG_OFFSET_BLDCNT) & ~BLDCNT_TGT2_BG_ALL);
+
         task->tDelayTimer = task->tFadeToGrayDelay;
         task->tBlend += task->tFadeToGrayIncrement;
         if (task->tBlend > 16)
@@ -3999,8 +4001,6 @@ static bool8 TransitionIntro_FadeToGray(struct Task *task)
     if (task->tBlend >= 16)
     {
         // Fade to gray complete, start fade back
-        task->tOldBldClt = GetGpuReg(REG_OFFSET_BLDCNT);
-        SetGpuReg(REG_OFFSET_BLDCNT, task->tOldBldClt & ~BLDCNT_TGT2_BG_ALL);
         task->tState++;
         task->tDelayTimer = task->tFadeFromGrayDelay;
     }
@@ -4016,7 +4016,6 @@ static bool8 TransitionIntro_FadeFromGray(struct Task *task)
         if (task->tBlend < 0)
             task->tBlend = 0;
         BlendPalettes(PALETTES_ALL, task->tBlend, RGB(11, 11, 11));
-        SetGpuReg(REG_OFFSET_BLDCNT, task->tOldBldClt);
     }
     if (task->tBlend == 0)
     {
