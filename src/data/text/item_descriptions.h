@@ -759,6 +759,14 @@ static const u8 sStickDesc[] = _(
     "A hold item that raises\n"
     "Farfetch'd's critical-hit ratio.");
 
+static const u8 sResistanceBadgeDesc[] = _(
+    "A badge given out to members of the\n"
+    "Resistance.");
+
+static const u8 sPokePhoneDesc[] = _(
+    "A futuristic phone given to you by\n"
+    "Prof. Birch.");
+
 static const u8 sRedScarfDesc[] = _(
     "A hold item that raises Cool in\n"
     "Contests.");

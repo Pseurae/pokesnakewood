@@ -1050,6 +1050,7 @@ Common_EventScript_LegendaryFlewAway::
 	.include "data/text/battle_dome.inc"
 	.include "data/scripts/battle_pike.inc"
 	.include "data/text/blend_master.inc"
+	.include "data/text/blissed_trainer.inc"
 	.include "data/text/battle_tent.inc"
 	.include "data/text/event_ticket_2.inc"
 	.include "data/text/move_tutors.inc"

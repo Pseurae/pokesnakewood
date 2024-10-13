@@ -160,6 +160,9 @@ const u32 gTrainerPalette_PokefanF[] = INCBIN_U32("graphics/trainers/front_pics/
 const u32 gTrainerFrontPic_Youngster[] = INCBIN_U32("graphics/trainers/front_pics/youngster.4bpp.lz");
 const u32 gTrainerPalette_Youngster[] = INCBIN_U32("graphics/trainers/front_pics/youngster.gbapal.lz");
 
+const u32 gTrainerFrontPic_YoungsterBlissed[] = INCBIN_U32("graphics/trainers/front_pics/youngster_blissed.4bpp.lz");
+const u32 gTrainerPalette_YoungsterBlissed[] = INCBIN_U32("graphics/trainers/front_pics/youngster_blissed.gbapal.lz");
+
 const u32 gTrainerFrontPic_ChampionWallace[] = INCBIN_U32("graphics/trainers/front_pics/champion_wallace.4bpp.lz");
 const u32 gTrainerPalette_ChampionWallace[] = INCBIN_U32("graphics/trainers/front_pics/champion_wallace.gbapal.lz");
 
@@ -220,6 +223,9 @@ const u32 gTrainerPalette_May[] = INCBIN_U32("graphics/trainers/palettes/may.gba
 const u32 gTrainerFrontPic_BugCatcher[] = INCBIN_U32("graphics/trainers/front_pics/bug_catcher.4bpp.lz");
 const u32 gTrainerPalette_BugCatcher[] = INCBIN_U32("graphics/trainers/front_pics/bug_catcher.gbapal.lz");
 
+const u32 gTrainerFrontPic_BugCatcherBlissed[] = INCBIN_U32("graphics/trainers/front_pics/bug_catcher_blissed.4bpp.lz");
+const u32 gTrainerPalette_BugCatcherBlissed[] = INCBIN_U32("graphics/trainers/front_pics/bug_catcher_blissed.gbapal.lz");
+
 const u32 gTrainerFrontPic_PokemonRangerM[] = INCBIN_U32("graphics/trainers/front_pics/pokemon_ranger_m.4bpp.lz");
 const u32 gTrainerPalette_PokemonRangerM[] = INCBIN_U32("graphics/trainers/front_pics/pokemon_ranger_m.gbapal.lz");
 
@@ -231,6 +237,9 @@ const u32 gTrainerPalette_MagmaLeaderMaxie[] = INCBIN_U32("graphics/trainers/fro
 
 const u32 gTrainerFrontPic_Lass[] = INCBIN_U32("graphics/trainers/front_pics/lass.4bpp.lz");
 const u32 gTrainerPalette_Lass[] = INCBIN_U32("graphics/trainers/front_pics/lass.gbapal.lz");
+
+const u32 gTrainerFrontPic_LassBlissed[] = INCBIN_U32("graphics/trainers/front_pics/lass_blissed.4bpp.lz");
+const u32 gTrainerPalette_LassBlissed[] = INCBIN_U32("graphics/trainers/front_pics/lass_blissed.gbapal.lz");
 
 const u32 gTrainerFrontPic_YoungCouple[] = INCBIN_U32("graphics/trainers/front_pics/young_couple.4bpp.lz");
 const u32 gTrainerPalette_YoungCouple[] = INCBIN_U32("graphics/trainers/front_pics/young_couple.gbapal.lz");

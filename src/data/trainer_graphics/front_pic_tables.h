@@ -93,6 +93,9 @@ const struct MonCoords gTrainerFrontPicCoords[] =
     [TRAINER_PIC_LEAF] = {.size = 8, .y_offset = 1},
     [TRAINER_PIC_RS_BRENDAN] = {.size = 8, .y_offset = 1},
     [TRAINER_PIC_RS_MAY] = {.size = 8, .y_offset = 1},
+    [TRAINER_PIC_LASS_BLISSED] = {.size = 8, .y_offset = 1},
+    [TRAINER_PIC_YOUNGSTER_BLISSED] = {.size = 8, .y_offset = 1},
+    [TRAINER_PIC_BUG_CATCHER_BLISSED] = {.size = 8, .y_offset = 1},
 };
 
 #define TRAINER_SPRITE(trainerPic, sprite, size) [TRAINER_PIC_##trainerPic] = {sprite, size, TRAINER_PIC_##trainerPic}
@@ -192,6 +195,9 @@ const struct CompressedSpriteSheet gTrainerFrontPicTable[] =
     TRAINER_SPRITE(LEAF, gTrainerFrontPic_Leaf, TRAINER_PIC_SIZE),
     TRAINER_SPRITE(RS_BRENDAN, gTrainerFrontPic_RubySapphireBrendan, TRAINER_PIC_SIZE),
     TRAINER_SPRITE(RS_MAY, gTrainerFrontPic_RubySapphireMay, TRAINER_PIC_SIZE),
+    TRAINER_SPRITE(LASS_BLISSED, gTrainerFrontPic_LassBlissed, TRAINER_PIC_SIZE),
+    TRAINER_SPRITE(YOUNGSTER_BLISSED, gTrainerFrontPic_YoungsterBlissed, TRAINER_PIC_SIZE),
+    TRAINER_SPRITE(BUG_CATCHER_BLISSED, gTrainerFrontPic_BugCatcherBlissed, TRAINER_PIC_SIZE),
 };
 
 #define TRAINER_PAL(trainerPic, pal) [TRAINER_PIC_##trainerPic] = {pal, TRAINER_PIC_##trainerPic}
@@ -291,4 +297,7 @@ const struct CompressedSpritePalette gTrainerFrontPicPaletteTable[] =
     TRAINER_PAL(LEAF, gTrainerPalette_Leaf),
     TRAINER_PAL(RS_BRENDAN, gTrainerPalette_RubySapphireBrendan),
     TRAINER_PAL(RS_MAY, gTrainerPalette_RubySapphireMay),
+    TRAINER_PAL(LASS_BLISSED, gTrainerPalette_LassBlissed),
+    TRAINER_PAL(YOUNGSTER_BLISSED, gTrainerPalette_YoungsterBlissed),
+    TRAINER_PAL(BUG_CATCHER_BLISSED, gTrainerPalette_BugCatcherBlissed),
 };

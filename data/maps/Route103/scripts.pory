@@ -4,31 +4,30 @@ mapscripts Route103_MapScripts {
 }
 
 script Route103_EventScript_ProfBirch {
-	msgbox(Route103_Text_ProfBirch1, MSGBOX_NPC)
+	lock
+	faceplayer
+	msgbox(Route103_Text_ProfBirch1)
 	giveegg(SPECIES_TOGEPI)
-	msgbox("{COLOR DARK_GRAY}{PLAYER} received the {COLOR GREEN}egg{COLOR DARK_GRAY}.", MSGBOX_NPC)
-	msgbox(Route103_Text_ProfBirch2, MSGBOX_NPC)
+	msgbox("{COLOR DARK_GRAY}{PLAYER} received the {COLOR GREEN}egg{COLOR DARK_GRAY}.")
+	msgbox(Route103_Text_ProfBirch2)
 
-	msgbox(format("So, will you go?"), MSGBOX_YESNO)
-
-	while (var(VAR_RESULT) == NO)
-	{
-		msgbox(format(
-			"This is the only chance we've got at surviving this!\p"
-			"I know its too much to ask, you're the only person I can count on to do this."), MSGBOX_DEFAULT)
-		msgbox(format(
-			"So, will you go?"), MSGBOX_YESNO)
-	}
-
-	msgbox(Route103_Text_ProfBirch3, MSGBOX_NPC)
+	msgbox(Route103_Text_ProfBirch3)
+	giveitem(ITEM_RESISTANCE_BADGE, 1)
+	giveitem(ITEM_POKEPHONE, 1)
 	msgbox(format(
-		"{COLOR DARK_GRAY}Prof. Birch:{COLOR BLUE} Alright, {PLAYER}! I'll see you around."), MSGBOX_NPC)
+		"{COLOR DARK_GRAY}Prof. Birch:{COLOR BLUE} That badge carries the symbol of the Resistance.\p"
+		"If you carry it with you, people will trust you more.\p"
+		"Also, I'll use that PokéPhone to contact you if anything comes up."
+	))
+	msgbox(format(
+		"{COLOR DARK_GRAY}Prof. Birch:{COLOR BLUE} Alright then, {PLAYER}! I'll see you around."), MSGBOX_NPC)
 
 	fadescreen(FADE_TO_BLACK)
 	setflag(FLAG_ADVENTURE_STARTED)
 	setflag(FLAG_HIDE_ROUTE_103_RIVAL)
 	removeobject(LOCALID_BIRCH)
 	fadescreen(FADE_FROM_BLACK)
+	release
 	end
 }
 
@@ -46,21 +45,27 @@ text Route103_Text_ProfBirch1 {
 text Route103_Text_ProfBirch2 {
 	format(
 		"{COLOR DARK_GRAY}Prof. Birch:{COLOR BLUE} That's only one of the reasons I brought you here.\p"
-		"I also wanted to talk to you about the zombie invasion.\p"
-		"You probably don't remember yet, but three years ago, {COLOR GREEN}your brother{COLOR BLUE} was crowned the Champion of Hoenn.\p"
-		"Few weeks ago, he and {COLOR GREEN}May{COLOR BLUE} set off to find the source of the infection.\p"
-		"I haven't heard hide or hair of them since the last two weeks.\p"
-		"They're the strongest trainers in the region, so I'm not particularly worried about their safety.\p"
-		"But, you can't be too sure nowadays with all the monsters running rampant."
+		"I also wanted to talk to you about the our current situation.\p"
+		"You wouldn't remember this yet, but 4 years ago a certain group calling themselves the Unification, popped up in Hoenn.\p"
+		"Their goal was to... ehem... 'revert humanity back to how it was before technology'.\p"
+		"Naturally, no one took them seriously.\p"
+		"But, soon enough the cult started experimenting on Pokemon and developed a pathogen which created the monsters that we know now.\p"
+		"The then Hoenn champion, Brendan and his friend, Wally created the Resistance, a group dedicated to keeping order and ensuring the welfare of the people.\p"
+		"We both are part of the Resistance and you were in Littleroot Town as part of an assignment to scout it for survivors when Brendan's old house collapsed on you.\p"
+		"Now, since you're fit to go back in action, I'll be the one in charge of your duties.\p"
+		"As for your current assignment...\p"
+		"It seems that the network uplink in Dewford Town is faulty.\p"
+		"We need you to go fix it.\pSince its an island, the only way to properly stay in contact with them is through the network.\p"
+		"Time is of the essence, {PLAYER}. If their uplink fails completely, it is going to cost us more resources to fix."
 	)
 }
 
 text Route103_Text_ProfBirch3 {
 	format(
-		"You should head towards {COLOR GREEN}Petalburg City{COLOR BLUE}.\n"
-		"There may be survivors that may have seen where they went.\p"
-		"Meanwhile, I'll try to repurpose the PC network to contact other survivors.\p"
-		"Also, have this."
+		"You should head towards {COLOR GREEN}Petalburg City{COLOR BLUE}, to {COLOR GREEN}Route 104{COLOR BLUE}.\p"
+		"There should be a cottage where {COLOR GREEN}Mr. Briney{COLOR BLUE} lives. He's a retired navyperson who gave rides to trainers from Route 104 to Dewford Town.\p"
+		"Get him to drop you off at {COLOR GREEN}Dewford Town{COLOR BLUE}, and fix the uplink issue.\p"
+		"Here, have these too."
 	)
 }
 

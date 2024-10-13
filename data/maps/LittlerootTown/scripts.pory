@@ -3,6 +3,35 @@ mapscripts LittlerootTown_MapScripts {
 		setflag(FLAG_VISITED_LITTLEROOT_TOWN)
 		end
 	}
+	MAP_SCRIPT_ON_FRAME_TABLE [
+		VAR_LITTLEROOT_INTRO_STATE, 0 {
+			lockall
+			msgbox(format("{PLAYER}: {PLAYER_COLOR}Ugh...\pI think I hit my head..."), MSGBOX_AUTOCLOSE)
+			applymovement(0xFF, LittlerootTown_LookAround)
+			waitmovement(0xFF)
+			msgbox(format("{PLAYER}: {PLAYER_COLOR}Where am I?"), MSGBOX_AUTOCLOSE)
+			setvar(VAR_LITTLEROOT_INTRO_STATE, 1)
+			releaseall
+		}
+	]
+}
+
+movement LittlerootTown_LookAround {
+	face_left
+	delay_16
+	delay_16
+	delay_16
+	delay_16
+	face_right
+	delay_16
+	delay_16
+	delay_16
+	delay_16
+	delay_4
+	face_down
+	delay_16
+	delay_16
+	step_end
 }
 
 script LittlerootTown_EventScript_BirchsLabSign {
@@ -11,7 +40,7 @@ script LittlerootTown_EventScript_BirchsLabSign {
 }
 
 script LittlerootTown_EventScript_BrendansHouseSign {
-	msgbox("{PLAYER}'s House", MSGBOX_SIGN)
+	msgbox("Brendan's House", MSGBOX_SIGN)
 	end
 }
 
@@ -36,6 +65,7 @@ script LittlerootTown_EventScript_BirchsBag {
 	setflag(FLAG_SYS_POKEMON_GET)
 	fadescreen(FADE_TO_BLACK)
 	special(ChooseStarter)
+	setvar(VAR_LITTLEROOT_INTRO_STATE, 2)
 	waitstate
 	release
 	end
@@ -43,11 +73,9 @@ script LittlerootTown_EventScript_BirchsBag {
 
 script LittlerootTown_EventScript_WalkBackFromRoute {
 	lock
-	if (!flag(FLAG_SYS_POKEMON_GET)) {
-		msgbox(format("I may not remember much, but I do remember that there are wild Pokemon in the grass!\pIt isn't safe without a Pokemon of my own."), MSGBOX_NPC)
-		applymovement(OBJ_EVENT_ID_PLAYER, LittlerootTown_Movement_WalkBackFromRoute)
-		waitmovement(0)
-	}
+	msgbox(format("It isn't safe in the tall grass without a Pokemon of my own."), MSGBOX_AUTOCLOSE)
+	applymovement(OBJ_EVENT_ID_PLAYER, LittlerootTown_Movement_WalkBackFromRoute)
+	waitmovement(0)
 	release
 	end
 }

@@ -3363,9 +3363,9 @@ const struct Trainer gTrainers[] = {
 
     [TRAINER_KAREN_1] =
     {
-        .trainerClass = TRAINER_CLASS_SCHOOL_KID,
+        .trainerClass = TRAINER_CLASS_BLISSED,
         .encounterMusic_gender = F_TRAINER_FEMALE | TRAINER_ENCOUNTER_MUSIC_GIRL,
-        .trainerPic = TRAINER_PIC_SCHOOL_KID_F,
+        .trainerPic = TRAINER_PIC_LASS_BLISSED,
         .trainerName = _("Karen"),
         .items = {},
         .doubleBattle = FALSE,
@@ -3819,9 +3819,9 @@ const struct Trainer gTrainers[] = {
 
     [TRAINER_CALVIN_1] =
     {
-        .trainerClass = TRAINER_CLASS_YOUNGSTER,
+        .trainerClass = TRAINER_CLASS_BLISSED,
         .encounterMusic_gender = TRAINER_ENCOUNTER_MUSIC_MALE,
-        .trainerPic = TRAINER_PIC_YOUNGSTER,
+        .trainerPic = TRAINER_PIC_YOUNGSTER_BLISSED,
         .trainerName = _("Calvin"),
         .items = {},
         .doubleBattle = FALSE,
@@ -3999,7 +3999,7 @@ const struct Trainer gTrainers[] = {
 
     [TRAINER_ALLEN] =
     {
-        .trainerClass = TRAINER_CLASS_YOUNGSTER,
+        .trainerClass = TRAINER_CLASS_BLISSED,
         .encounterMusic_gender = TRAINER_ENCOUNTER_MUSIC_MALE,
         .trainerPic = TRAINER_PIC_YOUNGSTER,
         .trainerName = _("Allen"),
@@ -7239,9 +7239,9 @@ const struct Trainer gTrainers[] = {
 
     [TRAINER_TIANA] =
     {
-        .trainerClass = TRAINER_CLASS_LASS,
+        .trainerClass = TRAINER_CLASS_BLISSED,
         .encounterMusic_gender = F_TRAINER_FEMALE | TRAINER_ENCOUNTER_MUSIC_FEMALE,
-        .trainerPic = TRAINER_PIC_LASS,
+        .trainerPic = TRAINER_PIC_LASS_BLISSED,
         .trainerName = _("Tiana"),
         .items = {},
         .doubleBattle = FALSE,
@@ -7383,9 +7383,9 @@ const struct Trainer gTrainers[] = {
 
     [TRAINER_RICK] =
     {
-        .trainerClass = TRAINER_CLASS_BUG_CATCHER,
+        .trainerClass = TRAINER_CLASS_BLISSED,
         .encounterMusic_gender = TRAINER_ENCOUNTER_MUSIC_MALE,
-        .trainerPic = TRAINER_PIC_BUG_CATCHER,
+        .trainerPic = TRAINER_PIC_BUG_CATCHER_BLISSED,
         .trainerName = _("Rick"),
         .items = {},
         .doubleBattle = FALSE,
